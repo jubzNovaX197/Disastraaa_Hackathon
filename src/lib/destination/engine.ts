@@ -24,6 +24,7 @@ import { demoAlerts } from '@/data/demo/alerts';
 import { demoShelters } from '@/data/demo/shelters';
 import { demoRoadSegments } from '@/data/demo/roads';
 import { demoHistoricalEvents } from '@/data/demo/historicalEvents';
+import type { HistoricalDisasterEvent } from '@/lib/historical/types';
 import { computedMultiHazardRisks } from '@/data/demo/computedMultiHazardRisks';
 import { DEMO_SCENARIOS, demoScenarioProvider } from './scenarios';
 import type {
@@ -427,11 +428,13 @@ function evaluateShelterAvailability(
 
 function evaluateHistoricalContext(
   coords: LngLat,
+  historicalEvents: HistoricalDisasterEvent[],
+  isReal: boolean = false,
 ): { factor: DestinationRiskFactor; context: DestinationSafetyResult['supportingData']['historicalContext'] } {
   const weight = 0.2;
 
   // Filter historical events within ~50km
-  const nearbyEvents = demoHistoricalEvents.filter((ev) => {
+  const nearbyEvents = historicalEvents.filter((ev) => {
     const dist = distanceKm(coords, ev.coordinates);
     return dist <= 50;
   });
@@ -441,7 +444,7 @@ function evaluateHistoricalContext(
   const hasHigh = nearbyEvents.some((e) => e.severity === 'HIGH');
 
   let historyScore = 80;
-  let statusLabel = 'Low Historical Recurrence';
+  let statusLabel = isReal ? 'No Recorded Disaster Events' : 'Low Historical Recurrence';
 
   if (hasCritical && eventCount >= 2) {
     historyScore = 45;
@@ -462,6 +465,8 @@ function evaluateHistoricalContext(
     explanation:
       eventCount > 0
         ? `Region has ${eventCount} recorded major historical disaster events (e.g., ${nearbyEvents[0]?.name}).`
+        : isReal
+        ? 'No historical disaster events found in operational records within a 50 km radius.'
         : 'Area has minimal recorded catastrophic disaster landfall history in demo archives.',
     metricValue: `${eventCount} Historical Events (${hasCritical ? 'Critical History' : 'Standard History'})`,
   };
@@ -472,6 +477,8 @@ function evaluateHistoricalContext(
     summary:
       eventCount > 0
         ? `${eventCount} past disaster events documented in this corridor. High resilience infrastructure advised.`
+        : isReal
+        ? 'No historical disaster events recorded in operational registry for this corridor.'
         : 'No high-frequency historical disaster surge recorded in repository records.',
   };
 
@@ -536,6 +543,8 @@ function generateReasons(
 export function generateDestinationTimeline(
   destinationId: string,
   coords: LngLat,
+  historicalEvents: HistoricalDisasterEvent[] = demoHistoricalEvents,
+  isReal: boolean = false,
 ): DestinationSafetyResult['timeline'] {
   const slots: Array<{
     slotKey: keyof typeof DEMO_SCENARIOS;
@@ -557,7 +566,7 @@ export function generateDestinationTimeline(
     const { factor: warnF } = evaluateActiveWarnings(coords, sc);
     const { factor: roadF } = evaluateRoadwayAccess(coords, sc);
     const { factor: shF } = evaluateShelterAvailability(coords);
-    const { factor: histF } = evaluateHistoricalContext(coords);
+    const { factor: histF } = evaluateHistoricalContext(coords, historicalEvents, isReal);
 
     const score = Math.round(
       hazardF.weightedScore +
@@ -589,6 +598,11 @@ export function generateDestinationTimeline(
 export function calculateDestinationSafety(
   req: DestinationSafetyRequest
 ): DestinationSafetyResult {
+  const isReal = req.environment === 'REAL';
+  const historicalEvents = isReal
+    ? (req.historicalEvents ?? [])
+    : (req.historicalEvents ?? demoHistoricalEvents);
+
   const dest = resolveDestination(req);
 
   // Determine scenario
@@ -612,7 +626,11 @@ export function calculateDestinationSafety(
   const { factor: shelterFactor, nearest: nearestShelter } = evaluateShelterAvailability(dest.coordinates);
 
   // 5. Historical context
-  const { factor: historicalFactor, context: historicalContext } = evaluateHistoricalContext(dest.coordinates);
+  const { factor: historicalFactor, context: historicalContext } = evaluateHistoricalContext(
+    dest.coordinates,
+    historicalEvents,
+    isReal,
+  );
 
   const factors: DestinationRiskFactor[] = [
     hazardFactor,
@@ -672,8 +690,10 @@ export function calculateDestinationSafety(
     };
   }
 
-  // Generate timeline
-  const timeline = generateDestinationTimeline(dest.id, dest.coordinates);
+  // Generate timeline (in REAL mode, do not fabricate simulated future scenarios)
+  const timeline = isReal
+    ? []
+    : generateDestinationTimeline(dest.id, dest.coordinates, historicalEvents, isReal);
 
   return {
     destinationId: dest.id,

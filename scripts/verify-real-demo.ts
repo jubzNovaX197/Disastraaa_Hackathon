@@ -228,6 +228,100 @@ async function runVerification() {
   assert(verifiedPayload !== null && verifiedPayload.email === 'officer@osdma.gov.demo', 'Real session token created and verified correctly');
   assert(verifiedPayload?.role === ROLES.STATE_AUTHORITY, 'Real session payload preserves authenticated role');
 
+  // ── TEST 7: P1 Task - Real Mode Integrity & Demo Data Leak Verification ──
+  console.log('\n--- TEST 7: P1 Task - Real Mode Integrity & Demo Data Leak Verification ---');
+  const { calculateDestinationSafety } = await import('../src/lib/destination/engine');
+  const { buildStructuredContext } = await import('../src/lib/ai/context');
+  const { DeterministicProvider } = await import('../src/lib/ai/providers/deterministic-provider');
+
+  // 7a. Destination Safety Engine (REAL vs DEMO)
+  const realDestSafety = calculateDestinationSafety({
+    destinationId: 'dest-puri-01',
+    environment: 'REAL',
+  });
+  assert(
+    realDestSafety.supportingData.historicalContext.eventCount === 0,
+    `REAL destination safety historicalContext.eventCount is 0 (got ${realDestSafety.supportingData.historicalContext.eventCount})`,
+  );
+  assert(
+    realDestSafety.timeline.length === 0,
+    `REAL destination safety timeline is empty (got ${realDestSafety.timeline.length})`,
+  );
+  assert(
+    realDestSafety.supportingData.historicalContext.summary.includes('No historical disaster events'),
+    'REAL destination safety summary explicitly states no historical disaster events',
+  );
+
+  const demoDestSafety = calculateDestinationSafety({
+    destinationId: 'dest-puri-01',
+    environment: 'DEMO',
+  });
+  assert(
+    demoDestSafety.supportingData.historicalContext.eventCount > 0,
+    `DEMO destination safety historicalContext.eventCount > 0 (got ${demoDestSafety.supportingData.historicalContext.eventCount})`,
+  );
+  assert(
+    demoDestSafety.timeline.length > 0,
+    `DEMO destination safety timeline is populated (got ${demoDestSafety.timeline.length})`,
+  );
+
+  // 7b. AI Context Builder (REAL vs DEMO)
+  const realAiContext = buildStructuredContext({
+    intent: 'LIVE_CHANGE_QUERY',
+    liveOverrides: { environment: 'REAL' },
+  });
+  assert(
+    (realAiContext.recentLiveEvents || []).length === 0,
+    `REAL AI context recentLiveEvents has 0 items (got ${realAiContext.recentLiveEvents?.length})`,
+  );
+  assert(
+    realAiContext.dataFreshness.isSimulated === false,
+    'REAL AI context dataFreshness.isSimulated is false',
+  );
+
+  const demoAiContext = buildStructuredContext({
+    intent: 'LIVE_CHANGE_QUERY',
+    liveOverrides: { environment: 'DEMO' },
+  });
+  assert(
+    (demoAiContext.recentLiveEvents || []).length > 0,
+    `DEMO AI context recentLiveEvents has populated items (got ${demoAiContext.recentLiveEvents?.length})`,
+  );
+  assert(
+    demoAiContext.dataFreshness.isSimulated === true,
+    'DEMO AI context dataFreshness.isSimulated is true',
+  );
+
+  // 7c. Deterministic AI Provider Response
+  const aiProvider = new DeterministicProvider();
+  const realAiResponse = await aiProvider.generateResponse({
+    question: 'What changed recently?',
+    intent: 'LIVE_CHANGE_QUERY',
+    context: realAiContext,
+  });
+  assert(
+    !realAiResponse.dataQuality.includes('SIMULATED'),
+    'REAL AI response dataQuality does NOT contain SIMULATED badge',
+  );
+  assert(
+    realAiResponse.dataQuality.includes('LIVE_UPDATED'),
+    'REAL AI response dataQuality contains LIVE_UPDATED badge',
+  );
+  assert(
+    !realAiResponse.text.includes('Naraj Inflow Spike'),
+    'REAL AI response text does NOT leak simulated "Naraj Inflow Spike"',
+  );
+
+  const demoAiResponse = await aiProvider.generateResponse({
+    question: 'What changed recently?',
+    intent: 'LIVE_CHANGE_QUERY',
+    context: demoAiContext,
+  });
+  assert(
+    demoAiResponse.dataQuality.includes('SIMULATED'),
+    'DEMO AI response dataQuality contains SIMULATED badge',
+  );
+
   // Clean up
   _resetRealLocationsRegistry();
   _resetRealReportsForTesting();

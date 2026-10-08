@@ -304,6 +304,7 @@ export interface RoutePlannerProps {
   initialDestinationId?: string;
   initialOriginId?: string;
   showFullDestinationPanel?: boolean;
+  environment?: 'REAL' | 'DEMO';
 }
 
 import { useLiveIntelligence } from '@/context/LiveIntelligenceContext';
@@ -319,8 +320,10 @@ export function RoutePlanner({
   initialDestinationId = '',
   initialOriginId = '',
   showFullDestinationPanel = true,
+  environment: environmentProp,
 }: RoutePlannerProps) {
-  const { environment, switchEnvironment } = useLiveIntelligence();
+  const { environment: contextEnv, switchEnvironment } = useLiveIntelligence();
+  const environment = environmentProp ?? contextEnv ?? 'REAL';
   const [originId, setOriginId] = useState<string>(initialOriginId);
   const [destinationId, setDestinationId] = useState<string>(initialDestinationId);
   const [calculated, setCalculated] = useState(false);
@@ -412,8 +415,9 @@ export function RoutePlanner({
       scenarioSlot: activeSlotKey,
       selectedDate: customDate || undefined,
       selectedTime: customTime || undefined,
+      environment,
     });
-  }, [destinationId, activeSlotKey, customDate, customTime, destNode]);
+  }, [environment, destinationId, activeSlotKey, customDate, customTime, destNode]);
 
   // 2. Calculate Routes when origin & destination are selected and calculated is true
   const results = useMemo(() => {
@@ -425,19 +429,19 @@ export function RoutePlanner({
     ? (results[activeMode.toLowerCase() as keyof typeof results] as RouteResult)
     : null;
 
-  // 3. Calculate Combined Travel Risk
+  // 3. Calculate Combined Travel Risk (DEMO mode only)
   const travelRisk = useMemo(() => {
-    if (!destinationSafety) return null;
+    if (environment === 'REAL' || !destinationSafety) return null;
     return calculateTravelRisk({
       routeResult: activeResult,
       destinationSafety,
       comparisonRoutes: results,
     });
-  }, [activeResult, destinationSafety, results]);
+  }, [environment, activeResult, destinationSafety, results]);
 
-  // 4. Calculate Comprehensive Journey Risk (Task 15)
+  // 4. Calculate Comprehensive Journey Risk (DEMO mode only)
   const journeyRisk = useMemo(() => {
-    if (!destinationSafety || !originId || !destinationId) return null;
+    if (environment === 'REAL' || !destinationSafety || !originId || !destinationId) return null;
     return calculateJourneyRisk({
       originNodeId: originId,
       destinationNodeId: destinationId,
@@ -446,8 +450,9 @@ export function RoutePlanner({
       selectedTime: customTime || undefined,
       selectedRoute: activeResult,
       destinationSafety,
+      environment,
     });
-  }, [originId, destinationId, activeSlotKey, customDate, customTime, activeResult, destinationSafety]);
+  }, [environment, originId, destinationId, activeSlotKey, customDate, customTime, activeResult, destinationSafety]);
 
   // Determine effective tab so that if user selected a destination without calculating routes,
   // it shows Destination Safety immediately without leaving an empty/broken tab body!
@@ -497,6 +502,10 @@ export function RoutePlanner({
 
   // Notify parent of destination safety updates
   useEffect(() => {
+    if (environment === 'REAL') {
+      onDestinationSafetyCalculated?.(null);
+      return;
+    }
     onDestinationSafetyCalculated?.(destinationSafety);
     if (destinationSafety) {
       onDestinationSelected?.(
@@ -505,10 +514,15 @@ export function RoutePlanner({
         destinationSafety.status
       );
     }
-  }, [destinationSafety, onDestinationSafetyCalculated, onDestinationSelected]);
+  }, [environment, destinationSafety, onDestinationSafetyCalculated, onDestinationSelected]);
 
   // Notify parent of Journey Risk and corridor highlights (Task 15)
   useEffect(() => {
+    if (environment === 'REAL') {
+      onJourneyRiskCalculated?.(null);
+      onCorridorHighlighted?.([]);
+      return;
+    }
     onJourneyRiskCalculated?.(journeyRisk);
     if (journeyRisk && journeyRisk.hazardCorridor.length > 0) {
       const pts = journeyRisk.hazardCorridor
@@ -522,16 +536,20 @@ export function RoutePlanner({
     } else {
       onCorridorHighlighted?.([]);
     }
-  }, [journeyRisk, onJourneyRiskCalculated, onCorridorHighlighted]);
+  }, [environment, journeyRisk, onJourneyRiskCalculated, onCorridorHighlighted]);
 
   // Emit map coordinates when active route changes
   useEffect(() => {
+    if (environment === 'REAL') {
+      onRouteClear?.();
+      return;
+    }
     if (activeResult?.found) {
       onRouteSelected?.(activeResult.mapCoordinates, activeResult.mode);
     } else if (!activeResult && !destinationSafety) {
       onRouteClear?.();
     }
-  }, [activeResult, destinationSafety, onRouteSelected, onRouteClear]);
+  }, [environment, activeResult, destinationSafety, onRouteSelected, onRouteClear]);
 
   const nodeOptions = useMemo(() => {
     if (environment === 'REAL') {
@@ -544,15 +562,15 @@ export function RoutePlanner({
   // If in REAL mode but no real OSM network has loaded yet, display professional standby state
   if (environment === 'REAL' && (!realGraph || realGraph.nodes.length === 0)) {
     return (
-      <div className="p-8 sm:p-12 text-center rounded-2xl bg-surface-card border border-white/[0.08] space-y-4">
-        <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 mx-auto flex items-center justify-center">
+      <div className="p-8 sm:p-12 text-center rounded-2xl bg-white dark:bg-surface-card border border-slate-200 dark:border-white/[0.08] space-y-4">
+        <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-600 dark:text-cyan-400 mx-auto flex items-center justify-center">
           {isLoadingReal ? <Loader2 className="w-7 h-7 animate-spin" /> : <Compass className="w-7 h-7" />}
         </div>
         <div className="space-y-1.5 max-w-lg mx-auto">
-          <h3 className="text-base sm:text-lg font-bold text-slate-100 flex items-center justify-center gap-2">
+          <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center justify-center gap-2">
             <span>Live Road Intelligence &amp; Transit Routing Graph Standing By</span>
           </h3>
-          <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
             {isLoadingReal
               ? 'Ingesting real OpenStreetMap / Overpass geospatial corridor telemetry for live origin-destination routing...'
               : 'Real-time road network telemetry connects to live OpenStreetMap Overpass and PostGIS geospatial tables.'}
@@ -576,7 +594,7 @@ export function RoutePlanner({
           <button
             type="button"
             onClick={() => switchEnvironment('DEMO')}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-amber-500/15 border border-amber-500/30 text-amber-300 hover:bg-amber-500/25 transition-colors shadow-sm"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-amber-500/15 border border-amber-500/30 text-amber-700 dark:text-amber-300 hover:bg-amber-500/25 transition-colors shadow-sm"
           >
             <span>Explore Demo Simulation</span>
             <Sparkles className="w-3.5 h-3.5" />

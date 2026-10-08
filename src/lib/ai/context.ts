@@ -13,7 +13,7 @@ import { DETERMINISTIC_LIVE_EVENTS } from '@/lib/realtime/events';
 interface BuildContextOptions {
   intent: AssistantIntent;
   targetLocation?: string;
-  liveOverrides?: LiveDataOverrides;
+  liveOverrides?: Partial<LiveDataOverrides>;
   secondsSinceSync?: number;
 }
 
@@ -215,14 +215,20 @@ export function buildStructuredContext({
     intent === 'SITUATION_SUMMARY' ||
     intent === 'GENERAL_OPERATIONAL'
   ) {
-    payload.recentLiveEvents = DETERMINISTIC_LIVE_EVENTS.slice(0, 4).map((e) => ({
-      id: e.id,
-      type: e.type,
-      title: e.title,
-      severity: e.severity,
-      timeFormatted: e.timeFormatted,
-      summary: e.summary,
-    }));
+    if (isReal) {
+      // In REAL mode, never inject simulated/fictional live events.
+      // Use only actual real operational events, or empty dataset if unavailable.
+      payload.recentLiveEvents = [];
+    } else {
+      payload.recentLiveEvents = DETERMINISTIC_LIVE_EVENTS.slice(0, 4).map((e) => ({
+        id: e.id,
+        type: e.type,
+        title: e.title,
+        severity: e.severity,
+        timeFormatted: e.timeFormatted,
+        summary: e.summary,
+      }));
+    }
   }
 
   return payload;

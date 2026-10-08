@@ -546,7 +546,7 @@ export function DisasterMap({ dataset, className, center, zoom, initialLayers, e
           severity: activePanel.explanation.result.severity,
           riskScore: activePanel.explanation.result.score,
           allShelters: dataset.shelters,
-          allHistoricalEvents: demoHistoricalEvents,
+          allHistoricalEvents: isDemo ? demoHistoricalEvents : [],
         })
       : null;
 
@@ -567,7 +567,7 @@ export function DisasterMap({ dataset, className, center, zoom, initialLayers, e
               : activePanel.explanation.result.dominantHazard,
           impactResult,
           shelterPlanning,
-          historicalEvents: demoHistoricalEvents,
+          historicalEvents: isDemo ? demoHistoricalEvents : [],
         })
       : null;
 
@@ -619,6 +619,7 @@ export function DisasterMap({ dataset, className, center, zoom, initialLayers, e
         {/* Task 13 + 14 + 15: Route, Destination & Journey Intelligence */}
         <div className="pointer-events-auto">
           <RouteMapOverlay
+            environment={envMode}
             onRouteSelected={handleRouteSelected}
             onRouteClear={handleRouteClear}
             onDestinationSelected={handleDestinationSelected}

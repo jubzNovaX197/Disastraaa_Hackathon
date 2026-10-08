@@ -153,6 +153,6 @@ export interface AssistantQueryRequest {
   question: string;
   locationFocus?: string;
   role?: Role;
-  liveOverrides?: LiveDataOverrides;
+  liveOverrides?: Partial<LiveDataOverrides>;
   secondsSinceSync?: number;
 }
