@@ -1,0 +1,161 @@
+'use client';
+
+/**
+ * MapContainer — reusable MapLibre GL JS wrapper.
+ *
+ * Design principles:
+ *  - MapLibre is dynamically imported inside useEffect so it never
+ *    runs in the SSR environment.
+ *  - The CSS is imported statically at the top of this file; Next.js
+ *    extracts it into the global stylesheet at build time.
+ *  - All disaster-specific layer logic lives OUTSIDE this component.
+ *    This component only handles: init, controls, cleanup, and a slot
+ *    for UI overlay children.
+ *  - Sources, layers, and GeoJSON are added by parent components via
+ *    the onMapReady callback.
+ */
+
+import 'maplibre-gl/dist/maplibre-gl.css';
+
+import { useEffect, useRef } from 'react';
+import type { Map as MLMap, StyleSpecification } from 'maplibre-gl';
+import { mapConfig } from '@/config/map';
+import { cn } from '@/lib/utils';
+import type { MapContainerProps } from './types';
+
+export function MapContainer({
+  viewState,
+  style,
+  className,
+  onMapReady,
+  onMapClick,
+  children,
+  interactive = true,
+}: MapContainerProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const mapRef       = useRef<MLMap | null>(null);
+  const targetStyleRef = useRef(style ?? mapConfig.defaultStyle);
+  const currentAppliedStyleRef = useRef<string | StyleSpecification | null>(null);
+
+  useEffect(() => {
+    targetStyleRef.current = style ?? mapConfig.defaultStyle;
+  }, [style]);
+
+  useEffect(() => {
+    if (!containerRef.current || mapRef.current) return;
+
+    let canceled = false;
+
+    const init = async () => {
+      const {
+        Map,
+        NavigationControl,
+        ScaleControl,
+        AttributionControl,
+      } = await import('maplibre-gl');
+
+      if (canceled || !containerRef.current) return;
+
+      const initialStyle = targetStyleRef.current ?? mapConfig.defaultStyle;
+
+      const map = new Map({
+        container:        containerRef.current,
+        style:            initialStyle,
+        center:           viewState?.center  ?? mapConfig.defaultCenter,
+        zoom:             viewState?.zoom    ?? mapConfig.defaultZoom,
+        bearing:          viewState?.bearing ?? 0,
+        pitch:            viewState?.pitch   ?? 0,
+        minZoom:          mapConfig.minZoom,
+        maxZoom:          mapConfig.maxZoom,
+        attributionControl: false,
+        interactive,
+      });
+
+      // Controls
+      if (mapConfig.controls.attribution) {
+        map.addControl(new AttributionControl({ compact: true }), 'bottom-right');
+      }
+      if (mapConfig.controls.navigation && interactive) {
+        map.addControl(new NavigationControl({ showCompass: true }), 'bottom-right');
+      }
+      if (mapConfig.controls.scale) {
+        map.addControl(new ScaleControl({ unit: 'metric' }), 'bottom-left');
+      }
+
+      // Click handler
+      if (onMapClick) {
+        map.on('click', (e) => {
+          onMapClick([e.lngLat.lng, e.lngLat.lat]);
+        });
+      }
+
+      // Notify parent when style is fully loaded
+      map.on('load', () => {
+        if (!canceled) {
+          map.resize();
+          onMapReady?.(map);
+        }
+      });
+
+      if (canceled) {
+        map.remove();
+      } else {
+        mapRef.current = map;
+        currentAppliedStyleRef.current = initialStyle;
+
+        // In case style updated while async init was importing maplibre
+        if (targetStyleRef.current !== initialStyle) {
+          map.setStyle(targetStyleRef.current);
+          currentAppliedStyleRef.current = targetStyleRef.current;
+        }
+      }
+    };
+
+    init().catch(console.error);
+
+    return () => {
+      canceled = true;
+      mapRef.current?.remove();
+      mapRef.current = null;
+      currentAppliedStyleRef.current = null;
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Handle dynamic style switching (e.g. Light mode <-> Dark mode)
+  useEffect(() => {
+    const map = mapRef.current;
+    const targetStyle = style ?? mapConfig.defaultStyle;
+    targetStyleRef.current = targetStyle;
+
+    if (!map) return;
+    if (currentAppliedStyleRef.current === targetStyle) return;
+
+    currentAppliedStyleRef.current = targetStyle;
+    map.setStyle(targetStyle);
+
+    const onStyleData = () => {
+      if (map.isStyleLoaded()) {
+        map.off('styledata', onStyleData);
+        map.resize();
+        onMapReady?.(map);
+      }
+    };
+    map.on('styledata', onStyleData);
+
+    return () => {
+      map.off('styledata', onStyleData);
+    };
+  }, [style, onMapReady]);
+
+  return (
+    <div className={cn('relative w-full h-full overflow-hidden', className)}>
+      {/* MapLibre renders into this div */}
+      <div ref={containerRef} className="w-full h-full" />
+
+      {/* UI overlay slot — individual children control pointer-events */}
+      <div className="absolute inset-0 pointer-events-none z-10">
+        {children}
+      </div>
+    </div>
+  );
+}

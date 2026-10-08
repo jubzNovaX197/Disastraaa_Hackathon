@@ -1,0 +1,411 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Base styles
+   ───────────────────────────────────────────────────────────────────────────── */
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  :root {
+    --surface-base-rgb: 8 12 24;
+    --surface-card-rgb: 14 20 34;
+    --surface-elevated-rgb: 20 27 45;
+    --surface-overlay-rgb: 26 34 54;
+  }
+
+  html.light,
+  :root[data-theme='light'] {
+    --surface-base-rgb: 248 250 252;
+    --surface-card-rgb: 255 255 255;
+    --surface-elevated-rgb: 255 255 255;
+    --surface-overlay-rgb: 241 245 249;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: rgb(var(--surface-base-rgb));
+    color: #F1F5F9;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  /* Subtle scrollbar */
+  ::-webkit-scrollbar       { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.20);
+  }
+
+  html.light ::-webkit-scrollbar-thumb,
+  :root[data-theme='light'] ::-webkit-scrollbar-thumb {
+    background: rgba(15, 23, 42, 0.16);
+  }
+  html.light ::-webkit-scrollbar-thumb:hover,
+  :root[data-theme='light'] ::-webkit-scrollbar-thumb:hover {
+    background: rgba(15, 23, 42, 0.25);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Reusable utility classes
+   ───────────────────────────────────────────────────────────────────────────── */
+@layer components {
+  /* Glass morphism surfaces */
+  .glass {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.04) 0%,
+      rgba(255, 255, 255, 0.01) 100%
+    );
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .glass-strong {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.07) 0%,
+      rgba(255, 255, 255, 0.02) 100%
+    );
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+  }
+
+  /* Gradient text */
+  .text-gradient-accent {
+    background: linear-gradient(135deg, #22D3EE 0%, #14B8A6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   MapLibre GL — dark theme overrides (default, dark-mode app)
+   ───────────────────────────────────────────────────────────────────────────── */
+.maplibregl-popup-content {
+  background: #141B2D !important;
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  border-radius: 10px !important;
+  color: #F1F5F9 !important;
+  padding: 12px 16px !important;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5) !important;
+  font-family: inherit !important;
+  font-size: 13px !important;
+  min-width: 220px;
+  max-width: 300px;
+}
+
+.maplibregl-popup-tip {
+  border-top-color: #141B2D !important;
+  border-bottom-color: #141B2D !important;
+}
+
+.maplibregl-popup-close-button {
+  color: #64748B !important;
+  font-size: 16px !important;
+  padding: 4px 8px !important;
+  background: transparent !important;
+  line-height: 1 !important;
+}
+.maplibregl-popup-close-button:hover {
+  color: #F1F5F9 !important;
+  background: transparent !important;
+}
+
+.maplibregl-ctrl-group {
+  background: #141B2D !important;
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  border-radius: 8px !important;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+}
+
+.maplibregl-ctrl-group button {
+  background: transparent !important;
+  color: #94A3B8 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+  width: 32px !important;
+  height: 32px !important;
+}
+.maplibregl-ctrl-group button:last-child { border-bottom: none !important; }
+.maplibregl-ctrl-group button:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: #F1F5F9 !important;
+}
+
+.maplibregl-ctrl-attrib {
+  background: rgba(8, 12, 24, 0.75) !important;
+  color: #64748B !important;
+  font-size: 10px !important;
+  border-radius: 4px !important;
+  padding: 2px 6px !important;
+}
+.maplibregl-ctrl-attrib a { color: #22D3EE !important; }
+
+.maplibregl-ctrl-scale {
+  background: rgba(8, 12, 24, 0.75) !important;
+  border-color: #64748B !important;
+  color: #94A3B8 !important;
+  font-size: 10px !important;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Light-mode styles (class-based, attribute-based, or system preference)
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* Base body and html in light mode */
+html.light,
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+html.light body,
+:root[data-theme='light'] body {
+  background-color: #F8FAFC !important;
+  color: #0F172A !important;
+}
+
+/* Nav header in light mode */
+html.light header > div.absolute.inset-0,
+:root[data-theme='light'] header > div.absolute.inset-0 {
+  background-color: rgba(255, 255, 255, 0.88) !important;
+  border-bottom-color: rgba(15, 23, 42, 0.08) !important;
+}
+
+html.light nav a,
+:root[data-theme='light'] nav a {
+  color: #334155;
+}
+html.light nav a:hover,
+:root[data-theme='light'] nav a:hover {
+  color: #0F172A;
+  background-color: rgba(15, 23, 42, 0.05);
+}
+
+/* Light mode text contrast overrides across all pages and components */
+html.light .text-slate-100,
+:root[data-theme='light'] .text-slate-100 {
+  color: #0F172A !important;
+}
+html.light .text-slate-200,
+:root[data-theme='light'] .text-slate-200 {
+  color: #1E293B !important;
+}
+html.light .text-slate-300,
+:root[data-theme='light'] .text-slate-300 {
+  color: #334155 !important;
+}
+html.light .text-slate-400,
+:root[data-theme='light'] .text-slate-400 {
+  color: #475569 !important;
+}
+html.light .text-slate-500,
+:root[data-theme='light'] .text-slate-500 {
+  color: #64748B !important;
+}
+html.light .text-slate-600,
+:root[data-theme='light'] .text-slate-600 {
+  color: #94A3B8 !important;
+}
+
+/* Hover text overrides in light mode */
+html.light .hover\:text-slate-100:hover,
+:root[data-theme='light'] .hover\:text-slate-100:hover {
+  color: #0F172A !important;
+}
+html.light .hover\:text-slate-200:hover,
+:root[data-theme='light'] .hover\:text-slate-200:hover {
+  color: #1E293B !important;
+}
+html.light .hover\:text-slate-300:hover,
+:root[data-theme='light'] .hover\:text-slate-300:hover {
+  color: #334155 !important;
+}
+
+/* Light mode border contrast overrides */
+html.light .border-white\/10,
+html.light .border-white\/20,
+html.light .border-white\/\[0\.06\],
+html.light .border-white\/\[0\.07\],
+html.light .border-white\/\[0\.12\],
+:root[data-theme='light'] .border-white\/10,
+:root[data-theme='light'] .border-white\/20,
+:root[data-theme='light'] .border-white\/\[0\.06\],
+:root[data-theme='light'] .border-white\/\[0\.07\],
+:root[data-theme='light'] .border-white\/\[0\.12\] {
+  border-color: rgba(15, 23, 42, 0.10) !important;
+}
+
+/* Light mode chip & surface background overrides */
+html.light .bg-white\/5,
+html.light .bg-white\/8,
+html.light .bg-white\/10,
+html.light .bg-white\/\[0\.03\],
+html.light .bg-white\/\[0\.04\],
+html.light .bg-white\/\[0\.06\],
+:root[data-theme='light'] .bg-white\/5,
+:root[data-theme='light'] .bg-white\/8,
+:root[data-theme='light'] .bg-white\/10,
+:root[data-theme='light'] .bg-white\/\[0\.03\],
+:root[data-theme='light'] .bg-white\/\[0\.04\],
+:root[data-theme='light'] .bg-white\/\[0\.06\] {
+  background-color: rgba(15, 23, 42, 0.04) !important;
+}
+
+/* Light mode hover backgrounds */
+html.light .hover\:bg-white\/5:hover,
+html.light .hover\:bg-white\/10:hover,
+html.light .hover\:bg-white\/20:hover,
+html.light .hover\:bg-white\/\[0\.04\]:hover,
+:root[data-theme='light'] .hover\:bg-white\/5:hover,
+:root[data-theme='light'] .hover\:bg-white\/10:hover,
+:root[data-theme='light'] .hover\:bg-white\/20:hover,
+:root[data-theme='light'] .hover\:bg-white\/\[0\.04\]:hover {
+  background-color: rgba(15, 23, 42, 0.06) !important;
+}
+
+/* Ring track contrast in light mode */
+html.light .text-white\/5,
+:root[data-theme='light'] .text-white\/5 {
+  color: rgba(15, 23, 42, 0.12) !important;
+}
+
+/* Divide borders */
+html.light .divide-white\/\[0\.05\],
+:root[data-theme='light'] .divide-white\/\[0\.05\] {
+  border-color: rgba(15, 23, 42, 0.08) !important;
+}
+
+/* Glass cards in light mode */
+html.light .glass,
+:root[data-theme='light'] .glass {
+  background: rgba(255, 255, 255, 0.85) !important;
+  border-color: rgba(15, 23, 42, 0.10) !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.06) !important;
+}
+html.light .glass-strong,
+:root[data-theme='light'] .glass-strong {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-color: rgba(15, 23, 42, 0.12) !important;
+  box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Map UI overlay panels (LayerControl, MapLegend, alert badge, theme toggle) */
+html.light .map-panel,
+:root[data-theme='light'] .map-panel,
+@media (prefers-color-scheme: light) {
+  .map-panel {
+    background-color: rgba(255, 255, 255, 0.96) !important;
+    border-color: rgba(15, 23, 42, 0.12) !important;
+    color: #0F172A !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04) !important;
+  }
+  .map-panel .text-slate-100,
+  .map-panel .text-slate-200,
+  .map-panel .text-slate-300 { color: #0F172A !important; }
+  .map-panel .text-slate-400  { color: #475569 !important; }
+  .map-panel .text-slate-500  { color: #64748B !important; }
+  .map-panel .bg-white\/\[0\.06\],
+  .map-panel .hover\:bg-white\/\[0\.04\] { background-color: rgba(15, 23, 42, 0.05) !important; }
+  .map-panel .border-white\/10,
+  .map-panel .border-white\/\[0\.07\] { border-color: rgba(15, 23, 42, 0.10) !important; }
+  .map-panel .bg-accent { background-color: #0891B2 !important; }
+  .map-panel .bg-white\/10 { background-color: rgba(15, 23, 42, 0.08) !important; }
+  .map-panel .bg-white { background-color: #FFFFFF !important; }
+
+  .maplibregl-popup-content {
+    background: #FFFFFF !important;
+    border: 1px solid rgba(15, 23, 42, 0.12) !important;
+    color: #0F172A !important;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.12) !important;
+  }
+  .maplibregl-popup-tip {
+    border-top-color: #FFFFFF !important;
+    border-bottom-color: #FFFFFF !important;
+  }
+  .maplibregl-popup-close-button {
+    color: #64748B !important;
+  }
+  .maplibregl-popup-close-button:hover {
+    color: #0F172A !important;
+  }
+  .maplibregl-ctrl-group {
+    background: #FFFFFF !important;
+    border: 1px solid rgba(15, 23, 42, 0.12) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+  }
+  .maplibregl-ctrl-group button {
+    color: #475569 !important;
+    border-bottom-color: rgba(15, 23, 42, 0.06) !important;
+  }
+  .maplibregl-ctrl-group button:hover {
+    background: rgba(15, 23, 42, 0.05) !important;
+    color: #0F172A !important;
+  }
+  .maplibregl-ctrl-attrib {
+    background: rgba(255, 255, 255, 0.88) !important;
+    color: #64748B !important;
+  }
+  .maplibregl-ctrl-scale {
+    background: rgba(255, 255, 255, 0.88) !important;
+    border-color: #94A3B8 !important;
+    color: #475569 !important;
+  }
+}
+
+/* Explicit class-based overrides for maplibre elements */
+html.light .maplibregl-popup-content,
+:root[data-theme='light'] .maplibregl-popup-content {
+  background: #FFFFFF !important;
+  border: 1px solid rgba(15, 23, 42, 0.12) !important;
+  color: #0F172A !important;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.12) !important;
+}
+html.light .maplibregl-popup-tip,
+:root[data-theme='light'] .maplibregl-popup-tip {
+  border-top-color: #FFFFFF !important;
+  border-bottom-color: #FFFFFF !important;
+}
+html.light .maplibregl-ctrl-group,
+:root[data-theme='light'] .maplibregl-ctrl-group {
+  background: #FFFFFF !important;
+  border: 1px solid rgba(15, 23, 42, 0.12) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+}
+html.light .maplibregl-ctrl-group button,
+:root[data-theme='light'] .maplibregl-ctrl-group button {
+  color: #475569 !important;
+  border-bottom-color: rgba(15, 23, 42, 0.06) !important;
+}
+html.light .maplibregl-ctrl-group button:hover,
+:root[data-theme='light'] .maplibregl-ctrl-group button:hover {
+  background: rgba(15, 23, 42, 0.05) !important;
+  color: #0F172A !important;
+}
+html.light .maplibregl-ctrl-attrib,
+:root[data-theme='light'] .maplibregl-ctrl-attrib {
+  background: rgba(255, 255, 255, 0.88) !important;
+  color: #64748B !important;
+}
+html.light .maplibregl-ctrl-scale,
+:root[data-theme='light'] .maplibregl-ctrl-scale {
+  background: rgba(255, 255, 255, 0.88) !important;
+  border-color: #94A3B8 !important;
+  color: #475569 !important;
+}

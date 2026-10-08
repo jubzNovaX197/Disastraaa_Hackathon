@@ -1,0 +1,92 @@
+/**
+ * DEMO DATA — Active Disaster Alerts
+ *
+ * ⚠️  SIMULATED DATA ONLY. Not real government data. For prototype demonstration.
+ */
+
+import type { DemoAlert } from '@/data/types';
+
+export const demoAlerts: DemoAlert[] = [
+  {
+    id: 'al-cyclone-puri',
+    type: 'CYCLONE',
+    severity: 'CRITICAL',
+    title: 'Cyclone Red Alert — Puri District',
+    message: 'Severe cyclonic storm expected to make landfall near Puri within 6 hours. Winds 160–180 km/h. Immediate evacuation of coastal areas mandatory.',
+    coordinates: [85.8315, 19.8005],
+    regionName: 'Puri District, Odisha',
+    issuedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+    expiresAt: new Date(Date.now() + 18 * 60 * 60 * 1000).toISOString(),
+    isActive: true,
+  },
+  {
+    id: 'al-flood-cuttack',
+    type: 'FLOOD',
+    severity: 'HIGH',
+    title: 'Flash Flood Warning — Cuttack North',
+    message: 'Hirakud Dam releases increased to 8 lakh cusecs. Mahanadi river level rising rapidly. Low-lying areas north of Cuttack under immediate flood threat.',
+    coordinates: [85.8830, 20.4812],
+    regionName: 'Cuttack District, Odisha',
+    issuedAt: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
+    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    isActive: true,
+  },
+  {
+    id: 'al-flood-kendrapara',
+    type: 'FLOOD',
+    severity: 'HIGH',
+    title: 'Flood Alert — Kendrapara District',
+    message: '12 villages cut off due to rising flood waters. NDRF teams deployed. Residents advised to move to designated shelters.',
+    coordinates: [86.4214, 20.5012],
+    regionName: 'Kendrapara District, Odisha',
+    issuedAt: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
+    isActive: true,
+  },
+  {
+    id: 'al-surge-puri',
+    type: 'STORM_SURGE',
+    severity: 'CRITICAL',
+    title: 'Storm Surge Warning — Coastal Odisha',
+    message: 'Sea surge of 2–4 m expected along Puri–Konark coastline. All fishing activity suspended. Evacuations ongoing.',
+    coordinates: [85.8700, 19.7800],
+    regionName: 'Coastal Odisha',
+    issuedAt: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
+    expiresAt: new Date(Date.now() + 12 * 60 * 60 * 1000).toISOString(),
+    isActive: true,
+  },
+  {
+    id: 'al-lightning-bhubaneswar',
+    type: 'LIGHTNING',
+    severity: 'MODERATE',
+    title: 'Lightning Warning — Bhubaneswar',
+    message: 'Severe thunderstorm approaching from the northwest. High lightning activity expected. Avoid open areas and elevated ground.',
+    coordinates: [85.8314, 20.2961],
+    regionName: 'Bhubaneswar, Odisha',
+    issuedAt: new Date(Date.now() - 20 * 60 * 1000).toISOString(),
+    expiresAt: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(),
+    isActive: true,
+  },
+  {
+    id: 'al-flood-vizag',
+    type: 'FLOOD',
+    severity: 'MODERATE',
+    title: 'Urban Flood Advisory — Visakhapatnam',
+    message: 'Heavy rainfall expected for next 6 hours. Low-lying areas and underpasses likely to experience waterlogging.',
+    coordinates: [83.3010, 17.6868],
+    regionName: 'Visakhapatnam, Andhra Pradesh',
+    issuedAt: new Date(Date.now() - 45 * 60 * 1000).toISOString(),
+    expiresAt: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString(),
+    isActive: true,
+  },
+  {
+    id: 'al-landslide-ghats',
+    type: 'LANDSLIDE',
+    severity: 'HIGH',
+    title: 'Landslide Risk — Eastern Ghats Section',
+    message: 'Continuous heavy rainfall has saturated hill slopes. NH-16 mountain stretch: avoid travel. Forest dept. on alert.',
+    coordinates: [83.2100, 18.1800],
+    regionName: 'Eastern Ghats, Visakhapatnam Dist.',
+    issuedAt: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
+    isActive: true,
+  },
+];
