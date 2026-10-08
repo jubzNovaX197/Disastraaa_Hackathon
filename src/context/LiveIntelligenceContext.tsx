@@ -43,6 +43,10 @@ import { ROLES } from '@/types/roles';
 
 import type { AppEnvironment } from '@/lib/env';
 import { parseEnvironmentFromCookie } from '@/lib/env';
+import type { DemoAlert as Alert, Shelter } from '@/data/types';
+import type { RoadSegment } from '@/lib/roads/types';
+import type { NormalizedWeather } from '@/lib/weather/types';
+import type { CitizenReportItem } from '@/lib/reports/types';
 
 const REAL_OVERRIDES: LiveDataOverrides = {
   alerts: [],
@@ -150,6 +154,65 @@ export function LiveIntelligenceProvider({
     return current;
   });
 
+  // Fetch real operational records from server endpoints
+  const fetchRealData = useCallback(async () => {
+    setStatus('updating');
+    try {
+      const [roadsRes, sheltersRes, alertsRes, weatherRes, reportsRes] = await Promise.allSettled([
+        fetch('/api/roads?env=REAL').then((r) => (r.ok ? r.json() : null)),
+        fetch('/api/shelters?env=REAL').then((r) => (r.ok ? r.json() : null)),
+        fetch('/api/alerts?env=REAL').then((r) => (r.ok ? r.json() : null)),
+        fetch('/api/weather?env=REAL&regional=true').then((r) => (r.ok ? r.json() : null)),
+        fetch('/api/reports?env=REAL').then((r) => (r.ok ? r.json() : null)),
+      ]);
+
+      const roads: RoadSegment[] =
+        roadsRes.status === 'fulfilled' && roadsRes.value?.success && Array.isArray(roadsRes.value.roads)
+          ? roadsRes.value.roads
+          : [];
+
+      const shelters: Shelter[] =
+        sheltersRes.status === 'fulfilled' && sheltersRes.value?.success && Array.isArray(sheltersRes.value.shelters)
+          ? sheltersRes.value.shelters
+          : [];
+
+      const alerts: Alert[] =
+        alertsRes.status === 'fulfilled' && alertsRes.value?.success && Array.isArray(alertsRes.value.alerts)
+          ? alertsRes.value.alerts
+          : [];
+
+      const weatherList: NormalizedWeather[] =
+        weatherRes.status === 'fulfilled' && weatherRes.value?.success && Array.isArray(weatherRes.value.data)
+          ? weatherRes.value.data
+          : [];
+
+      const reports: CitizenReportItem[] =
+        reportsRes.status === 'fulfilled' && reportsRes.value?.success && Array.isArray(reportsRes.value.reports)
+          ? reportsRes.value.reports
+          : [];
+
+      setOverrides({
+        alerts,
+        reports,
+        roads,
+        shelters,
+        shelterOccupancies: {},
+        resourceStocks: {},
+        riverGaugeDeltas: {},
+        rainfallDeltas: {},
+        weather: weatherList,
+        environment: 'REAL',
+      });
+
+      setLastSyncTime(new Date());
+      setSecondsSinceSync(0);
+      setStatus('connected');
+    } catch (err) {
+      console.warn('[LIVE-CONTEXT] Operational sync error:', err);
+      setStatus('delayed');
+    }
+  }, []);
+
   // Switch environment dynamically
   const switchEnvironment = useCallback((newEnv: AppEnvironment) => {
     if (typeof document !== 'undefined') {
@@ -157,9 +220,9 @@ export function LiveIntelligenceProvider({
     }
     setEnvironment(newEnv);
     if (newEnv === 'REAL') {
-      setOverrides({ ...REAL_OVERRIDES });
       setRecentEvents([]);
       setUnreadEventCount(0);
+      fetchRealData();
     } else {
       let current = { ...DEMO_OVERRIDES };
       for (let i = 0; i < 3; i++) {
@@ -173,17 +236,16 @@ export function LiveIntelligenceProvider({
         })),
       );
     }
-  }, []);
+  }, [fetchRealData]);
 
   // Re-sync overrides when environment state changes
   useEffect(() => {
     if (environment === 'REAL') {
-      setOverrides((prev) => (prev.environment === 'REAL' ? prev : { ...REAL_OVERRIDES }));
-      setRecentEvents((prev) => (prev.length === 0 ? prev : []));
+      fetchRealData();
     } else {
       setOverrides((prev) => (prev.environment === 'DEMO' ? prev : { ...DEMO_OVERRIDES }));
     }
-  }, [environment]);
+  }, [environment, fetchRealData]);
 
   // Calculate synchronized operational models
   const commandCenterData = useMemo(() => {
@@ -241,6 +303,10 @@ export function LiveIntelligenceProvider({
   // Refresh current data streams now without advancing event cursor
   const refreshNow = useCallback(() => {
     setStatus('updating');
+    if (environment === 'REAL') {
+      fetchRealData();
+      return;
+    }
     setTimeout(() => {
       // Re-evaluate command center data
       setOverrides((prev) => ({ ...prev }));
@@ -248,7 +314,7 @@ export function LiveIntelligenceProvider({
       setSecondsSinceSync(0);
       setStatus(isPaused ? 'paused' : 'connected');
     }, 250);
-  }, [isPaused]);
+  }, [environment, fetchRealData, isPaused]);
 
   // Pause live stream
   const pauseFeed = useCallback(() => {

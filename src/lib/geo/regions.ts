@@ -40,6 +40,8 @@ export interface RegionSummary {
   district: string;
   displayName: string;
   coordinates?: [number, number];
+  population?: number;
+  populationSource?: string;
   activeHazardCount: number;
   activeAlertCount: number;
   reportCount: number;
@@ -50,6 +52,61 @@ export interface RegionSummary {
 }
 
 // ── Dynamic Operational Real Region Registry ────────────────────────────────
+
+// Documented Census of India 2011 statistics for core operational demonstration sectors
+export const CANONICAL_ODISHA_LOCATIONS: Array<CanonicalLocation & { population: number; populationSource: string }> = [
+  {
+    id: 'odisha-kalahandi',
+    country: 'India',
+    state: 'Odisha',
+    district: 'Kalahandi District',
+    coordinates: [83.1659, 19.9075],
+    source: 'AUTHORITY',
+    environment: 'REAL',
+    registeredAt: '2026-10-09T00:00:00.000Z',
+    population: 1576869,
+    populationSource: 'Census of India 2011 (District Census Handbook - Kalahandi)',
+  },
+  {
+    id: 'odisha-khordha',
+    country: 'India',
+    state: 'Odisha',
+    district: 'Khordha District',
+    locality: 'Bhubaneswar State Command Operations',
+    coordinates: [85.8245, 20.2961],
+    source: 'AUTHORITY',
+    environment: 'REAL',
+    registeredAt: '2026-10-09T00:00:00.000Z',
+    population: 2251673,
+    populationSource: 'Census of India 2011 (District Census Handbook - Khordha)',
+  },
+  {
+    id: 'odisha-puri',
+    country: 'India',
+    state: 'Odisha',
+    district: 'Puri District',
+    locality: 'Puri Coastal Belt',
+    coordinates: [85.8312, 19.8135],
+    source: 'AUTHORITY',
+    environment: 'REAL',
+    registeredAt: '2026-10-09T00:00:00.000Z',
+    population: 1698730,
+    populationSource: 'Census of India 2011 (District Census Handbook - Puri)',
+  },
+  {
+    id: 'odisha-cuttack',
+    country: 'India',
+    state: 'Odisha',
+    district: 'Cuttack District',
+    locality: 'Cuttack Operational Sector',
+    coordinates: [85.8830, 20.4625],
+    source: 'AUTHORITY',
+    environment: 'REAL',
+    registeredAt: '2026-10-09T00:00:00.000Z',
+    population: 2624470,
+    populationSource: 'Census of India 2011 (District Census Handbook - Cuttack)',
+  },
+];
 
 // Registry of dynamically ingested real operational locations
 let _realLocationsRegistry: CanonicalLocation[] = [];
@@ -325,8 +382,8 @@ export function getAvailableRealRegions(): RegionSummary[] {
     }
   });
 
-  // Merge any explicitly registered real locations
-  _realLocationsRegistry.forEach((loc) => {
+  // Merge canonical baseline locations
+  CANONICAL_ODISHA_LOCATIONS.forEach((loc) => {
     if (!regionMap.has(loc.id)) {
       regionMap.set(loc.id, {
         id: loc.id,
@@ -335,6 +392,32 @@ export function getAvailableRealRegions(): RegionSummary[] {
         district: loc.district,
         displayName: `${loc.district}, ${loc.state}`,
         coordinates: loc.coordinates,
+        population: loc.population,
+        populationSource: loc.populationSource,
+        activeHazardCount: 0,
+        activeAlertCount: 0,
+        reportCount: 0,
+        incidentCount: 0,
+        roadDisruptionCount: 0,
+        shelterCount: 0,
+        lastUpdated: loc.registeredAt,
+      });
+    }
+  });
+
+  // Merge any explicitly registered real locations
+  _realLocationsRegistry.forEach((loc) => {
+    if (!regionMap.has(loc.id)) {
+      const canonicalMatch = CANONICAL_ODISHA_LOCATIONS.find((c) => c.id === loc.id);
+      regionMap.set(loc.id, {
+        id: loc.id,
+        country: loc.country,
+        state: loc.state,
+        district: loc.district,
+        displayName: `${loc.district}, ${loc.state}`,
+        coordinates: loc.coordinates,
+        population: canonicalMatch?.population,
+        populationSource: canonicalMatch?.populationSource,
         activeHazardCount: 0,
         activeAlertCount: 0,
         reportCount: 0,

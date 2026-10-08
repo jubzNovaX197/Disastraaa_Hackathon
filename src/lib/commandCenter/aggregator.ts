@@ -24,6 +24,8 @@ import { formatNumber } from '@/lib/utils';
 import { calculateFloodRisk } from '@/lib/risk/flood';
 import { calculateCycloneRisk } from '@/lib/risk/cyclone';
 import { getAllCachedWeather } from '@/lib/weather/store';
+import type { NormalizedWeather } from '@/lib/weather/types';
+import type { RegionSummary } from '@/lib/geo/regions';
 import type { HazardType, Severity, ReportStatus } from '@/types';
 import type { RoadStatus, RoadSegment } from '@/lib/roads/types';
 import type { DemoAlert as Alert, Shelter } from '@/data/types';
@@ -145,6 +147,8 @@ export interface CommandCenterDataOverrides {
   resourceStocks?: Record<string, number>;
   riverGaugeDeltas?: Record<string, number>;
   rainfallDeltas?: Record<string, number>;
+  weather?: NormalizedWeather[];
+  regions?: RegionSummary[];
   environment?: 'REAL' | 'DEMO';
 }
 
@@ -172,8 +176,8 @@ export function aggregateCommandCenterData(overrides?: CommandCenterDataOverride
   let priorityLocations: PriorityLocation[];
 
   if (isReal) {
-    const realRegions = getAvailableRealRegions();
-    const cachedWeatherList = getAllCachedWeather();
+    const realRegions = overrides?.regions && overrides.regions.length > 0 ? overrides.regions : getAvailableRealRegions();
+    const cachedWeatherList = overrides?.weather && overrides.weather.length > 0 ? overrides.weather : getAllCachedWeather();
 
     priorityLocations = realRegions.map((region) => {
       const localAlerts = activeAlerts.filter(
@@ -189,15 +193,46 @@ export function aggregateCommandCenterData(overrides?: CommandCenterDataOverride
       const localRoads = roads.filter(
         (rd) =>
           (rd.administrativeArea && rd.administrativeArea.toLowerCase().includes(region.district.toLowerCase())) ||
-          rd.name.toLowerCase().includes(region.district.toLowerCase()),
+          rd.name.toLowerCase().includes(region.district.toLowerCase()) ||
+          (region.coordinates && rd.coordinates.length > 0 &&
+            Math.hypot(rd.coordinates[0][0] - region.coordinates[0], rd.coordinates[0][1] - region.coordinates[1]) < 0.6),
       );
+
+      // Correlate shelters
+      const localShelters = shelters.filter(
+        (s) =>
+          (s.address && s.address.toLowerCase().includes(region.district.toLowerCase())) ||
+          (region.displayName && s.address && s.address.toLowerCase().includes(region.displayName.toLowerCase())) ||
+          (region.coordinates && s.coordinates &&
+            Math.hypot(s.coordinates[0] - region.coordinates[0], s.coordinates[1] - region.coordinates[1]) < 0.6),
+      );
+      const totalShelterCapacity = localShelters.reduce((sum, s) => sum + (s.capacity || 0), 0);
+      const totalShelterOccupancy = localShelters.reduce((sum, s) => sum + (s.occupancy || 0), 0);
+      const shelterGap = Math.max(0, totalShelterOccupancy - totalShelterCapacity);
+      const shelterSurplus = Math.max(0, totalShelterCapacity - totalShelterOccupancy);
+      const shelterPressureLabel =
+        totalShelterCapacity > 0
+          ? shelterGap > 0
+            ? `SHORTAGE (-${formatNumber(shelterGap)})`
+            : `AVAILABLE (+${formatNumber(shelterSurplus)})`
+          : 'SUFFICIENT';
+
+      // Correlate roads
+      const localBlockedRoads = localRoads.filter((r) => r.status === 'BLOCKED' || r.status === 'CLOSED');
+      const roadAccessibility: PriorityLocation['roadAccessibility'] =
+        localBlockedRoads.length > 0
+          ? 'BLOCKED'
+          : localRoads.some((r) => r.status === 'PARTIALLY_BLOCKED' || r.status === 'CAUTION')
+          ? 'PARTIAL'
+          : 'OPEN';
+      const blockedRoadsKm = Math.round(localBlockedRoads.reduce((sum, r) => sum + (r.lengthKm || 0), 0) * 10) / 10;
 
       // Match real weather observation if available
       const matchingWeather = cachedWeatherList.find(
         (w) =>
           (region.district && w.district && w.district.toLowerCase().includes(region.district.toLowerCase())) ||
           (region.displayName && w.locationName && w.locationName.toLowerCase().includes(region.displayName.toLowerCase())) ||
-          (region.coordinates &&
+          (region.coordinates && w.coordinates &&
             Math.hypot(w.coordinates[0] - region.coordinates[0], w.coordinates[1] - region.coordinates[1]) < 0.6),
       );
 
@@ -205,6 +240,8 @@ export function aggregateCommandCenterData(overrides?: CommandCenterDataOverride
       let cycloneScore = 0;
       let weatherRiskScore = 0;
       let dominantHazard: HazardType | 'MULTI_HAZARD' = 'MULTI_HAZARD';
+
+      const regionalPopulation = region.population || 50000;
 
       if (matchingWeather) {
         const precip24h = Math.max(0, matchingWeather.precipitationMm * 24);
@@ -215,7 +252,7 @@ export function aggregateCommandCenterData(overrides?: CommandCenterDataOverride
             riverLevelMetres: riverSurgeProxy,
             elevationMetres: 18,
             distanceFromRiverKm: 3.0,
-            exposedPopulation: 35000,
+            exposedPopulation: regionalPopulation,
             historicalFloodFrequency: 1.5,
             infrastructureVulnerabilityIndex: 0.35,
           },
@@ -230,7 +267,7 @@ export function aggregateCommandCenterData(overrides?: CommandCenterDataOverride
             rainfallMmPerDay: precip24h,
             stormSurgeMetres: pressureDropSurge,
             distanceFromTrackKm: 45,
-            exposedPopulation: 45000,
+            exposedPopulation: regionalPopulation,
             elevationMetres: 18,
             historicalCycloneFrequency: 1.2,
             infrastructureVulnerabilityIndex: 0.35,
@@ -248,10 +285,16 @@ export function aggregateCommandCenterData(overrides?: CommandCenterDataOverride
         weatherRiskScore = Math.max(floodScore, cycloneScore);
       }
 
-      const hasActivity = localAlerts.length > 0 || localReports.length > 0 || localRoads.length > 0;
-      const activityScore = hasActivity ? Math.min(100, 30 + localReports.length * 15 + localAlerts.length * 20) : 0;
+      const hasActivity = localAlerts.length > 0 || localReports.length > 0 || localBlockedRoads.length > 0;
+      const activityScore = hasActivity ? Math.min(100, 30 + localReports.length * 15 + localAlerts.length * 20 + localBlockedRoads.length * 25) : 0;
       const riskScore = Math.max(activityScore, weatherRiskScore);
       const severity: Severity = riskScore >= 80 ? 'CRITICAL' : riskScore >= 65 ? 'HIGH' : riskScore >= 45 ? 'MODERATE' : 'LOW';
+
+      // Exposed population is only calculated when a genuine hazard corridor exists (MODERATE+ risk or active alert)
+      const hasElevatedHazard = riskScore >= 45 || localAlerts.length > 0;
+      const populationExposed = hasElevatedHazard
+        ? Math.round(regionalPopulation * (riskScore >= 65 ? 0.35 : riskScore >= 45 ? 0.15 : 0.05))
+        : 0;
 
       return {
         id: region.id,
@@ -261,23 +304,23 @@ export function aggregateCommandCenterData(overrides?: CommandCenterDataOverride
         riskScore,
         severity,
         dominantHazard,
-        populationExposed: 0,
+        populationExposed,
         floodRiskScore: floodScore,
         cycloneRiskScore: cycloneScore,
         activeAlertCount: localAlerts.length,
         activeAlertStatus: localAlerts.length > 0 ? (localAlerts.some((a) => a.severity === 'CRITICAL') ? 'CRITICAL' : 'HIGH') : 'CLEAR',
-        roadAccessibility: localRoads.some((r) => r.status === 'BLOCKED' || r.status === 'CLOSED') ? 'BLOCKED' : 'OPEN',
-        shelterStatus: 'SUFFICIENT',
-        shelterCapacity: 0,
-        shelterDemand: 0,
-        shelterGap: 0,
-        shelterPressureLabel: 'Normal',
+        roadAccessibility,
+        shelterStatus: shelterGap > 0 ? 'SHORTAGE' : 'SUFFICIENT',
+        shelterCapacity: totalShelterCapacity,
+        shelterDemand: totalShelterOccupancy,
+        shelterGap,
+        shelterPressureLabel,
         resourceShortageCount: 0,
         resourceGapSummary: 'Normal',
         rankScore: riskScore,
         impact: {
           buildings: 0,
-          roadsKm: 0,
+          roadsKm: blockedRoadsKm,
           hospitals: 0,
           schools: 0,
         },
