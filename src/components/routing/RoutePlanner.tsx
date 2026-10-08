@@ -19,15 +19,19 @@ import { useState, useMemo, useCallback, useEffect } from 'react';
 import {
   Compass,
   FileText,
+  Globe,
+  Loader2,
   MapPin,
   Radio,
+  RefreshCw,
   Shield,
   ShieldAlert,
   Sparkles,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { DEMO_NODES, calculateRoutes } from '@/lib/routing';
+import { DEMO_NODES, calculateRoutes, buildGraphFromRoadSegments, type RoutingGraph } from '@/lib/routing';
 import type { RouteResult, RouteNode, RouteComparison } from '@/lib/routing/types';
+import type { RoadSegment } from '@/lib/roads/types';
 import type { LngLat } from '@/data/types';
 import { calculateDestinationSafety } from '@/lib/destination/engine';
 import { calculateTravelRisk } from '@/lib/destination/travelEngine';
@@ -330,23 +334,96 @@ export function RoutePlanner({
   const [activeTab, setActiveTab] = useState<'JOURNEY' | 'ROUTES' | 'DESTINATION' | 'TRANSIT_RISK'>('JOURNEY');
   const [error, setError] = useState<string>('');
 
-  // 1. Calculate Destination Safety whenever destinationId or scenario changes (DEMO mode only)
+  // Real OSM Graph state
+  const [realRoads, setRealRoads] = useState<RoadSegment[]>([]);
+  const [realGraph, setRealGraph] = useState<RoutingGraph | null>(null);
+  const [isLoadingReal, setIsLoadingReal] = useState<boolean>(false);
+  const [realLoadError, setRealLoadError] = useState<string | null>(null);
+
+  // Fetch real OSM roads and build operational routing graph when in REAL mode
+  useEffect(() => {
+    if (environment !== 'REAL') return;
+    let isMounted = true;
+    setIsLoadingReal(true);
+    fetch('/api/roads?env=REAL')
+      .then((res) => res.json())
+      .then((data) => {
+        if (!isMounted) return;
+        if (data.success && Array.isArray(data.roads) && data.roads.length > 0) {
+          setRealRoads(data.roads);
+          const g = buildGraphFromRoadSegments(data.roads);
+          setRealGraph(g);
+          setRealLoadError(null);
+        } else {
+          setRealLoadError(data.error || 'No operational road segments returned.');
+        }
+      })
+      .catch((err) => {
+        if (isMounted) setRealLoadError(err.message || 'Failed to connect to road network API.');
+      })
+      .finally(() => {
+        if (isMounted) setIsLoadingReal(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [environment]);
+
+  const handleTriggerIngest = useCallback(() => {
+    setIsLoadingReal(true);
+    setRealLoadError(null);
+    fetch('/api/roads?env=REAL&ingest=true')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.roads) && data.roads.length > 0) {
+          setRealRoads(data.roads);
+          const g = buildGraphFromRoadSegments(data.roads);
+          setRealGraph(g);
+          setRealLoadError(null);
+        } else {
+          setRealLoadError(data.error || 'Ingestion returned 0 operational road segments.');
+        }
+      })
+      .catch((err) => {
+        setRealLoadError(err.message || 'Failed to execute Overpass ingestion.');
+      })
+      .finally(() => {
+        setIsLoadingReal(false);
+      });
+  }, []);
+
+  const effectiveGraph = useMemo(() => {
+    if (environment === 'REAL') {
+      return realGraph ?? undefined;
+    }
+    return undefined; // DEMO graph fallback
+  }, [environment, realGraph]);
+
+  const destNode = useMemo(() => {
+    if (!destinationId) return null;
+    return effectiveGraph?.nodeById?.[destinationId];
+  }, [destinationId, effectiveGraph]);
+
+  // 1. Calculate Destination Safety whenever destinationId or scenario changes
   const destinationSafety = useMemo(() => {
-    if (environment === 'REAL' || !destinationId) return null;
+    if (!destinationId) return null;
     return calculateDestinationSafety({
       destinationId,
+      coordinates: destNode?.coordinates,
+      destinationName: destNode?.name,
       scenarioSlot: activeSlotKey,
       selectedDate: customDate || undefined,
       selectedTime: customTime || undefined,
       environment,
     });
-  }, [environment, destinationId, activeSlotKey, customDate, customTime]);
+  }, [environment, destinationId, activeSlotKey, customDate, customTime, destNode]);
 
-  // 2. Calculate Routes when origin & destination are selected and calculated is true (DEMO mode only)
+  // 2. Calculate Routes when origin & destination are selected and calculated is true
   const results = useMemo(() => {
-    if (environment === 'REAL' || !calculated || !originId || !destinationId) return null;
-    return calculateRoutes({ originNodeId: originId, destinationNodeId: destinationId });
-  }, [environment, calculated, originId, destinationId]);
+    if (!calculated || !originId || !destinationId) return null;
+    return calculateRoutes({ originNodeId: originId, destinationNodeId: destinationId }, effectiveGraph);
+  }, [calculated, originId, destinationId, effectiveGraph]);
 
   const activeResult = results
     ? (results[activeMode.toLowerCase() as keyof typeof results] as RouteResult)
@@ -474,29 +551,52 @@ export function RoutePlanner({
     }
   }, [environment, activeResult, destinationSafety, onRouteSelected, onRouteClear]);
 
-  const nodeOptions = DEMO_NODES.filter((n) => n.type !== 'JUNCTION');
+  const nodeOptions = useMemo(() => {
+    if (environment === 'REAL') {
+      if (!realGraph || realGraph.nodes.length === 0) return [];
+      return realGraph.nodes;
+    }
+    return DEMO_NODES.filter((n) => n.type !== 'JUNCTION');
+  }, [environment, realGraph]);
 
-  if (environment === 'REAL') {
+  // If in REAL mode but no real OSM network has loaded yet, display professional standby state
+  if (environment === 'REAL' && (!realGraph || realGraph.nodes.length === 0)) {
     return (
       <div className="p-8 sm:p-12 text-center rounded-2xl bg-white dark:bg-surface-card border border-slate-200 dark:border-white/[0.08] space-y-4">
         <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-600 dark:text-cyan-400 mx-auto flex items-center justify-center">
-          <Compass className="w-7 h-7" />
+          {isLoadingReal ? <Loader2 className="w-7 h-7 animate-spin" /> : <Compass className="w-7 h-7" />}
         </div>
         <div className="space-y-1.5 max-w-lg mx-auto">
-          <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100">
-            Real Road Network Data Unavailable
+          <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center justify-center gap-2">
+            <span>Live Road Intelligence &amp; Transit Routing Graph Standing By</span>
           </h3>
           <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-            Real-time highway network telemetry, origin-to-destination safe routing, and destination safety scoring are in standby mode until live road authority feeds and PostGIS road layers are connected.
+            {isLoadingReal
+              ? 'Ingesting real OpenStreetMap / Overpass geospatial corridor telemetry for live origin-destination routing...'
+              : 'Real-time road network telemetry connects to live OpenStreetMap Overpass and PostGIS geospatial tables.'}
           </p>
+          {realLoadError && (
+            <p className="text-xs text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-lg p-2 mt-2">
+              ⚠️ {realLoadError}
+            </p>
+          )}
         </div>
-        <div className="pt-2">
+        <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
+          <button
+            type="button"
+            disabled={isLoadingReal}
+            onClick={handleTriggerIngest}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-cyan-500/20 border border-cyan-500/35 text-cyan-300 hover:bg-cyan-500/30 transition-colors shadow-sm disabled:opacity-50"
+          >
+            {isLoadingReal ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+            <span>{isLoadingReal ? 'Connecting to Overpass...' : 'Connect & Ingest Live OSM Roads'}</span>
+          </button>
           <button
             type="button"
             onClick={() => switchEnvironment('DEMO')}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-amber-500/15 border border-amber-500/30 text-amber-700 dark:text-amber-300 hover:bg-amber-500/25 transition-colors shadow-sm"
           >
-            <span>Explore Multi-Factor Route Planning in Demo Simulation</span>
+            <span>Explore Demo Simulation</span>
             <Sparkles className="w-3.5 h-3.5" />
           </button>
         </div>
@@ -507,17 +607,41 @@ export function RoutePlanner({
   return (
     <div className={cn('flex flex-col gap-4', className)}>
       {/* Operations disclaimer */}
-      <div className="px-3.5 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-xs text-amber-800 dark:text-amber-200 flex items-start gap-2.5 backdrop-blur-md">
-        <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+      <div
+        className={cn(
+          'px-3.5 py-2.5 rounded-xl border text-xs flex items-start gap-2.5 backdrop-blur-md',
+          environment === 'REAL'
+            ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-800 dark:text-emerald-200'
+            : 'bg-amber-500/10 border-amber-500/25 text-amber-800 dark:text-amber-200'
+        )}
+      >
+        {environment === 'REAL' ? (
+          <Globe className="w-4 h-4 text-emerald-600 dark:text-emerald-400 mt-0.5 flex-shrink-0" />
+        ) : (
+          <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+        )}
         <div className="space-y-0.5">
           <div className="font-bold flex items-center gap-2">
-            <span>Safe Transit &amp; Corridor Risk Intelligence</span>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-700 dark:text-amber-300 font-bold uppercase tracking-wider">
-              Decision Support
+            <span>
+              {environment === 'REAL'
+                ? 'Real OpenStreetMap Road Intelligence & Transit Corridor'
+                : 'Safe Transit & Corridor Risk Intelligence'}
+            </span>
+            <span
+              className={cn(
+                'text-[10px] font-mono px-2 py-0.5 rounded font-bold uppercase tracking-wider',
+                environment === 'REAL'
+                  ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300'
+                  : 'bg-amber-500/20 text-amber-700 dark:text-amber-300'
+              )}
+            >
+              {environment === 'REAL' ? 'REAL OSM INGESTION ACTIVE' : 'Decision Support'}
             </span>
           </div>
           <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
-            Multi-hazard scenario model for emergency transit decision-support. Not live GPS traffic or official evacuation mandates.
+            {environment === 'REAL'
+              ? `Connected to ${realRoads.length} real public OpenStreetMap road segments. Live origin-to-destination graph routing active.`
+              : 'Multi-hazard scenario model for emergency transit decision-support. Not live GPS traffic or official evacuation mandates.'}
           </p>
         </div>
       </div>

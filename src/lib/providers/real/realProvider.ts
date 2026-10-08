@@ -110,13 +110,16 @@ export class RealHazardProvider implements HazardProvider {
   }
 }
 
+import { osmRoadStore } from '@/lib/roads/osmStore';
+import { osmShelterStore } from '@/lib/shelters/osmStore';
+
 export class RealRoadProvider implements RoadProvider {
   async getBlockedRoads(): Promise<BlockedRoad[]> {
     // Derives disruptions from real verified reports/incidents
     const incidents = getIncidents('REAL').filter(
       (inc) => inc.status !== 'RESOLVED' && inc.incidentType === INCIDENT_TYPES.ROAD_BLOCKAGE,
     );
-    return incidents.map((inc) => ({
+    const incidentBlockages: BlockedRoad[] = incidents.map((inc) => ({
       id: inc.id,
       name: inc.title,
       severity: inc.severity === 'CRITICAL' ? 'FULL' : 'PARTIAL',
@@ -124,17 +127,78 @@ export class RealRoadProvider implements RoadProvider {
       coordinates: inc.coordinates ? [[inc.coordinates[0], inc.coordinates[1]]] : [],
       since: inc.createdAt,
     }));
+
+    // Also include any road segments that are marked blocked
+    const allSegments = await osmRoadStore.getRoadSegments();
+    const blockedSegments = allSegments
+      .filter((s) => s.status === 'BLOCKED' || s.status === 'CLOSED')
+      .map((s) => ({
+        id: s.id,
+        name: s.name,
+        severity: (s.status === 'CLOSED' ? 'FULL' : 'PARTIAL') as 'FULL' | 'PARTIAL',
+        reason: s.authorityVerification.notes || 'Roadway reported impassable on operational network',
+        coordinates: s.coordinates,
+        since: s.lastUpdated,
+      }));
+
+    return [...incidentBlockages, ...blockedSegments];
   }
+
   async getRoadSegments(): Promise<RoadSegment[]> {
-    // Real road network baseline without fictional closures
-    return [];
+    const segments = await osmRoadStore.getRoadSegments();
+
+    // Correlate with active road blockage incidents
+    const incidents = getIncidents('REAL').filter(
+      (inc) => inc.status !== 'RESOLVED' && inc.incidentType === INCIDENT_TYPES.ROAD_BLOCKAGE,
+    );
+
+    if (incidents.length === 0) {
+      return segments;
+    }
+
+    // Correlate incidents to nearby road segments
+    return segments.map((seg) => {
+      const matchingInc = incidents.find((inc) => {
+        if (!inc.coordinates || seg.coordinates.length === 0) return false;
+        const [incLon, incLat] = inc.coordinates;
+        // Check if any point on road is within ~500m of incident
+        return seg.coordinates.some(([rLon, rLat]) => {
+          const dLon = Math.abs(rLon - incLon);
+          const dLat = Math.abs(rLat - incLat);
+          return dLon < 0.005 && dLat < 0.005;
+        });
+      });
+
+      if (!matchingInc) return seg;
+
+      const mappedSeverity =
+        matchingInc.severity === 'CRITICAL'
+          ? 'CRITICAL'
+          : matchingInc.severity === 'HIGH'
+            ? 'HIGH'
+            : matchingInc.severity === 'LOW'
+              ? 'LOW'
+              : 'MODERATE';
+
+      return {
+        ...seg,
+        status: matchingInc.severity === 'CRITICAL' ? 'BLOCKED' : 'PARTIALLY_BLOCKED',
+        severity: mappedSeverity,
+        travelRisk: {
+          ...seg.travelRisk,
+          score: matchingInc.severity === 'CRITICAL' ? 90 : 65,
+          severity: mappedSeverity,
+          safeToTravel: false,
+          explanation: `Operational blockage confirmed: ${matchingInc.title}`,
+        },
+      };
+    });
   }
 }
 
 export class RealShelterProvider implements ShelterProvider {
   async getShelters(): Promise<Shelter[]> {
-    // In real mode, empty or connected to live municipal shelter telemetry
-    return [];
+    return osmShelterStore.getShelters();
   }
 }
 
@@ -158,10 +222,26 @@ export class RealDisasterDataProvider implements DisasterDataProvider {
   readonly isLive = true;
   private hazardProvider = new RealHazardProvider();
   private roadProvider = new RealRoadProvider();
+  private shelterProvider = new RealShelterProvider();
 
   async getDataset(): Promise<DisasterDataset> {
     const realReports = getAllReports('REAL');
-    const blockedRoads = await this.roadProvider.getBlockedRoads();
+    const [
+      [blockedRoads, roads],
+      shelters,
+      [riskZones, floodAreas, cycloneZones],
+    ] = await Promise.all([
+      Promise.all([
+        this.roadProvider.getBlockedRoads(),
+        this.roadProvider.getRoadSegments(),
+      ]),
+      this.shelterProvider.getShelters(),
+      Promise.all([
+        this.hazardProvider.getRiskZones(),
+        this.hazardProvider.getFloodAreas(),
+        this.hazardProvider.getCycloneZones(),
+      ]),
+    ]);
 
     // Map real reports to citizen reports format for map display
     const mappedReports = realReports.map((r) => ({
@@ -177,21 +257,15 @@ export class RealDisasterDataProvider implements DisasterDataProvider {
       severity: r.severity,
     }));
 
-    const [riskZones, floodAreas, cycloneZones] = await Promise.all([
-      this.hazardProvider.getRiskZones(),
-      this.hazardProvider.getFloodAreas(),
-      this.hazardProvider.getCycloneZones(),
-    ]);
-
     return {
       riskZones,
       floodAreas,
-      shelters: [],
+      shelters,
       alerts: [],
       infrastructure: [],
       blockedRoads,
       citizenReports: mappedReports,
-      roads: [],
+      roads,
       cycloneZones,
       cycloneTrack: null,
       sourceType: 'LIVE_OPERATIONAL',
