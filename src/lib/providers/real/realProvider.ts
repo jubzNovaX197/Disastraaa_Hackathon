@@ -41,21 +41,71 @@ export class RealAlertProvider implements AlertProvider {
   }
 }
 
+import { weatherRiskService, createCircularPolygon } from '@/lib/ingestion/risk/weatherRiskService';
+import { hazardRepository } from '@/lib/ingestion/repositories/hazardRepository';
+
 export class RealHazardProvider implements HazardProvider {
   async getRiskZones(): Promise<RiskZone[]> {
-    // Real mode only shows zones with actual active alerts or monitoring
-    return [];
+    // 1. Derived risk zones from live Open-Meteo weather telemetry
+    const derived = await weatherRiskService.computeDerivedRisks();
+
+    // 2. Active hazards from NASA EONET and NASA FIRMS
+    const activeHazards = await hazardRepository.getActiveHazards();
+    const ingestedZones: RiskZone[] = activeHazards.map((h) => {
+      const ring = createCircularPolygon(h.coordinates, h.hazardType === 'CYCLONE' ? 30 : 15);
+      return {
+        id: `rz-${h.id}`,
+        name: h.title,
+        severity: h.severity,
+        coordinates: ring,
+        primaryHazard: h.hazardType,
+        riskScore: h.severity === 'CRITICAL' ? 88 : h.severity === 'HIGH' ? 68 : 45,
+        affectedPopulation: 25000,
+        description: `${h.description} [${h.source}]`,
+      };
+    });
+
+    return [...derived.riskZones, ...ingestedZones];
   }
+
   async getFloodAreas(): Promise<FloodArea[]> {
-    // Empty until real-time flood monitoring / gauge telemetry is triggered
-    return [];
+    const derived = await weatherRiskService.computeDerivedRisks();
+    const activeHazards = await hazardRepository.getActiveHazards();
+    const floodHazards = activeHazards.filter((h) => h.hazardType === 'FLOOD');
+    const ingestedFloods: FloodArea[] = floodHazards.map((h) => ({
+      id: `fa-${h.id}`,
+      name: h.title,
+      severity: h.severity,
+      type: 'FLOOD',
+      coordinates: createCircularPolygon(h.coordinates, 18),
+      depthMeters: h.severity === 'CRITICAL' ? 2.5 : 1.2,
+      areaKm2: 24,
+      lastUpdated: h.updatedAt,
+      description: h.description,
+    }));
+
+    return [...derived.floodAreas, ...ingestedFloods];
   }
+
   async getCycloneZones(): Promise<RiskZone[]> {
-    // No simulated storm zones in real mode
-    return [];
+    const derived = await weatherRiskService.computeDerivedRisks();
+    const activeHazards = await hazardRepository.getActiveHazards();
+    const stormHazards = activeHazards.filter((h) => h.hazardType === 'CYCLONE');
+    const stormZones: RiskZone[] = stormHazards.map((h) => ({
+      id: `rz-cyclone-${h.id}`,
+      name: h.title,
+      severity: h.severity,
+      coordinates: createCircularPolygon(h.coordinates, 35),
+      primaryHazard: 'CYCLONE',
+      riskScore: h.severity === 'CRITICAL' ? 92 : 75,
+      affectedPopulation: 45000,
+      description: h.description,
+    }));
+
+    return [...derived.cycloneZones, ...stormZones];
   }
+
   async getCycloneTrack(): Promise<CycloneTrack | null> {
-    // No simulated track in real mode
     return null;
   }
 }

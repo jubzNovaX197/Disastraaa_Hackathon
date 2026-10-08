@@ -25,6 +25,7 @@ interface RouteMapOverlayProps {
   onDestinationClear?: () => void;
   onCorridorHighlighted?: (points: Array<{ coordinates: [number, number]; risk: string; name: string }>) => void;
   className?: string;
+  environment?: 'REAL' | 'DEMO';
 }
 
 export function RouteMapOverlay({
@@ -34,6 +35,7 @@ export function RouteMapOverlay({
   onDestinationClear,
   onCorridorHighlighted,
   className,
+  environment,
 }: RouteMapOverlayProps) {
   const [open, setOpen] = useState(false);
 
@@ -105,6 +107,7 @@ export function RouteMapOverlay({
           {/* Planner body with dedicated scrolling */}
           <div className="p-3.5 sm:p-4 flex-1 min-h-0 overflow-y-auto space-y-3.5">
             <RoutePlanner
+              environment={environment}
               onRouteSelected={onRouteSelected}
               onRouteClear={handleRouteClear}
               onDestinationSelected={onDestinationSelected}

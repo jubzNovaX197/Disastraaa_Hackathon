@@ -79,6 +79,8 @@ export interface DestinationSafetyRequest {
   selectedTime?: string;
   scenarioSlot?: ScenarioSlotKey | string;
   routeRiskScore?: number;
+  environment?: import('@/lib/env').AppEnvironment;
+  historicalEvents?: import('@/lib/historical/types').HistoricalDisasterEvent[];
 }
 
 // ── Destination Safety Result ───────────────────────────────────────────────

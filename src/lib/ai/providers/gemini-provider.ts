@@ -111,7 +111,11 @@ Provide a concise, data-grounded response according to the exact required format
       }
 
       // Parse structured sections from generated markdown
-      const sections = this.parseSections(rawText, context.dataFreshness.lastSyncFormatted);
+      const sections = this.parseSections(
+        rawText,
+        context.dataFreshness.lastSyncFormatted,
+        context.dataFreshness.isSimulated,
+      );
 
       const sources = ['Risk Intelligence', 'Active Alerts', 'Command Operations'];
       if (context.recentLiveEvents?.length) sources.push('Live Intelligence');
@@ -119,7 +123,9 @@ Provide a concise, data-grounded response according to the exact required format
       if (context.relevantShelters?.length) sources.push('Shelter Readiness');
       if (context.relevantResources?.length) sources.push('Resource Readiness');
 
-      const dataQuality: DataQualityBadge[] = ['VERIFIED', 'PREDICTED', 'SIMULATED'];
+      const dataQuality: DataQualityBadge[] = context.dataFreshness.isSimulated
+        ? ['VERIFIED', 'PREDICTED', 'SIMULATED']
+        : ['VERIFIED', 'LIVE_UPDATED'];
 
       return {
         text: rawText,
@@ -137,7 +143,7 @@ Provide a concise, data-grounded response according to the exact required format
     }
   }
 
-  private parseSections(text: string, freshnessStr: string): StructuredSections {
+  private parseSections(text: string, freshnessStr: string, isSimulated = false): StructuredSections {
     const extractSection = (heading: string): string => {
       const regex = new RegExp(`###\\s*${heading}[\\r\\n]+([\\s\\S]*?)(?=###|$)`, 'i');
       const match = text.match(regex);
@@ -166,8 +172,11 @@ Provide a concise, data-grounded response according to the exact required format
 
     const operationalContext =
       extractSection('Operational Context') || 'State Emergency Operations Center guidelines active.';
+    const defaultFreshness = isSimulated
+      ? `Synchronized ${freshnessStr} (Simulated Live Feed)`
+      : `Synchronized ${freshnessStr} (Live Operational Feed)`;
     const dataFreshness =
-      extractSection('Data Freshness') || `Synchronized ${freshnessStr} (Simulated Live Feed)`;
+      extractSection('Data Freshness') || defaultFreshness;
 
     return {
       situation,

@@ -115,6 +115,7 @@ export function calculateJourneyRisk(req: JourneyRiskRequest): JourneyRiskResult
       scenarioSlot,
       selectedDate,
       selectedTime,
+      environment: req.environment,
     });
 
   const destSafetyScore = destSafety.safetyScore; // 0–100, HIGHER = SAFER
@@ -511,6 +512,7 @@ export function calculateJourneyRisk(req: JourneyRiskRequest): JourneyRiskResult
       scenarioSlot: slotKey,
       selectedDate: sc.targetDate,
       selectedTime: sc.targetTime,
+      environment: req.environment,
     });
 
     const timeDestRisk = clampScore(100 - timeDestSafety.safetyScore);

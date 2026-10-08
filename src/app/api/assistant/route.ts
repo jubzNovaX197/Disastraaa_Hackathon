@@ -9,6 +9,8 @@ import { NextResponse } from 'next/server';
 import { assistantEngine } from '@/lib/ai/engine';
 import type { AssistantQueryRequest } from '@/lib/ai/types';
 
+import { resolveServerEnvironment } from '@/lib/env';
+
 export async function POST(req: Request) {
   try {
     const body = (await req.json()) as AssistantQueryRequest;
@@ -27,10 +29,16 @@ export async function POST(req: Request) {
       );
     }
 
+    const serverEnv = await resolveServerEnvironment();
+    const liveOverrides: Partial<import('@/lib/realtime/types').LiveDataOverrides> = {
+      ...(body.liveOverrides || {}),
+      environment: body.liveOverrides?.environment || serverEnv,
+    };
+
     const payload = await assistantEngine.processQuery({
       question: body.question.trim(),
       locationFocus: body.locationFocus,
-      liveOverrides: body.liveOverrides,
+      liveOverrides,
       secondsSinceSync: body.secondsSinceSync,
       role: body.role,
     });

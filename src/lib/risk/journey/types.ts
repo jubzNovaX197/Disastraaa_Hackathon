@@ -179,6 +179,7 @@ export interface JourneyRiskRequest {
   scenarioSlot?: ScenarioSlotKey | string;
   selectedRoute?: RouteResult | null;
   destinationSafety?: DestinationSafetyResult | null;
+  environment?: import('@/lib/env').AppEnvironment;
 }
 
 export interface JourneyRiskContributions {

@@ -334,8 +334,15 @@ export function LiveIntelligenceProvider({
       setSecondsSinceSync(0);
 
       return { report, incident };
-    } catch {
-      // Local fallback
+    } catch (err: unknown) {
+      if (environment === 'REAL') {
+        // In REAL mode, never silently fall back to creating a demo/simulated report on API failure.
+        // Re-throw so the submission failure state is shown to the user and their input is preserved.
+        console.error('Citizen report submission failed in REAL mode:', err);
+        throw err;
+      }
+
+      // Local fallback for DEMO mode only
       const report = createCitizenReport(input, demoDataset);
       saveReport(report);
       const incType = mapReportTypeToIncidentType(report.reportType);
@@ -364,7 +371,7 @@ export function LiveIntelligenceProvider({
       }));
       return { report, incident };
     }
-  }, []);
+  }, [environment]);
 
   // Freshness second ticker
   useEffect(() => {

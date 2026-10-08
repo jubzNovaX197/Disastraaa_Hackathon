@@ -25,7 +25,9 @@ export class DeterministicProvider implements AIProvider {
     const currentData: Record<string, string | number> = {};
     let operationalContext = '';
     const sources: string[] = ['Risk Intelligence', 'Operational Command Center'];
-    const dataQuality: DataQualityBadge[] = ['VERIFIED', 'PREDICTED', 'SIMULATED'];
+    const dataQuality: DataQualityBadge[] = context.dataFreshness.isSimulated
+      ? ['VERIFIED', 'PREDICTED', 'SIMULATED']
+      : ['VERIFIED', 'LIVE_UPDATED'];
 
     switch (intent) {
       case 'SITUATION_SUMMARY': {
@@ -190,15 +192,22 @@ export class DeterministicProvider implements AIProvider {
 
       case 'LIVE_CHANGE_QUERY': {
         sources.push('Live Intelligence', 'Real-Time Telemetry Stream');
-        dataQuality.push('LIVE_UPDATED');
+        if (!dataQuality.includes('LIVE_UPDATED')) {
+          dataQuality.push('LIVE_UPDATED');
+        }
         const events = context.recentLiveEvents || [];
-        situation = `Real-time disaster telemetry ${locPrefix} recorded ${events.length} dynamic operational updates in the recent stream cycle.`;
+        if (events.length === 0) {
+          situation = `Real-time disaster telemetry ${locPrefix} indicates zero active operational telemetry events recorded in the current monitoring window.`;
+          keyFactors.push('Telemetry feeds standing by for real-time sensor and authority updates.');
+          currentData['Latest Telemetry Event'] = 'None / Standby';
+        } else {
+          situation = `Real-time disaster telemetry ${locPrefix} recorded ${events.length} dynamic operational updates in the recent stream cycle.`;
+          events.forEach((e) => {
+            keyFactors.push(`[${e.timeFormatted}] ${e.title}: ${e.summary}`);
+          });
+          currentData['Latest Telemetry Event'] = events[0]?.title || 'None';
+        }
 
-        events.forEach((e) => {
-          keyFactors.push(`[${e.timeFormatted}] ${e.title}: ${e.summary}`);
-        });
-
-        currentData['Latest Telemetry Event'] = events[0]?.title || 'Naraj Inflow Spike';
         currentData['Recent Events Processed'] = events.length;
         currentData['Stream Freshness'] = context.dataFreshness.lastSyncFormatted;
 
