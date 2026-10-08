@@ -35,6 +35,33 @@ function deriveSeverity(hazardType: HazardType, geom?: EonetGeometry, isOpen: bo
   return isOpen ? 'HIGH' : 'LOW';
 }
 
+function extractCentroidOrPoint(coordinates: any): [number, number] | null {
+  if (!Array.isArray(coordinates) || coordinates.length === 0) return null;
+
+  // Case 1: Point [lon, lat]
+  if (typeof coordinates[0] === 'number' && typeof coordinates[1] === 'number') {
+    return [coordinates[0], coordinates[1]];
+  }
+
+  // Case 2: LineString or Polygon ring [[lon, lat], ...]
+  if (Array.isArray(coordinates[0]) && typeof coordinates[0][0] === 'number') {
+    const ring = coordinates as [number, number][];
+    const avgLon = ring.reduce((s, p) => s + (p[0] || 0), 0) / ring.length;
+    const avgLat = ring.reduce((s, p) => s + (p[1] || 0), 0) / ring.length;
+    return [avgLon, avgLat];
+  }
+
+  // Case 3: Polygon with rings [[[lon, lat], ...]]
+  if (Array.isArray(coordinates[0]) && Array.isArray(coordinates[0][0]) && typeof coordinates[0][0][0] === 'number') {
+    const ring = coordinates[0] as [number, number][];
+    const avgLon = ring.reduce((s, p) => s + (p[0] || 0), 0) / ring.length;
+    const avgLat = ring.reduce((s, p) => s + (p[1] || 0), 0) / ring.length;
+    return [avgLon, avgLat];
+  }
+
+  return null;
+}
+
 export function normalizeEonetEvent(
   raw: EonetEventRaw,
   archiveStorageKey?: string,
@@ -43,20 +70,12 @@ export function normalizeEonetEvent(
 
   // Latest geometry point
   const latestGeom = raw.geometry[raw.geometry.length - 1];
-  if (!latestGeom || !Array.isArray(latestGeom.coordinates)) return null;
+  if (!latestGeom || !latestGeom.coordinates) return null;
 
-  // Ensure coordinates are [lng, lat] numbers
-  let lon = 0;
-  let lat = 0;
-  if (typeof latestGeom.coordinates[0] === 'number') {
-    lon = latestGeom.coordinates[0];
-    lat = latestGeom.coordinates[1];
-  } else if (Array.isArray(latestGeom.coordinates[0])) {
-    const pt = latestGeom.coordinates[0] as number[];
-    lon = pt[0];
-    lat = pt[1];
-  }
+  const coords = extractCentroidOrPoint(latestGeom.coordinates);
+  if (!coords) return null;
 
+  const [lon, lat] = coords;
   if (isNaN(lon) || isNaN(lat)) return null;
 
   const category = raw.categories[0]?.id || 'severeStorms';

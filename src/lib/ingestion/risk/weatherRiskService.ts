@@ -21,7 +21,7 @@ import { calculateFloodRisk, explainFloodRisk } from '@/lib/risk/flood';
 import { calculateCycloneRisk, explainCycloneRisk } from '@/lib/risk/cyclone';
 import { calculateMultiHazardRisk, explainMultiHazardRisk } from '@/lib/risk/multiHazard';
 import { executeQuery } from '@/lib/db';
-import { getCachedWeather } from '@/lib/weather/store';
+import { getCachedWeather, getAllCachedWeather } from '@/lib/weather/store';
 
 // Cache for derived risk zones (15-minute TTL)
 interface CachedRiskResults {
@@ -92,13 +92,17 @@ export class WeatherRiskService {
             relativeHumidityPct: parseInt(r.relative_humidity_pct, 10),
             precipitationMm: parseFloat(r.precipitation_mm),
             windSpeedKmh: parseFloat(r.wind_speed_kmh),
-            windDirectionDeg: r.wind_direction_deg ? parseInt(r.wind_direction_deg, 10) : undefined,
+            windDirectionDeg: r.wind_direction_deg ? parseInt(r.wind_direction_deg, 10) : 0,
             surfacePressureHpa: r.surface_pressure_hpa ? parseFloat(r.surface_pressure_hpa) : 1010,
             weatherCode: parseInt(r.weather_code, 10),
             condition: r.weather_condition,
+            icon: '🌧️',
+            isDay: true,
             source: r.source,
             observedAt: r.observed_at,
             retrievedAt: r.retrieved_at,
+            validFrom: r.observed_at,
+            validUntil: new Date(new Date(r.observed_at).getTime() + 60 * 60 * 1000).toISOString(),
             freshnessStatus: r.freshness_status,
             environment: 'REAL',
             hourlyForecast: typeof r.forecast_json === 'string' ? JSON.parse(r.forecast_json) : (r.forecast_json ?? []),
@@ -110,18 +114,7 @@ export class WeatherRiskService {
     }
 
     // 2. Check in-memory cache for recent weather
-    // If testing in memory without persistent DB connection
-    const sampleCoords: [number, number][] = [
-      [20.2961, 85.8245], // Bhubaneswar
-      [19.8135, 85.8312], // Puri
-      [20.4625, 85.8828], // Cuttack
-    ];
-    const cachedList: NormalizedWeather[] = [];
-    for (const [lat, lon] of sampleCoords) {
-      const cached = getCachedWeather(lat, lon);
-      if (cached) cachedList.push(cached);
-    }
-
+    const cachedList = getAllCachedWeather();
     return cachedList;
   }
 

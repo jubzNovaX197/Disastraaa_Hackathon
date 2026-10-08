@@ -156,11 +156,12 @@ export class RealDisasterDataProvider implements DisasterDataProvider {
   readonly environment = 'REAL' as const;
   readonly sourceLabel = 'Live Operational Feed';
   readonly isLive = true;
+  private hazardProvider = new RealHazardProvider();
+  private roadProvider = new RealRoadProvider();
 
   async getDataset(): Promise<DisasterDataset> {
     const realReports = getAllReports('REAL');
-    const realRoadProvider = new RealRoadProvider();
-    const blockedRoads = await realRoadProvider.getBlockedRoads();
+    const blockedRoads = await this.roadProvider.getBlockedRoads();
 
     // Map real reports to citizen reports format for map display
     const mappedReports = realReports.map((r) => ({
@@ -176,16 +177,22 @@ export class RealDisasterDataProvider implements DisasterDataProvider {
       severity: r.severity,
     }));
 
+    const [riskZones, floodAreas, cycloneZones] = await Promise.all([
+      this.hazardProvider.getRiskZones(),
+      this.hazardProvider.getFloodAreas(),
+      this.hazardProvider.getCycloneZones(),
+    ]);
+
     return {
-      riskZones: [],
-      floodAreas: [],
+      riskZones,
+      floodAreas,
       shelters: [],
       alerts: [],
       infrastructure: [],
       blockedRoads,
       citizenReports: mappedReports,
       roads: [],
-      cycloneZones: [],
+      cycloneZones,
       cycloneTrack: null,
       sourceType: 'LIVE_OPERATIONAL',
       environment: 'REAL',

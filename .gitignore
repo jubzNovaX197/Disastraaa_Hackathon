@@ -27,3 +27,6 @@ next-env.d.ts
 .DS_Store
 *.pem
 .vercel
+
+# ── Local Object Storage ──────────────────────────────────────
+.storage/

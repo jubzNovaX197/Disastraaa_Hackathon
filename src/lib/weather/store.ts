@@ -32,6 +32,19 @@ export function getCachedWeather(lat: number, lon: number): NormalizedWeather | 
   return entry.weather;
 }
 
+export function getAllCachedWeather(): NormalizedWeather[] {
+  const now = Date.now();
+  const list: NormalizedWeather[] = [];
+  for (const [key, entry] of _weatherCache.entries()) {
+    if (now > entry.expiresAt) {
+      _weatherCache.delete(key);
+    } else {
+      list.push(entry.weather);
+    }
+  }
+  return list;
+}
+
 /**
  * Persists normalized operational weather into Neon PostgreSQL + PostGIS
  * and updates memory cache. Deduplicates by ID and observation timestamp.

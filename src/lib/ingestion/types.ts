@@ -29,7 +29,7 @@ export interface IngestedHazardEvent {
   description: string;
   hazardType: HazardType;
   severity: Severity;
-  status: 'ACTIVE' | 'WATCH' | 'WARNING' | 'RECEDING' | 'DISSIPATED';
+  status: 'ACTIVE' | 'WATCH' | 'WARNING' | 'PEAK' | 'RECEDING' | 'DISSIPATED';
   coordinates: [number, number]; // [lng, lat]
   state?: string;
   district?: string;
