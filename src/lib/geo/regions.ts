@@ -382,29 +382,6 @@ export function getAvailableRealRegions(): RegionSummary[] {
     }
   });
 
-  // Merge canonical baseline locations
-  CANONICAL_ODISHA_LOCATIONS.forEach((loc) => {
-    if (!regionMap.has(loc.id)) {
-      regionMap.set(loc.id, {
-        id: loc.id,
-        country: loc.country,
-        state: loc.state,
-        district: loc.district,
-        displayName: `${loc.district}, ${loc.state}`,
-        coordinates: loc.coordinates,
-        population: loc.population,
-        populationSource: loc.populationSource,
-        activeHazardCount: 0,
-        activeAlertCount: 0,
-        reportCount: 0,
-        incidentCount: 0,
-        roadDisruptionCount: 0,
-        shelterCount: 0,
-        lastUpdated: loc.registeredAt,
-      });
-    }
-  });
-
   // Merge any explicitly registered real locations
   _realLocationsRegistry.forEach((loc) => {
     if (!regionMap.has(loc.id)) {
@@ -430,6 +407,30 @@ export function getAvailableRealRegions(): RegionSummary[] {
   });
 
   return Array.from(regionMap.values());
+}
+
+/**
+ * Returns static canonical metadata for core demonstration sectors (Kalahandi, Khordha, Puri, Cuttack).
+ * Sourced from Census of India 2011. Used by seed scripts and explicit operational benchmarks.
+ */
+export function getCanonicalOdishaRegions(): RegionSummary[] {
+  return CANONICAL_ODISHA_LOCATIONS.map((loc) => ({
+    id: loc.id,
+    country: loc.country,
+    state: loc.state,
+    district: loc.district,
+    displayName: `${loc.district}, ${loc.state}`,
+    coordinates: loc.coordinates,
+    population: loc.population,
+    populationSource: loc.populationSource,
+    activeHazardCount: 0,
+    activeAlertCount: 0,
+    reportCount: 0,
+    incidentCount: 0,
+    roadDisruptionCount: 0,
+    shelterCount: 0,
+    lastUpdated: loc.registeredAt,
+  }));
 }
 
 /**

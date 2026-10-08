@@ -42,7 +42,12 @@ import { osmShelterStore } from '../src/lib/shelters/osmStore';
 import { alertStore } from '../src/lib/alerts/alertStore';
 import { realWeatherProvider } from '../src/lib/providers/real/realWeatherProvider';
 import { aggregateCommandCenterData } from '../src/lib/commandCenter/aggregator';
-import { getAvailableRealRegions, getAvailableRegions, CANONICAL_ODISHA_LOCATIONS } from '../src/lib/geo/regions';
+import {
+  getAvailableRealRegions,
+  getAvailableRegions,
+  getCanonicalOdishaRegions,
+  CANONICAL_ODISHA_LOCATIONS,
+} from '../src/lib/geo/regions';
 
 async function runStage1Verification() {
   console.log('====================================================');
@@ -100,28 +105,36 @@ async function runStage1Verification() {
     `Weather telemetry record verified: ${wx1?.locationName} (${wx1?.temperatureC}°C, freshness: ${wx1?.freshnessStatus})`,
   );
 
-  // ── TEST 4: Canonical Region Discovery ────────────────────
-  console.log('\n--- TEST 4: Canonical Region Discovery ---');
-  const canonicalRegions = CANONICAL_ODISHA_LOCATIONS;
-  assert(canonicalRegions.length === 4, `4 canonical demonstration sectors defined: ${canonicalRegions.map((r) => r.district).join(', ')}`);
+  // ── TEST 4: Canonical Region Discovery & Operational Separation ──
+  console.log('\n--- TEST 4: Canonical Region Discovery & Operational Separation ---');
+  const canonicalLocations = CANONICAL_ODISHA_LOCATIONS;
+  assert(canonicalLocations.length === 4, `4 canonical demonstration sectors defined: ${canonicalLocations.map((r) => r.district).join(', ')}`);
 
-  const kalahandi = canonicalRegions.find((r) => r.id === 'odisha-kalahandi');
+  const kalahandi = canonicalLocations.find((r) => r.id === 'odisha-kalahandi');
   assert(
     Boolean(kalahandi && kalahandi.population === 1576869 && kalahandi.populationSource.includes('Census of India 2011')),
     'Kalahandi documented population: 1,576,869 (Source: Census of India 2011)',
   );
 
-  const realRegions = getAvailableRealRegions();
-  assert(realRegions.length >= 4, `getAvailableRealRegions() successfully returns ${realRegions.length} operational regions in REAL mode`);
+  const canonicalRegions = getCanonicalOdishaRegions();
+  assert(canonicalRegions.length === 4, `getCanonicalOdishaRegions() successfully returns ${canonicalRegions.length} canonical demonstration sectors`);
   assert(
-    realRegions.some((r) => r.id === 'odisha-kalahandi') && realRegions.some((r) => r.id === 'odisha-khordha'),
-    'Both Kalahandi and Khordha present in available real regions list',
+    canonicalRegions.some((r) => r.id === 'odisha-kalahandi') && canonicalRegions.some((r) => r.id === 'odisha-khordha'),
+    'Both Kalahandi and Khordha present in canonical demonstration regions metadata',
+  );
+
+  // Dynamic operational regions baseline verification: clean 0 rows before reports or incidents arrive
+  const realOperationalRegions = getAvailableRealRegions();
+  assert(
+    realOperationalRegions.length === 0,
+    `getAvailableRealRegions() truthfully reports clean 0-row operational baseline before field observations (got: ${realOperationalRegions.length})`,
   );
 
   // ── TEST 5: Truthful Operational Intelligence Aggregation ───
   console.log('\n--- TEST 5: Deterministic Aggregation with Genuine Data ---');
   const commandCenterData = aggregateCommandCenterData({
     environment: 'REAL',
+    regions: canonicalRegions,
     roads: roadSegments,
     shelters: shelters,
     weather: regionalWeather,

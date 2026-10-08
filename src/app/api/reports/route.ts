@@ -3,6 +3,7 @@ import {
   createCitizenReport,
   saveReport,
   getAllReports,
+  getPersistedReports,
   REPORT_TYPES,
   type CreateReportInput,
   type ReportType,
@@ -18,10 +19,16 @@ import type { Severity } from '@/types';
 import { resolveServerEnvironment } from '@/lib/env';
 import { getDatasetProvider } from '@/lib/providers';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const env = await resolveServerEnvironment();
-    const reports = getAllReports(env);
+    const { searchParams } = new URL(request.url);
+    const requestedEnv = searchParams.get('env');
+    const env =
+      requestedEnv === 'REAL' || requestedEnv === 'DEMO'
+        ? requestedEnv
+        : await resolveServerEnvironment();
+
+    const reports = env === 'REAL' ? await getPersistedReports('REAL') : getAllReports('DEMO');
     return NextResponse.json({
       success: true,
       environment: env,
@@ -121,7 +128,7 @@ export async function POST(req: Request) {
     const datasetProvider = getDatasetProvider(env);
     const dataset = await datasetProvider.getDataset();
     const report = createCitizenReport(input, dataset);
-    saveReport(report, env);
+    await saveReport(report, env);
 
     // ── 2. Create and Persist Linked Incident for Authority System ──────────
     const incidentType = mapReportTypeToIncidentType(report.reportType);
@@ -145,7 +152,7 @@ export async function POST(req: Request) {
       evidence: report.evidence,
     });
 
-    saveIncident(incident, env);
+    await saveIncident(incident, env);
 
     return NextResponse.json(
       {
