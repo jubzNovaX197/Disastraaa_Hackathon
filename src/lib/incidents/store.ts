@@ -231,9 +231,153 @@ function seedIncidents(): Incident[] {
 
 // ── Singleton stores — strictly separated ───────────────────────────────────────
 import type { AppEnvironment } from '@/lib/env';
+import { executeQuery } from '@/lib/db';
+import { parseLocationFromText, registerRealOperationalLocation } from '@/lib/geo/regions';
 
 let _realIncidentsStore: Incident[] = [];
 let _demoIncidentsStore: Incident[] = seedIncidents();
+
+const VALID_HAZARDS = new Set([
+  'CYCLONE',
+  'FLOOD',
+  'URBAN_FLOOD',
+  'LANDSLIDE',
+  'STORM_SURGE',
+  'HEATWAVE',
+  'LIGHTNING',
+  'DROUGHT',
+  'EARTHQUAKE',
+  'MULTI_HAZARD',
+]);
+
+function mapDbSeverity(sev: string): 'LOW' | 'MODERATE' | 'HIGH' | 'CRITICAL' {
+  if (sev === 'CRITICAL') return 'CRITICAL';
+  if (sev === 'HIGH') return 'HIGH';
+  if (sev === 'MEDIUM' || sev === 'MODERATE') return 'MODERATE';
+  return 'LOW';
+}
+
+function mapDbStatus(st: string): 'NEW' | 'TRIAGED' | 'DISPATCHED' | 'ON_SCENE' | 'CONTAINED' | 'RESOLVED' | 'CLOSED' {
+  if (st === 'ASSIGNED') return 'DISPATCHED';
+  if (st === 'IN_PROGRESS') return 'ON_SCENE';
+  if (st === 'ESCALATED') return 'TRIAGED';
+  if (st === 'RESOLVED') return 'RESOLVED';
+  if (st === 'CLOSED') return 'CLOSED';
+  if (st === 'TRIAGED') return 'TRIAGED';
+  return 'NEW';
+}
+
+async function persistIncidentToDatabase(incident: Incident): Promise<void> {
+  if (!process.env.DATABASE_URL) return;
+
+  const parsed = parseLocationFromText(incident.affectedArea || incident.locationName);
+  const state = parsed.state || 'Odisha';
+  const district = parsed.district || 'Khordha';
+
+  const hazardType = VALID_HAZARDS.has(incident.hazardType) ? incident.hazardType : 'FLOOD';
+  const dbSeverity = mapDbSeverity(incident.severity);
+  const dbStatus = mapDbStatus(incident.status);
+
+  const coords = incident.coordinates || [85.8245, 20.2961];
+  const originReportId = incident.sourceReference || (incident.relatedReportIds && incident.relatedReportIds[0]) || null;
+
+  await executeQuery(
+    `INSERT INTO incidents (
+      id, title, description, hazard_type, severity, status,
+      state, district, address, coordinates, origin_report_id,
+      assigned_team, command_notes, environment, created_at, updated_at
+    ) VALUES (
+      $1, $2, $3, $4::hazard_type_enum, $5::severity_enum, $6::incident_status_enum,
+      $7, $8, $9, ST_SetSRID(ST_MakePoint($10, $11), 4326), $12,
+      $13, $14, 'REAL'::data_environment_enum, $15, $16
+    )
+    ON CONFLICT (id) DO UPDATE SET
+      title = EXCLUDED.title,
+      description = EXCLUDED.description,
+      status = EXCLUDED.status,
+      assigned_team = EXCLUDED.assigned_team,
+      updated_at = NOW();`,
+    [
+      incident.id,
+      incident.title.slice(0, 255),
+      incident.description,
+      hazardType,
+      dbSeverity,
+      dbStatus,
+      state.slice(0, 100),
+      district.slice(0, 100),
+      incident.locationName.slice(0, 500),
+      coords[0],
+      coords[1],
+      originReportId,
+      incident.assignedTeam || null,
+      incident.actions?.length ? incident.actions[0].title : null,
+      incident.createdAt || new Date().toISOString(),
+      incident.updatedAt || new Date().toISOString(),
+    ],
+  );
+}
+
+export async function getPersistedIncidents(env: AppEnvironment = 'REAL'): Promise<Incident[]> {
+  if (env === 'DEMO') {
+    return _demoIncidentsStore;
+  }
+
+  if (process.env.DATABASE_URL) {
+    try {
+      const rows = await executeQuery<any>(
+        `SELECT id, title, description, hazard_type, severity, status,
+                state, district, address,
+                ST_X(coordinates) as lon, ST_Y(coordinates) as lat,
+                origin_report_id, assigned_team, command_notes,
+                created_at, updated_at
+         FROM incidents
+         WHERE environment = 'REAL'
+         ORDER BY created_at DESC;`,
+      );
+
+      const mapped: Incident[] = rows.map((r) => {
+        const lon = parseFloat(r.lon) || 0;
+        const lat = parseFloat(r.lat) || 0;
+        const mappedSeverity = r.severity === 'MODERATE' ? 'MEDIUM' : r.severity;
+        const mappedStatus = r.status === 'DISPATCHED' ? 'ASSIGNED' : r.status === 'ON_SCENE' ? 'IN_PROGRESS' : r.status;
+
+        const base = createIncident({
+          title: r.title,
+          description: r.description,
+          incidentType: 'OTHER',
+          hazardType: r.hazard_type,
+          severity: mappedSeverity,
+          locationName: r.address,
+          coordinates: [lon, lat],
+          affectedArea: `${r.district}, ${r.state}`,
+          source: r.origin_report_id ? 'CITIZEN_REPORT' : 'MANUAL',
+          sourceReference: r.origin_report_id || undefined,
+          dataLabel: 'VERIFIED',
+          createdBy: 'Operations Dispatcher',
+          createdByRole: ROLES.DISTRICT_AUTHORITY,
+          relatedReportIds: r.origin_report_id ? [r.origin_report_id] : [],
+        });
+
+        return {
+          ...base,
+          id: r.id,
+          status: mappedStatus,
+          assignedTeam: r.assigned_team || undefined,
+          createdAt: new Date(r.created_at).toISOString(),
+          updatedAt: new Date(r.updated_at).toISOString(),
+        };
+      });
+
+      _realIncidentsStore = mapped;
+      return mapped;
+    } catch (err) {
+      console.warn('[INCIDENTS/STORE] Failed to query persisted incidents from database:', err);
+    }
+  }
+
+  return _realIncidentsStore;
+}
 
 export function getIncidents(env: AppEnvironment = 'REAL'): Incident[] {
   return env === 'DEMO' ? _demoIncidentsStore : _realIncidentsStore;
@@ -244,7 +388,7 @@ export function getIncident(id: string, env: AppEnvironment = 'REAL'): Incident 
   return store.find((i) => i.id === id);
 }
 
-export function saveIncident(incident: Incident, env: AppEnvironment = 'REAL'): void {
+export async function saveIncident(incident: Incident, env: AppEnvironment = 'REAL'): Promise<void> {
   if (env === 'DEMO') {
     const idx = _demoIncidentsStore.findIndex((i) => i.id === incident.id);
     if (idx >= 0) {
@@ -259,9 +403,16 @@ export function saveIncident(incident: Incident, env: AppEnvironment = 'REAL'): 
     } else {
       _realIncidentsStore = [incident, ..._realIncidentsStore];
     }
+
+    // Persist to Neon database
+    try {
+      await persistIncidentToDatabase(incident);
+    } catch (err) {
+      console.warn('[INCIDENTS/STORE] Database persistence error (falling back to memory):', err);
+    }
+
     // Register real geographic region dynamically
     try {
-      const { registerRealOperationalLocation, parseLocationFromText } = require('@/lib/geo');
       const parsed = parseLocationFromText(incident.affectedArea || incident.locationName);
       registerRealOperationalLocation({
         district: parsed.district,

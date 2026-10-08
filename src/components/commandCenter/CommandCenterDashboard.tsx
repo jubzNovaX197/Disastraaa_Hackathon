@@ -160,6 +160,18 @@ export function CommandCenterDashboard({
         environment={environment}
       />
 
+      {/* ── Feed Degradation Alert Banner ── */}
+      {overrides.feedErrors && Object.keys(overrides.feedErrors).length > 0 && environment === 'REAL' && (
+        <div className="p-2.5 px-3.5 rounded-xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-between text-xs text-amber-300">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+            <span>
+              Operational Feeds Degraded: Upstream telemetry issue on ({Object.keys(overrides.feedErrors).join(', ')}). Serving verified database records.
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* ── 2. Key Operational Metrics (KPIs) ── */}
       <CommandCenterKpiRow kpis={baseData.kpis} />
 

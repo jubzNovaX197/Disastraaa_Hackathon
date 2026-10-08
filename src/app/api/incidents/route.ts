@@ -1,12 +1,18 @@
 import { NextResponse } from 'next/server';
-import { getIncidents, saveIncident, createIncident, type CreateIncidentInput } from '@/lib/incidents';
+import { getIncidents, getPersistedIncidents, saveIncident, createIncident, type CreateIncidentInput } from '@/lib/incidents';
 import { ROLES } from '@/types/roles';
 import { resolveServerEnvironment } from '@/lib/env';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const env = await resolveServerEnvironment();
-    const incidents = getIncidents(env);
+    const { searchParams } = new URL(request.url);
+    const requestedEnv = searchParams.get('env');
+    const env =
+      requestedEnv === 'REAL' || requestedEnv === 'DEMO'
+        ? requestedEnv
+        : await resolveServerEnvironment();
+
+    const incidents = env === 'REAL' ? await getPersistedIncidents('REAL') : getIncidents('DEMO');
     return NextResponse.json({
       success: true,
       environment: env,
@@ -68,7 +74,7 @@ export async function POST(req: Request) {
 
     const env = await resolveServerEnvironment();
     const incident = createIncident(input);
-    saveIncident(incident, env);
+    await saveIncident(incident, env);
 
     return NextResponse.json(
       { success: true, incident },

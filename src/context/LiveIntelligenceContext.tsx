@@ -166,30 +166,65 @@ export function LiveIntelligenceProvider({
         fetch('/api/reports?env=REAL').then((r) => (r.ok ? r.json() : null)),
       ]);
 
+      const feedErrors: Record<string, string> = {};
+
       const roads: RoadSegment[] =
         roadsRes.status === 'fulfilled' && roadsRes.value?.success && Array.isArray(roadsRes.value.roads)
           ? roadsRes.value.roads
           : [];
+      if (roadsRes.status === 'rejected' || (roadsRes.status === 'fulfilled' && !roadsRes.value?.success)) {
+        feedErrors.roads =
+          roadsRes.status === 'rejected'
+            ? 'Road network feed offline'
+            : roadsRes.value?.error || 'Failed to fetch road network';
+      }
 
       const shelters: Shelter[] =
         sheltersRes.status === 'fulfilled' && sheltersRes.value?.success && Array.isArray(sheltersRes.value.shelters)
           ? sheltersRes.value.shelters
           : [];
+      if (sheltersRes.status === 'rejected' || (sheltersRes.status === 'fulfilled' && !sheltersRes.value?.success)) {
+        feedErrors.shelters =
+          sheltersRes.status === 'rejected'
+            ? 'Shelter registry feed offline'
+            : sheltersRes.value?.error || 'Failed to fetch shelter registry';
+      }
 
       const alerts: Alert[] =
         alertsRes.status === 'fulfilled' && alertsRes.value?.success && Array.isArray(alertsRes.value.alerts)
           ? alertsRes.value.alerts
           : [];
+      if (alertsRes.status === 'rejected' || (alertsRes.status === 'fulfilled' && !alertsRes.value?.success)) {
+        feedErrors.alerts =
+          alertsRes.status === 'rejected'
+            ? 'Authoritative alerts feed offline'
+            : alertsRes.value?.error || 'Failed to fetch alerts feed';
+      }
 
       const weatherList: NormalizedWeather[] =
         weatherRes.status === 'fulfilled' && weatherRes.value?.success && Array.isArray(weatherRes.value.data)
           ? weatherRes.value.data
           : [];
+      if (weatherRes.status === 'rejected' || (weatherRes.status === 'fulfilled' && !weatherRes.value?.success)) {
+        feedErrors.weather =
+          weatherRes.status === 'rejected'
+            ? 'Weather telemetry feed offline'
+            : weatherRes.value?.error || 'Failed to fetch weather telemetry';
+      }
 
       const reports: CitizenReportItem[] =
         reportsRes.status === 'fulfilled' && reportsRes.value?.success && Array.isArray(reportsRes.value.reports)
           ? reportsRes.value.reports
           : [];
+      if (reportsRes.status === 'rejected' || (reportsRes.status === 'fulfilled' && !reportsRes.value?.success)) {
+        feedErrors.reports =
+          reportsRes.status === 'rejected'
+            ? 'Citizen reports feed offline'
+            : reportsRes.value?.error || 'Failed to fetch citizen reports';
+      }
+
+      const totalFeeds = 5;
+      const failedCount = Object.keys(feedErrors).length;
 
       setOverrides({
         alerts,
@@ -201,12 +236,19 @@ export function LiveIntelligenceProvider({
         riverGaugeDeltas: {},
         rainfallDeltas: {},
         weather: weatherList,
+        feedErrors: failedCount > 0 ? feedErrors : undefined,
         environment: 'REAL',
       });
 
       setLastSyncTime(new Date());
       setSecondsSinceSync(0);
-      setStatus('connected');
+      if (failedCount === totalFeeds) {
+        setStatus('offline');
+      } else if (failedCount > 0) {
+        setStatus('delayed');
+      } else {
+        setStatus('connected');
+      }
     } catch (err) {
       console.warn('[LIVE-CONTEXT] Operational sync error:', err);
       setStatus('delayed');
