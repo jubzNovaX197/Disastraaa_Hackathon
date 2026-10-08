@@ -51,6 +51,14 @@ const QUALITY_BADGE_CONFIG: Record<DataQualityBadge, { label: string; className:
     label: 'Live Synchronized',
     className: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30',
   },
+  UNAVAILABLE: {
+    label: 'Unavailable / Offline',
+    className: 'bg-neutral-500/10 text-neutral-600 dark:text-neutral-400 border-neutral-500/20',
+  },
+  STALE: {
+    label: 'Stale (>24h)',
+    className: 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30',
+  },
 };
 
 export function AssistantMessageItem({ message }: AssistantMessageItemProps) {

@@ -7,6 +7,7 @@
  * - Future Anthropic / OpenAI / Local LLM providers
  */
 
+import type { Role } from '@/types/roles';
 import type { AssistantIntent, AssistantResponsePayload, StructuredContextPayload } from '../types';
 
 export interface GenerateInput {
@@ -14,6 +15,8 @@ export interface GenerateInput {
   intent: AssistantIntent;
   context: StructuredContextPayload;
   locationFocus?: string;
+  role?: Role;
+  isAuthorizedOperations?: boolean;
 }
 
 export interface AIProvider {
