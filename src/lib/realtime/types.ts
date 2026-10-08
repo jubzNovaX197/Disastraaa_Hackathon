@@ -55,6 +55,8 @@ export interface LiveDataOverrides {
   resourceStocks: Record<string, number>;
   riverGaugeDeltas: Record<string, number>; // zoneId -> meters
   rainfallDeltas: Record<string, number>; // zoneId -> mm
+  weather?: import('@/lib/weather/types').NormalizedWeather[];
+  regions?: import('@/lib/geo/regions').RegionSummary[];
   environment?: import('@/lib/env').AppEnvironment;
 }
 

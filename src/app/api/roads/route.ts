@@ -75,6 +75,7 @@ export async function GET(request: NextRequest) {
       count: roads.length,
       roads,
       blockedRoadsCount: blockedRoads.length,
+      blockedRoads,
       graph: {
         nodes: routingGraph.nodes,
         nodesCount: routingGraph.nodes.length,

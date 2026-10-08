@@ -89,13 +89,24 @@ export function CommandCenterDashboard({
   // Live Map Dataset strictly respecting the environment
   const liveMapDataset = useMemo(() => {
     if (environment === 'REAL') {
+      const blockedRoads = overrides.roads
+        .filter((r) => r.status === 'BLOCKED' || r.status === 'CLOSED')
+        .map((r) => ({
+          id: r.id,
+          name: r.name,
+          severity: (r.status === 'CLOSED' ? 'FULL' : 'PARTIAL') as 'FULL' | 'PARTIAL',
+          reason: r.travelRisk?.explanation || 'Operational roadway obstruction',
+          coordinates: r.coordinates,
+          since: r.lastUpdated,
+        }));
+
       return {
         riskZones: [],
         floodAreas: [],
         shelters: overrides.shelters,
         alerts: overrides.alerts,
         infrastructure: [],
-        blockedRoads: [],
+        blockedRoads,
         citizenReports: overrides.reports,
         roads: overrides.roads,
         cycloneZones: [],

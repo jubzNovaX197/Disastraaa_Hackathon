@@ -17,7 +17,7 @@ import {
   Layers,
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, Badge } from '@/components/ui';
-import { formatNumber } from '@/lib/utils';
+import { cn, formatNumber } from '@/lib/utils';
 import type { CommandOverviewKpis } from '@/lib/commandCenter/types';
 
 interface CommandCenterKpiRowProps {
@@ -26,6 +26,9 @@ interface CommandCenterKpiRowProps {
 
 export function CommandCenterKpiRow({ kpis }: CommandCenterKpiRowProps) {
   const { risk, impact, response } = kpis;
+  const peakScore = risk.highestCurrentRisk.score;
+  const peakSeverity =
+    peakScore >= 80 ? 'CRITICAL' : peakScore >= 65 ? 'HIGH' : peakScore >= 45 ? 'MODERATE' : 'LOW';
 
   return (
     <div className="space-y-3">
@@ -42,8 +45,8 @@ export function CommandCenterKpiRow({ kpis }: CommandCenterKpiRowProps) {
                   Hazard & Risk Status
                 </span>
               </div>
-              <Badge severity="CRITICAL" dot className="text-[10px]">
-                Peak {risk.highestCurrentRisk.score}/100
+              <Badge severity={peakSeverity} dot className="text-[10px]">
+                {peakScore === 0 ? 'Normal 0/100' : `Peak ${peakScore}/100`}
               </Badge>
             </div>
 
@@ -56,11 +59,22 @@ export function CommandCenterKpiRow({ kpis }: CommandCenterKpiRowProps) {
                 </p>
               </div>
               <div className="text-right">
-                <span className="text-base font-extrabold text-critical">
-                  {risk.highestCurrentRisk.score}
+                <span
+                  className={cn(
+                    'text-base font-extrabold',
+                    peakScore >= 80
+                      ? 'text-critical'
+                      : peakScore >= 65
+                      ? 'text-high'
+                      : peakScore >= 45
+                      ? 'text-amber-400'
+                      : 'text-slate-200',
+                  )}
+                >
+                  {peakScore}
                 </span>
                 <p className="text-[9px] text-slate-400 uppercase font-semibold">
-                  {risk.highestCurrentRisk.dominantHazard}
+                  {peakScore === 0 ? 'ALL CLEAR' : risk.highestCurrentRisk.dominantHazard}
                 </p>
               </div>
             </div>
@@ -69,28 +83,36 @@ export function CommandCenterKpiRow({ kpis }: CommandCenterKpiRowProps) {
             <div className="grid grid-cols-4 gap-1.5 text-center">
               <div className="p-1.5 rounded-lg bg-white/5 border border-white/[0.04]">
                 <p className="text-[10px] text-slate-400">High Risk</p>
-                <p className="text-sm font-bold text-critical">{risk.highRiskLocationsCount}</p>
+                <p className={cn('text-sm font-bold', risk.highRiskLocationsCount > 0 ? 'text-critical' : 'text-slate-400')}>
+                  {risk.highRiskLocationsCount}
+                </p>
                 <p className="text-[9px] text-slate-500">zones</p>
               </div>
               <div className="p-1.5 rounded-lg bg-blue-500/10 border border-blue-500/20">
                 <p className="text-[10px] text-blue-300 flex items-center justify-center gap-0.5">
                   <Waves className="w-3 h-3" /> Flood
                 </p>
-                <p className="text-sm font-bold text-blue-400">{risk.floodRiskLocationsCount}</p>
+                <p className={cn('text-sm font-bold', risk.floodRiskLocationsCount > 0 ? 'text-blue-400' : 'text-slate-400')}>
+                  {risk.floodRiskLocationsCount}
+                </p>
                 <p className="text-[9px] text-slate-500">zones</p>
               </div>
               <div className="p-1.5 rounded-lg bg-purple-500/10 border border-purple-500/20">
                 <p className="text-[10px] text-purple-300 flex items-center justify-center gap-0.5">
                   <Wind className="w-3 h-3" /> Cyclone
                 </p>
-                <p className="text-sm font-bold text-purple-400">{risk.cycloneRiskLocationsCount}</p>
+                <p className={cn('text-sm font-bold', risk.cycloneRiskLocationsCount > 0 ? 'text-purple-400' : 'text-slate-400')}>
+                  {risk.cycloneRiskLocationsCount}
+                </p>
                 <p className="text-[9px] text-slate-500">zones</p>
               </div>
               <div className="p-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20">
                 <p className="text-[10px] text-amber-300 flex items-center justify-center gap-0.5">
                   <Layers className="w-3 h-3" /> Multi
                 </p>
-                <p className="text-sm font-bold text-amber-400">{risk.multiHazardLocationsCount}</p>
+                <p className={cn('text-sm font-bold', risk.multiHazardLocationsCount > 0 ? 'text-amber-400' : 'text-slate-400')}>
+                  {risk.multiHazardLocationsCount}
+                </p>
                 <p className="text-[9px] text-slate-500">zones</p>
               </div>
             </div>
@@ -123,8 +145,8 @@ export function CommandCenterKpiRow({ kpis }: CommandCenterKpiRowProps) {
                   {formatNumber(impact.populationExposed)} People
                 </p>
               </div>
-              <Badge severity="HIGH" className="text-[10px]">
-                High Exposure
+              <Badge severity={impact.populationExposed > 0 ? 'HIGH' : 'LOW'} className="text-[10px]">
+                {impact.populationExposed > 0 ? 'High Exposure' : 'No Hazard Zone'}
               </Badge>
             </div>
 
@@ -133,24 +155,38 @@ export function CommandCenterKpiRow({ kpis }: CommandCenterKpiRowProps) {
               <div className="p-1.5 rounded-lg bg-white/5 border border-white/[0.04]">
                 <p className="text-[10px] text-slate-400">Buildings</p>
                 <p className="text-sm font-bold text-slate-200">
-                  {formatNumber(impact.estimatedBuildingsAffected)}
+                  {impact.estimatedBuildingsAffected > 0 ? formatNumber(impact.estimatedBuildingsAffected) : 'N/A'}
                 </p>
-                <p className="text-[9px] text-slate-500">units</p>
+                <p className="text-[9px] text-slate-500">
+                  {impact.estimatedBuildingsAffected > 0 ? 'units' : 'layer pending'}
+                </p>
               </div>
               <div className="p-1.5 rounded-lg bg-white/5 border border-white/[0.04]">
                 <p className="text-[10px] text-slate-400">Roads</p>
-                <p className="text-sm font-bold text-slate-200">{impact.affectedRoadsKm}</p>
-                <p className="text-[9px] text-slate-500">km network</p>
+                <p className="text-sm font-bold text-slate-200">
+                  {impact.affectedRoadsKm > 0 ? `${impact.affectedRoadsKm} km` : '0 km'}
+                </p>
+                <p className="text-[9px] text-slate-500">
+                  {impact.affectedRoadsKm > 0 ? 'disrupted' : 'all passable'}
+                </p>
               </div>
               <div className="p-1.5 rounded-lg bg-white/5 border border-white/[0.04]">
                 <p className="text-[10px] text-slate-400">Hospitals</p>
-                <p className="text-sm font-bold text-critical">{impact.affectedHospitals}</p>
-                <p className="text-[9px] text-slate-500">at risk</p>
+                <p className="text-sm font-bold text-slate-200">
+                  {impact.affectedHospitals > 0 ? impact.affectedHospitals : 'N/A'}
+                </p>
+                <p className="text-[9px] text-slate-500">
+                  {impact.affectedHospitals > 0 ? 'at risk' : 'layer pending'}
+                </p>
               </div>
               <div className="p-1.5 rounded-lg bg-white/5 border border-white/[0.04]">
                 <p className="text-[10px] text-slate-400">Schools</p>
-                <p className="text-sm font-bold text-slate-200">{impact.affectedSchools}</p>
-                <p className="text-[9px] text-slate-500">institutions</p>
+                <p className="text-sm font-bold text-slate-200">
+                  {impact.affectedSchools > 0 ? impact.affectedSchools : 'N/A'}
+                </p>
+                <p className="text-[9px] text-slate-500">
+                  {impact.affectedSchools > 0 ? 'institutions' : 'layer pending'}
+                </p>
               </div>
             </div>
           </div>
@@ -180,8 +216,8 @@ export function CommandCenterKpiRow({ kpis }: CommandCenterKpiRowProps) {
                   {response.activeAlertsCount} Broadcast Alerts
                 </p>
               </div>
-              <Badge severity="MODERATE" className="text-[10px]">
-                CAP Broadcast
+              <Badge severity={response.activeAlertsCount > 0 ? 'MODERATE' : 'LOW'} className="text-[10px]">
+                {response.activeAlertsCount > 0 ? 'CAP Broadcast' : 'All Clear'}
               </Badge>
             </div>
 
