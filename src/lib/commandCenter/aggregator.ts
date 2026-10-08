@@ -21,6 +21,9 @@ import { buildResourcePlanningForZone } from '@/lib/planning/resources';
 import type { ResourceRequirementItem } from '@/lib/planning/resources/types';
 import { getAvailableRealRegions } from '@/lib/geo';
 import { formatNumber } from '@/lib/utils';
+import { calculateFloodRisk } from '@/lib/risk/flood';
+import { calculateCycloneRisk } from '@/lib/risk/cyclone';
+import { getAllCachedWeather } from '@/lib/weather/store';
 import type { HazardType, Severity, ReportStatus } from '@/types';
 import type { RoadStatus, RoadSegment } from '@/lib/roads/types';
 import type { DemoAlert as Alert, Shelter } from '@/data/types';
@@ -170,6 +173,8 @@ export function aggregateCommandCenterData(overrides?: CommandCenterDataOverride
 
   if (isReal) {
     const realRegions = getAvailableRealRegions();
+    const cachedWeatherList = getAllCachedWeather();
+
     priorityLocations = realRegions.map((region) => {
       const localAlerts = activeAlerts.filter(
         (a) =>
@@ -187,8 +192,65 @@ export function aggregateCommandCenterData(overrides?: CommandCenterDataOverride
           rd.name.toLowerCase().includes(region.district.toLowerCase()),
       );
 
+      // Match real weather observation if available
+      const matchingWeather = cachedWeatherList.find(
+        (w) =>
+          (region.district && w.district && w.district.toLowerCase().includes(region.district.toLowerCase())) ||
+          (region.displayName && w.locationName && w.locationName.toLowerCase().includes(region.displayName.toLowerCase())) ||
+          (region.coordinates &&
+            Math.hypot(w.coordinates[0] - region.coordinates[0], w.coordinates[1] - region.coordinates[1]) < 0.6),
+      );
+
+      let floodScore = 0;
+      let cycloneScore = 0;
+      let weatherRiskScore = 0;
+      let dominantHazard: HazardType | 'MULTI_HAZARD' = 'MULTI_HAZARD';
+
+      if (matchingWeather) {
+        const precip24h = Math.max(0, matchingWeather.precipitationMm * 24);
+        const riverSurgeProxy = Math.max(-1.0, (matchingWeather.precipitationMm - 4) * 0.2);
+        const floodRes = calculateFloodRisk(
+          {
+            rainfallIntensityMmPerDay: precip24h,
+            riverLevelMetres: riverSurgeProxy,
+            elevationMetres: 18,
+            distanceFromRiverKm: 3.0,
+            exposedPopulation: 35000,
+            historicalFloodFrequency: 1.5,
+            infrastructureVulnerabilityIndex: 0.35,
+          },
+          true,
+        );
+        floodScore = floodRes.score;
+
+        const pressureDropSurge = Math.max(0, (1013 - matchingWeather.surfacePressureHpa) * 0.04);
+        const cycloneRes = calculateCycloneRisk(
+          {
+            windSpeedKmh: matchingWeather.windSpeedKmh,
+            rainfallMmPerDay: precip24h,
+            stormSurgeMetres: pressureDropSurge,
+            distanceFromTrackKm: 45,
+            exposedPopulation: 45000,
+            elevationMetres: 18,
+            historicalCycloneFrequency: 1.2,
+            infrastructureVulnerabilityIndex: 0.35,
+          },
+          true,
+        );
+        cycloneScore = cycloneRes.score;
+
+        if (cycloneScore > floodScore && cycloneScore >= 20) {
+          dominantHazard = 'CYCLONE';
+        } else if (floodScore > cycloneScore && floodScore >= 20) {
+          dominantHazard = 'FLOOD';
+        }
+
+        weatherRiskScore = Math.max(floodScore, cycloneScore);
+      }
+
       const hasActivity = localAlerts.length > 0 || localReports.length > 0 || localRoads.length > 0;
-      const riskScore = hasActivity ? Math.min(100, 30 + localReports.length * 15 + localAlerts.length * 20) : 0;
+      const activityScore = hasActivity ? Math.min(100, 30 + localReports.length * 15 + localAlerts.length * 20) : 0;
+      const riskScore = Math.max(activityScore, weatherRiskScore);
       const severity: Severity = riskScore >= 80 ? 'CRITICAL' : riskScore >= 65 ? 'HIGH' : riskScore >= 45 ? 'MODERATE' : 'LOW';
 
       return {
@@ -198,10 +260,10 @@ export function aggregateCommandCenterData(overrides?: CommandCenterDataOverride
         coordinates: region.coordinates || [85.0, 20.0],
         riskScore,
         severity,
-        dominantHazard: 'MULTI_HAZARD',
+        dominantHazard,
         populationExposed: 0,
-        floodRiskScore: 0,
-        cycloneRiskScore: 0,
+        floodRiskScore: floodScore,
+        cycloneRiskScore: cycloneScore,
         activeAlertCount: localAlerts.length,
         activeAlertStatus: localAlerts.length > 0 ? (localAlerts.some((a) => a.severity === 'CRITICAL') ? 'CRITICAL' : 'HIGH') : 'CLEAR',
         roadAccessibility: localRoads.some((r) => r.status === 'BLOCKED' || r.status === 'CLOSED') ? 'BLOCKED' : 'OPEN',
