@@ -218,11 +218,11 @@ export function ImpactPredictionPanel({
           </div>
         )}
 
-        {/* Prototype disclaimer */}
+        {/* Simulation disclaimer */}
         <div className="rounded-lg border border-warning/20 bg-warning/5 px-3 py-2">
           <div className="text-[10px] text-warning/80 leading-relaxed">
-            ⚠️ <strong>Prototype estimates only.</strong> Values are
-            deterministic demo calculations scaled from zone exposure data.
+            ⚠️ <strong>Simulation estimates only.</strong> Values are
+            deterministic calculations scaled from zone exposure data.
             Not calibrated to official standards. Do not use for real emergency decisions.
           </div>
         </div>

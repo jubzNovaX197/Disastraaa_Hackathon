@@ -21,7 +21,7 @@ export function SituationTimelineTrend({ timeline }: SituationTimelineTrendProps
           </span>
           <div>
             <CardTitle className="text-sm font-bold text-slate-100">
-              Prototype Situation Trend
+              Operational Situation Trend
             </CardTitle>
             <p className="text-[11px] text-slate-400">
               Temporal progression across synoptic observation and simulation horizons
@@ -31,7 +31,7 @@ export function SituationTimelineTrend({ timeline }: SituationTimelineTrendProps
 
         <Badge className="bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs">
           <AlertTriangle className="w-3 h-3 mr-1" />
-          Prototype Scenario Trend · Simulated Telemetry
+          Scenario Trend · Simulated Telemetry
         </Badge>
       </div>
 

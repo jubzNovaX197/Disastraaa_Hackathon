@@ -161,17 +161,34 @@ export function alertPopupHTML(props: Record<string, unknown>): string {
   const color = SEVERITY_COLOR[severity] ?? '#64748B';
   const issued = props.issuedAt
     ? new Date(String(props.issuedAt)).toLocaleString('en-IN', {
-        day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
+        day: 'numeric',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
       })
     : null;
+  const sourceAgency = props.sourceAgency ? String(props.sourceAgency) : null;
+  const isReal = !!sourceAgency && !sourceAgency.toLowerCase().includes('scenario');
+  const freshness = props.freshnessStatus ? String(props.freshnessStatus) : null;
+  const instruction = props.instruction ? String(props.instruction) : null;
+
   return `
     <div>
-      ${badge(severity, color)}
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">
+        ${badge(severity, color)}
+        ${
+          isReal
+            ? `<span style="font-size:10px;font-weight:700;color:#10B981;background:#10B98118;border:1px solid #10B98133;padding:2px 6px;border-radius:999px;">${freshness === 'STALE' ? 'ARCHIVED' : 'OFFICIAL CAP'}</span>`
+            : `<span style="font-size:10px;font-weight:700;color:#F59E0B;background:#F59E0B18;border:1px solid #F59E0B33;padding:2px 6px;border-radius:999px;">SIMULATED</span>`
+        }
+      </div>
       <div style="font-weight:600;font-size:14px;margin-bottom:4px;">${props.title}</div>
       <div style="font-size:11px;color:#64748B;margin-bottom:8px;">${HAZARD_LABEL[String(props.type)] ?? ''} · ${props.regionName}</div>
       <div style="font-size:12px;color:#CBD5E1;line-height:1.6;margin-bottom:6px;">${props.message}</div>
+      ${instruction ? `<div style="font-size:11px;color:#93C5FD;background:#1E3A8A25;border:1px solid #3B82F633;padding:6px 8px;border-radius:6px;margin:6px 0;"><strong>Directives:</strong> ${instruction}</div>` : ''}
       ${row('Issued', issued)}
-      ${demoTag()}
+      ${sourceAgency ? row('Authority', sourceAgency) : ''}
+      ${isReal ? '' : demoTag()}
     </div>`;
 }
 

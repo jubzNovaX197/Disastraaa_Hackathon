@@ -219,7 +219,7 @@ export function HistoricalAnalysisPanel({
 
         {/* Demo banner */}
         <div className="mt-2 text-[10px] text-warning/80 bg-warning/5 border border-warning/20 rounded px-2 py-1">
-          ⚠️ <strong>Prototype demo data.</strong> Not verified government records.
+          ⚠️ <strong>Historical simulation data.</strong> Model records for disaster benchmarking.
         </div>
       </div>
 

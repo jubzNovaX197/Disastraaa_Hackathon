@@ -51,7 +51,7 @@ export function AuthorityAccessGate({ currentRole, onClearanceGranted }: Authori
 
           <div className="pt-2 border-t border-white/[0.06] space-y-3">
             <p className="text-xs text-slate-400">
-              Evaluating this hackathon prototype? Assume an authorized responder role below to proceed:
+              Evaluating platform operations? Assume an authorized responder role below to proceed:
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5">
@@ -81,7 +81,7 @@ export function AuthorityAccessGate({ currentRole, onClearanceGranted }: Authori
 
           <p className="text-[11px] text-slate-500 flex items-center justify-center gap-1.5 pt-2">
             <CheckCircle2 className="w-3.5 h-3.5 text-safe" />
-            Decision-support prototype · Zero real-world dispatch triggers
+            Decision-support system · Zero unauthenticated dispatch triggers
           </p>
         </div>
       </Card>

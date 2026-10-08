@@ -187,7 +187,7 @@ export function RoadDetailPanel({
             {statusCfg.publicGuidance}
           </p>
           <div className="text-[10px] text-slate-500 dark:text-slate-400 italic pt-1 border-t border-slate-200/50 dark:border-white/5">
-            * Prototype decision support. Obey on-ground police barricades and official disaster alerts.
+            * Operational decision support. Obey on-ground police barricades and official disaster alerts.
           </div>
         </div>
 

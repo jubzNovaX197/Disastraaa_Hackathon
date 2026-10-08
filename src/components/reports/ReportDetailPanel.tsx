@@ -94,7 +94,7 @@ export function ReportDetailPanel({
   const typeCfg      = REPORT_TYPE_CONFIG[report.reportType] ?? REPORT_TYPE_CONFIG.OTHER;
   const prelimCfg    = CONFIDENCE_CONFIG[report.preliminaryAnalysis.confidence];
 
-  // Deterministic preliminary evidence assessment (Task 11)
+  // Deterministic preliminary evidence assessment
   const evidenceAssessment =
     report.preliminaryAnalysis.evidenceAssessment ??
     assessPreliminaryEvidence(report.evidence, {
@@ -303,7 +303,7 @@ export function ReportDetailPanel({
           )}
         </div>
 
-        {/* ── 5. Preliminary Evidence Assessment (Task 11) ── */}
+        {/* ── 5. Preliminary Evidence Assessment ── */}
         <div className="rounded-lg bg-slate-50 dark:bg-surface-elevated/60 border border-slate-200 dark:border-white/10 p-3 space-y-2.5">
           <div className="flex items-center justify-between flex-wrap gap-1">
             <div className="flex items-center gap-1.5">
@@ -628,7 +628,7 @@ export function ReportDetailPanel({
           {/* Authority Actions Bar (When in Authority Mode) */}
           {allowAuthorityActions && authorityMode && (
             <div className="pt-2 border-t border-slate-200 dark:border-white/10 space-y-2.5">
-              {/* Future Computer Vision Pipeline Readiness (Task 11 / Task 13 Architecture) */}
+              {/* Future Computer Vision Pipeline Readiness */}
               {evidenceAssessment.futureCvCompatibility && (
                 <div className="p-2.5 rounded-lg bg-indigo-500/5 dark:bg-indigo-500/10 border border-indigo-500/20 space-y-1.5 text-xs">
                   <div className="flex items-center justify-between">

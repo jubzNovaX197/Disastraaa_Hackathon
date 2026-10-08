@@ -1,14 +1,14 @@
 'use client';
 
 /**
- * RouteMapOverlay — wires RoutePlanner into the existing DisasterMap (Task 13 + 14).
+ * RouteMapOverlay — wires RoutePlanner into the existing DisasterMap.
  *
  * Sits as an absolute overlay panel (right side desktop, bottom sheet mobile).
  * Calls onRouteSelected / onRouteClear to let DisasterMap draw the route line.
  * Calls onDestinationSelected / onDestinationClear to draw destination marker & safety buffer.
  * Does NOT touch any other map layers.
  *
- * ⚠️  PROTOTYPE ROUTE & DESTINATION INTELLIGENCE — decision support prototype.
+ * Operational decision support system.
  */
 
 import { useCallback, useState } from 'react';

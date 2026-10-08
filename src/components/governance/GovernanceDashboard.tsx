@@ -107,7 +107,7 @@ export function GovernanceDashboard({ initialRole = ROLES.SUPER_ADMIN }: Governa
 
             <div className="pt-2 border-t border-white/[0.06] space-y-3">
               <p className="text-xs text-slate-400">
-                Evaluating the prototype? You can assume the Super Admin persona to inspect platform governance:
+                Evaluating platform governance? You can assume the Super Admin persona to inspect system access:
               </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5">
@@ -470,7 +470,7 @@ export function GovernanceDashboard({ initialRole = ROLES.SUPER_ADMIN }: Governa
             </h3>
             <div className="space-y-2 text-xs text-slate-300">
               <p className="leading-relaxed">
-                The Disastraaa prototype implements a robust zero-trust boundary separating public citizens from operational authorities.
+                The Disastraaa platform implements a robust zero-trust boundary separating public citizens from operational authorities.
               </p>
               <ul className="space-y-1.5 text-[11px] text-slate-400 pt-1">
                 <li className="flex items-start gap-1.5">

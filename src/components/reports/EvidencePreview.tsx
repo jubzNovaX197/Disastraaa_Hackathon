@@ -111,7 +111,7 @@ export function EvidencePreview({
               <div className="w-80 h-64 bg-slate-800 rounded flex flex-col items-center justify-center text-slate-400 p-6 text-center">
                 {isVideo ? <Film className="w-12 h-12 mb-2 text-slate-500" /> : <Camera className="w-12 h-12 mb-2 text-slate-500" />}
                 <p className="text-sm font-semibold text-slate-200">{evidence.fileName}</p>
-                <p className="text-xs text-slate-400 mt-1">Structured prototype evidence item.</p>
+                <p className="text-xs text-slate-400 mt-1">Structured verification evidence item.</p>
                 <p className="text-[10px] text-slate-500 mt-2 font-mono">Status: {evidence.status ?? 'AVAILABLE'}</p>
               </div>
             )}

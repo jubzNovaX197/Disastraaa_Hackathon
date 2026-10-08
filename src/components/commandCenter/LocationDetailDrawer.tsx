@@ -271,7 +271,7 @@ export function LocationDetailDrawer({
               <div className="p-4 rounded-xl bg-surface-elevated border border-white/[0.06] space-y-3">
                 <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
                   <Building2 className="w-4 h-4 text-amber-400" />
-                  Estimated Physical & Social Exposure (Task 4)
+                  Estimated Physical & Social Exposure
                 </h4>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
                   <div className="p-2.5 rounded-lg bg-white/5">
@@ -307,7 +307,7 @@ export function LocationDetailDrawer({
                 <div className="flex items-center justify-between">
                   <h4 className="text-xs font-bold text-purple-300 uppercase tracking-wider flex items-center gap-1.5">
                     <Home className="w-4 h-4 text-purple-400" />
-                    Shelter Operations Telemetry (Task 7)
+                    Shelter Operations Telemetry
                   </h4>
                   <Badge severity={location.shelterGap > 0 ? 'CRITICAL' : 'MODERATE'}>
                     {location.shelterPressureLabel}
@@ -336,7 +336,7 @@ export function LocationDetailDrawer({
                 <div className="flex items-center justify-between">
                   <h4 className="text-xs font-bold text-blue-300 uppercase tracking-wider flex items-center gap-1.5">
                     <Package className="w-4 h-4 text-blue-400" />
-                    Logistics & Stockpile Status (Task 8)
+                    Logistics & Stockpile Status
                   </h4>
                   <Badge severity={location.resourceShortageCount > 0 ? 'HIGH' : 'LOW'}>
                     {location.resourceGapSummary}

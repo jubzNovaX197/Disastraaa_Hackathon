@@ -1,15 +1,14 @@
 'use client';
 
 /**
- * RoutePlanner — Safe & Alternative Route Intelligence + Destination Safety (Task 13 + 14)
+ * RoutePlanner — Safe & Alternative Route Intelligence + Destination Safety
  *
- * ⚠️  PROTOTYPE ROUTE & DESTINATION INTELLIGENCE — Decision Support Prototype.
- * Not live traffic, not official evacuation routes.
+ * Operational Decision Support System
  *
  * Combines:
- * - Shortest / Safest / Alternative route routing graph analysis (Task 13)
- * - Date/time-aware destination safety score & active warning intelligence (Task 14)
- * - Overall travel risk composite assessment (Task 14)
+ * - Shortest / Safest / Alternative route routing graph analysis
+ * - Date/time-aware destination safety score & active warning intelligence
+ * - Overall travel risk composite assessment
  *
  * Responsive: stacked on mobile, side-by-side on desktop.
  * Dark + light mode via Tailwind tokens.
@@ -292,13 +291,13 @@ export interface RoutePlannerProps {
   /** Callback when a route is selected — passes map coordinates for display */
   onRouteSelected?: (coords: LngLat[], mode: RouteResult['mode']) => void;
   onRouteClear?: () => void;
-  /** Callback when destination safety changes (Task 14) */
+  /** Callback when destination safety changes */
   onDestinationSafetyCalculated?: (safety: DestinationSafetyResult | null) => void;
-  /** Callback when destination point is selected (Task 14) */
+  /** Callback when destination point is selected */
   onDestinationSelected?: (coords: LngLat, safetyScore: number, status: DestinationSafetyStatus) => void;
-  /** Callback when Task 15 journey risk is calculated */
+  /** Callback when journey risk is calculated */
   onJourneyRiskCalculated?: (journeyRisk: JourneyRiskResult | null) => void;
-  /** Callback to highlight hazard corridor on map (Task 15) */
+  /** Callback to highlight hazard corridor on map */
   onCorridorHighlighted?: (points: Array<{ coordinates: [number, number]; risk: string; name: string }>) => void;
   className?: string;
   initialDestinationId?: string;
@@ -516,7 +515,7 @@ export function RoutePlanner({
     }
   }, [environment, destinationSafety, onDestinationSafetyCalculated, onDestinationSelected]);
 
-  // Notify parent of Journey Risk and corridor highlights (Task 15)
+  // Notify parent of Journey Risk and corridor highlights
   useEffect(() => {
     if (environment === 'REAL') {
       onJourneyRiskCalculated?.(null);
@@ -848,7 +847,7 @@ export function RoutePlanner({
         </div>
       )}
 
-      {/* Tab 0: Comprehensive Journey Risk Intelligence (Task 15) */}
+      {/* Tab 0: Comprehensive Journey Risk Intelligence */}
       {effectiveTab === 'JOURNEY' && journeyRisk && (
         <JourneyRiskPanel
           journeyRisk={journeyRisk}

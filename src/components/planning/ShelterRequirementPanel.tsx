@@ -158,7 +158,7 @@ export function ShelterRequirementPanel({
                 ⛺ Shelter Planning
               </span>
               <span className="text-[9px] px-1.5 py-0.2 rounded bg-slate-200/80 dark:bg-white/10 text-slate-700 dark:text-slate-300 font-mono">
-                PROTOTYPE
+                SIMULATION MODEL
               </span>
             </div>
             <div className="font-semibold text-sm text-slate-900 dark:text-slate-100 leading-snug truncate" title={planning.zoneName}>
@@ -297,7 +297,7 @@ export function ShelterRequirementPanel({
         {/* ── Planning Recommendations (Requirement 8) ── */}
         <div>
           <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
-            Planning Recommendations (Prototype)
+            Planning Recommendations (Simulation)
           </div>
           <div className="rounded-lg bg-white/5 border border-white/[0.06] p-2.5 space-y-1.5">
             {planning.recommendations.map((rec, idx) => (
@@ -321,14 +321,14 @@ export function ShelterRequirementPanel({
           </div>
         )}
 
-        {/* ── Key Prototype Assumptions (Collapsible, Requirement 2) ── */}
+        {/* ── Key Planning Assumptions (Collapsible, Requirement 2) ── */}
         <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] overflow-hidden">
           <button
             type="button"
             onClick={() => setShowAssumptions((prev) => !prev)}
             className="w-full px-3 py-2 flex items-center justify-between text-left text-[11px] font-semibold text-slate-400 hover:text-slate-200 transition-colors"
           >
-            <span>Key Prototype Assumptions ({planning.assumptions.length})</span>
+            <span>Key Planning Assumptions ({planning.assumptions.length})</span>
             <span className="text-xs font-mono">{showAssumptions ? '▴ Hide' : '▾ Show'}</span>
           </button>
           {showAssumptions && (
@@ -343,12 +343,12 @@ export function ShelterRequirementPanel({
           )}
         </div>
 
-        {/* ── Prototype Disclaimer ── */}
+        {/* ── Planning Disclaimer ── */}
         <div className="rounded-lg border border-warning/20 bg-warning/5 px-3 py-2">
           <div className="text-[10px] text-warning/90 leading-relaxed">
-            ⚠️ <strong>Prototype planning model only.</strong> Deterministic demo
+            ⚠️ <strong>Simulation planning model only.</strong> Deterministic demo
             estimates combining current exposure, risk severity, historical impact,
-            and shelter demo records. Not official government disaster management standards.
+            and shelter contingency records. Not official government disaster management standards.
           </div>
         </div>
 

@@ -120,7 +120,7 @@ export function AuthorityRoleSwitcher({
                 Simulate Authority Role
               </p>
               <p className="text-[11px] text-slate-500 mt-0.5">
-                Test authority-facing clearance and role gating in prototype mode.
+                Test authority-facing clearance and role gating in simulation mode.
               </p>
             </div>
 

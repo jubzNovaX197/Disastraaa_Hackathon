@@ -39,8 +39,24 @@ import { realWeatherProvider } from './real/realWeatherProvider';
 import type { WeatherProvider } from './types';
 
 export * from './types';
-export { demoDataProvider } from './demo/demoProvider';
-export { realDataProvider } from './real/realProvider';
+export {
+  demoDataProvider,
+  demoAlertProvider,
+  demoHazardProvider,
+  demoRoadProvider,
+  demoShelterProvider,
+  demoReportProvider,
+  demoIncidentProvider,
+} from './demo/demoProvider';
+export {
+  realDataProvider,
+  realAlertProvider,
+  realHazardProvider,
+  realRoadProvider,
+  realShelterProvider,
+  realReportProvider,
+  realIncidentProvider,
+} from './real/realProvider';
 export { demoWeatherProvider } from './demo/demoWeatherProvider';
 export { realWeatherProvider } from './real/realWeatherProvider';
 

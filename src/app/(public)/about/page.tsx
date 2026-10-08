@@ -84,10 +84,10 @@ export default function AboutPage() {
           {/* Disclaimer */}
           <div className="p-4 rounded-xl bg-warning/5 border border-warning/20">
             <p className="text-xs text-warning/80 leading-relaxed">
-              <strong className="text-warning">Prototype notice:</strong>{' '}
-              {brand.name} {brand.version} uses demonstration data only and is
-              not connected to live government data sources. It is not intended
-              for operational use in real disaster situations.
+              <strong className="text-warning">Operational notice:</strong>{' '}
+              {brand.name} {brand.version} provides situational intelligence with dual-environment support
+              (Live Operational Feeds and Simulation Contingency Scenarios). Always adhere to direct instructions
+              from local police, district administration, and emergency services.
             </p>
           </div>
         </div>
