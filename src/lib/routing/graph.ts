@@ -14,6 +14,9 @@
  */
 
 import type { RouteNode, RouteEdge } from './types';
+import type { RoadSegment } from '@/lib/roads/types';
+import type { Shelter } from '@/data/types';
+import { haversineDistanceKm } from '@/lib/geo/osm/validation';
 
 // ── Nodes ─────────────────────────────────────────────────────────────────────
 
@@ -559,3 +562,125 @@ export function buildAdjacency(edges: RouteEdge[]): Map<string, RouteEdge[]> {
 
   return adj;
 }
+
+export interface RoutingGraph {
+  nodes: RouteNode[];
+  edges: RouteEdge[];
+  nodeById: Record<string, RouteNode>;
+}
+
+/**
+ * Builds an operational routing graph (nodes + edges) from normalized real OSM road segments
+ * and real emergency shelters.
+ */
+export function buildGraphFromRoadSegments(
+  segments: RoadSegment[],
+  shelters: Shelter[] = [],
+): RoutingGraph {
+  const nodes: RouteNode[] = [];
+  const edges: RouteEdge[] = [];
+  const nodeById: Record<string, RouteNode> = {};
+
+  // Track existing node positions to snap within ~100m (0.001 deg)
+  const SNAP_THRESHOLD_KM = 0.12;
+
+  function findOrAddNode(
+    coord: [number, number],
+    hintName: string,
+    typeHint: RouteNode['type'] = 'JUNCTION',
+  ): RouteNode {
+    const [lon, lat] = coord;
+    for (const existing of nodes) {
+      const dist = haversineDistanceKm(existing.coordinates[1], existing.coordinates[0], lat, lon);
+      if (dist <= SNAP_THRESHOLD_KM) {
+        return existing;
+      }
+    }
+
+    const id = `node-osm-${nodes.length + 1}`;
+    const newNode: RouteNode = {
+      id,
+      name: hintName,
+      coordinates: [lon, lat],
+      type: typeHint,
+    };
+    nodes.push(newNode);
+    nodeById[id] = newNode;
+    return newNode;
+  }
+
+  // 1. Process real road segments into edges and nodes
+  for (const seg of segments) {
+    if (seg.coordinates.length < 2) continue;
+
+    const startCoord = seg.coordinates[0];
+    const endCoord = seg.coordinates[seg.coordinates.length - 1];
+
+    const startNode = findOrAddNode(startCoord, `${seg.name} (West/Start)`, 'JUNCTION');
+    const endNode = findOrAddNode(endCoord, `${seg.name} (East/End)`, 'JUNCTION');
+
+    const edge: RouteEdge = {
+      id: `edge-${seg.id}`,
+      from: startNode.id,
+      to: endNode.id,
+      roadName: seg.name,
+      roadCode: seg.code,
+      distanceKm: seg.lengthKm && seg.lengthKm > 0 ? seg.lengthKm : 1.0,
+      roadType: seg.roadType || 'MAJOR_ROAD',
+      status: seg.status || 'OPEN',
+      riskScore: seg.travelRisk?.score || 10,
+      roadSegmentId: seg.id,
+      coordinates: seg.coordinates,
+    };
+
+    edges.push(edge);
+  }
+
+  // 2. Attach real shelters to the nearest road network node
+  for (const shelter of shelters) {
+    const shelterNode: RouteNode = {
+      id: `node-${shelter.id}`,
+      name: shelter.name,
+      coordinates: shelter.coordinates,
+      type: 'SHELTER',
+    };
+    nodes.push(shelterNode);
+    nodeById[shelterNode.id] = shelterNode;
+
+    // Connect to nearest road node if available
+    let nearestRoadNode: RouteNode | null = null;
+    let minDistance = Infinity;
+
+    for (const n of nodes) {
+      if (n.id === shelterNode.id || n.type === 'SHELTER') continue;
+      const d = haversineDistanceKm(
+        shelter.coordinates[1],
+        shelter.coordinates[0],
+        n.coordinates[1],
+        n.coordinates[0],
+      );
+      if (d < minDistance) {
+        minDistance = d;
+        nearestRoadNode = n;
+      }
+    }
+
+    if (nearestRoadNode && minDistance < 5.0) {
+      const linkEdge: RouteEdge = {
+        id: `edge-access-${shelter.id}`,
+        from: shelterNode.id,
+        to: nearestRoadNode.id,
+        roadName: `${shelter.name} Access Corridor`,
+        distanceKm: Math.round(minDistance * 10) / 10 || 0.2,
+        roadType: 'LOCAL_ROAD',
+        status: 'OPEN',
+        riskScore: 8,
+        coordinates: [shelter.coordinates, nearestRoadNode.coordinates],
+      };
+      edges.push(linkEdge);
+    }
+  }
+
+  return { nodes, edges, nodeById };
+}
+

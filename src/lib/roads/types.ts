@@ -103,7 +103,7 @@ export interface RoadSegment {
   blockageType: RoadBlockageType;
   severity: Severity;
   isVerified: boolean;
-  source: 'CITIZEN_REPORT' | 'FIELD_PATROL' | 'TRAFFIC_CONTROL' | 'GOVERNMENT_DISPATCH' | 'PREDICTIVE_RISK';
+  source: 'CITIZEN_REPORT' | 'FIELD_PATROL' | 'TRAFFIC_CONTROL' | 'GOVERNMENT_DISPATCH' | 'PREDICTIVE_RISK' | 'OPEN_STREET_MAP' | 'OSM_OVERPASS';
   lastUpdated: string; // ISO-8601
   relatedReportIds: string[]; // Linked citizen reports (cr-001, etc.)
   hazardExposure: RoadHazardExposure;
@@ -111,6 +111,7 @@ export interface RoadSegment {
   authorityVerification: RoadAuthorityVerification;
   alternateRoute?: string;
   estimatedDelayMinutes?: number;
+  travelMinutes?: number;
   lengthKm?: number;
   connectsShelters?: string[];  // Shelter IDs accessible/affected by this road
   connectsHospitals?: string[]; // Critical medical centers serviced by this road
