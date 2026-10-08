@@ -114,6 +114,18 @@ export class RealHazardProvider implements HazardProvider {
 import { osmRoadStore } from '@/lib/roads/osmStore';
 import { osmShelterStore } from '@/lib/shelters/osmStore';
 
+function isPointInRing(pt: [number, number], ring: [number, number][]): boolean {
+  const [x, y] = pt;
+  let inside = false;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const [xi, yi] = ring[i];
+    const [xj, yj] = ring[j];
+    const intersect = ((yi > y) !== (yj > y)) && (x < ((xj - xi) * (y - yi)) / (yj - yi) + xi);
+    if (intersect) inside = !inside;
+  }
+  return inside;
+}
+
 export class RealRoadProvider implements RoadProvider {
   async getBlockedRoads(): Promise<BlockedRoad[]> {
     // Derives disruptions from real verified reports/incidents
@@ -130,14 +142,14 @@ export class RealRoadProvider implements RoadProvider {
     }));
 
     // Also include any road segments that are marked blocked
-    const allSegments = await osmRoadStore.getRoadSegments();
+    const allSegments = await this.getRoadSegments();
     const blockedSegments = allSegments
       .filter((s) => s.status === 'BLOCKED' || s.status === 'CLOSED')
       .map((s) => ({
         id: s.id,
         name: s.name,
         severity: (s.status === 'CLOSED' ? 'FULL' : 'PARTIAL') as 'FULL' | 'PARTIAL',
-        reason: s.authorityVerification.notes || 'Roadway reported impassable on operational network',
+        reason: s.travelRisk.explanation || s.authorityVerification.notes || 'Roadway reported impassable on operational network',
         coordinates: s.coordinates,
         since: s.lastUpdated,
       }));
@@ -148,51 +160,141 @@ export class RealRoadProvider implements RoadProvider {
   async getRoadSegments(): Promise<RoadSegment[]> {
     const segments = await osmRoadStore.getRoadSegments();
 
-    // Correlate with active road blockage incidents
+    // 1. Correlate with active road blockage incidents
     const incidents = getIncidents('REAL').filter(
       (inc) => inc.status !== 'RESOLVED' && inc.incidentType === INCIDENT_TYPES.ROAD_BLOCKAGE,
     );
 
-    if (incidents.length === 0) {
+    // 2. Correlate with verified citizen reports
+    const verifiedBlockageReports = getAllReports('REAL').filter(
+      (r) => r.status === 'VERIFIED' && (r.blockedRoadInfo || (r as any).reportType === 'BLOCKED_ROAD' || r.hazardType === 'FLOOD'),
+    );
+
+    // 3. Correlate with active weather-derived flood areas & risk zones
+    let floodAreas: FloodArea[] = [];
+    let riskZones: RiskZone[] = [];
+    try {
+      const derived = await weatherRiskService.computeDerivedRisks();
+      floodAreas = derived.floodAreas;
+      riskZones = derived.riskZones;
+    } catch {
+      // Non-blocking
+    }
+
+    if (incidents.length === 0 && verifiedBlockageReports.length === 0 && floodAreas.length === 0 && riskZones.length === 0) {
       return segments;
     }
 
-    // Correlate incidents to nearby road segments
+    // Correlate hazards, reports, and incidents to affected road segments
     return segments.map((seg) => {
+      // Check 1: Incident intersection
       const matchingInc = incidents.find((inc) => {
         if (!inc.coordinates || seg.coordinates.length === 0) return false;
         const [incLon, incLat] = inc.coordinates;
-        // Check if any point on road is within ~500m of incident
         return seg.coordinates.some(([rLon, rLat]) => {
-          const dLon = Math.abs(rLon - incLon);
-          const dLat = Math.abs(rLat - incLat);
-          return dLon < 0.005 && dLat < 0.005;
+          return Math.abs(rLon - incLon) < 0.005 && Math.abs(rLat - incLat) < 0.005;
         });
       });
 
-      if (!matchingInc) return seg;
-
-      const mappedSeverity =
-        matchingInc.severity === 'CRITICAL'
-          ? 'CRITICAL'
-          : matchingInc.severity === 'HIGH'
-            ? 'HIGH'
-            : matchingInc.severity === 'LOW'
-              ? 'LOW'
-              : 'MODERATE';
-
-      return {
-        ...seg,
-        status: matchingInc.severity === 'CRITICAL' ? 'BLOCKED' : 'PARTIALLY_BLOCKED',
-        severity: mappedSeverity,
-        travelRisk: {
-          ...seg.travelRisk,
-          score: matchingInc.severity === 'CRITICAL' ? 90 : 65,
+      if (matchingInc) {
+        const mappedSeverity = matchingInc.severity === 'CRITICAL' ? 'CRITICAL' : 'HIGH';
+        return {
+          ...seg,
+          status: matchingInc.severity === 'CRITICAL' ? 'BLOCKED' : 'PARTIALLY_BLOCKED',
           severity: mappedSeverity,
-          safeToTravel: false,
-          explanation: `Operational blockage confirmed: ${matchingInc.title}`,
-        },
-      };
+          travelRisk: {
+            ...seg.travelRisk,
+            score: matchingInc.severity === 'CRITICAL' ? 95 : 70,
+            severity: mappedSeverity,
+            safeToTravel: false,
+            explanation: `Operational blockage confirmed: ${matchingInc.title}`,
+          },
+        };
+      }
+
+      // Check 2: Verified citizen report intersection
+      const matchingRep = verifiedBlockageReports.find((rep) => {
+        if (!rep.coordinates || seg.coordinates.length === 0) return false;
+        const [rLon, rLat] = rep.coordinates;
+        return seg.coordinates.some(([cLon, cLat]) => {
+          return Math.abs(cLon - rLon) < 0.004 && Math.abs(cLat - rLat) < 0.004;
+        });
+      });
+
+      if (matchingRep) {
+        const isFull = matchingRep.blockedRoadInfo?.severity === 'FULL';
+        return {
+          ...seg,
+          status: isFull ? 'BLOCKED' : 'PARTIALLY_BLOCKED',
+          severity: isFull ? 'CRITICAL' : 'HIGH',
+          travelRisk: {
+            ...seg.travelRisk,
+            score: isFull ? 90 : 65,
+            severity: isFull ? 'CRITICAL' : 'HIGH',
+            safeToTravel: false,
+            explanation: `Field verified report: ${matchingRep.title}`,
+          },
+        };
+      }
+
+      // Check 3: Active flood area intersection
+      const matchingFlood = floodAreas.find((fa) => {
+        if (!fa.coordinates || fa.coordinates.length === 0) return false;
+        const ring = fa.coordinates[0];
+        return seg.coordinates.some((coord) => isPointInRing(coord, ring));
+      });
+
+      if (matchingFlood) {
+        const isCriticalDepth = (matchingFlood.depthMeters ?? 0) >= 0.5 || matchingFlood.severity === 'CRITICAL';
+        return {
+          ...seg,
+          status: isCriticalDepth ? 'BLOCKED' : 'PARTIALLY_BLOCKED',
+          severity: matchingFlood.severity,
+          hazardExposure: {
+            primaryHazard: 'FLOOD',
+            riskScore: isCriticalDepth ? 90 : 65,
+          },
+          travelRisk: {
+            ...seg.travelRisk,
+            score: isCriticalDepth ? 90 : 65,
+            severity: matchingFlood.severity,
+            safeToTravel: false,
+            explanation: `Roadway submerged in verified flood zone: ${matchingFlood.name}`,
+          },
+        };
+      }
+
+      // Check 4: Elevated RiskZone intersection
+      const matchingRiskZone = riskZones.find((rz) => {
+        if (!rz.coordinates || rz.coordinates.length === 0 || rz.riskScore < 50) return false;
+        const ring = rz.coordinates[0];
+        return seg.coordinates.some((coord) => isPointInRing(coord, ring));
+      });
+
+      if (matchingRiskZone) {
+        const mappedHazard: 'FLOOD' | 'CYCLONE' | 'LANDSLIDE' | 'NONE' =
+          matchingRiskZone.primaryHazard === 'FLOOD' ||
+          matchingRiskZone.primaryHazard === 'CYCLONE' ||
+          matchingRiskZone.primaryHazard === 'LANDSLIDE'
+            ? matchingRiskZone.primaryHazard
+            : 'NONE';
+
+        return {
+          ...seg,
+          status: matchingRiskZone.severity === 'CRITICAL' ? 'CAUTION' : seg.status,
+          hazardExposure: {
+            primaryHazard: mappedHazard,
+            riskScore: matchingRiskZone.riskScore,
+          },
+          travelRisk: {
+            ...seg.travelRisk,
+            score: Math.max(seg.travelRisk?.score || 10, matchingRiskZone.riskScore),
+            explanation: `Caution: enters high-risk operational zone: ${matchingRiskZone.name}`,
+          },
+        };
+      }
+
+      return seg;
     });
   }
 }
