@@ -421,8 +421,9 @@ export function RoutePlanner({
   // 2. Calculate Routes when origin & destination are selected and calculated is true
   const results = useMemo(() => {
     if (!calculated || !originId || !destinationId) return null;
+    if (environment === 'REAL' && !realGraph) return null;
     return calculateRoutes({ originNodeId: originId, destinationNodeId: destinationId }, effectiveGraph);
-  }, [calculated, originId, destinationId, effectiveGraph]);
+  }, [calculated, originId, destinationId, effectiveGraph, environment, realGraph]);
 
   const activeResult = results
     ? (results[activeMode.toLowerCase() as keyof typeof results] as RouteResult)
@@ -539,16 +540,12 @@ export function RoutePlanner({
 
   // Emit map coordinates when active route changes
   useEffect(() => {
-    if (environment === 'REAL') {
-      onRouteClear?.();
-      return;
-    }
     if (activeResult?.found) {
       onRouteSelected?.(activeResult.mapCoordinates, activeResult.mode);
     } else if (!activeResult && !destinationSafety) {
       onRouteClear?.();
     }
-  }, [environment, activeResult, destinationSafety, onRouteSelected, onRouteClear]);
+  }, [activeResult, destinationSafety, onRouteSelected, onRouteClear]);
 
   const nodeOptions = useMemo(() => {
     if (environment === 'REAL') {

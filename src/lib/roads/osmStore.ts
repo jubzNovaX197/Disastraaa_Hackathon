@@ -94,31 +94,30 @@ export class OsmRoadStore {
 
             this.cache.set(segment.id, segment);
           }
-
-          if (this.cache.size > 0) {
-            this.isInitialized = true;
-            return;
-          }
         }
       } catch (dbErr) {
         // Fall back to seed elements
       }
     }
 
-    // 2. Initialize from real public OSM seed ways
+    // 2. Initialize and supplement from real public OSM seed ways for any missing segments
     const rawSeedElements = getRealOsmSeedWays();
+    const newSegments: RoadSegment[] = [];
     if (Array.isArray(rawSeedElements) && rawSeedElements.length > 0) {
       for (const el of rawSeedElements as OverpassElement[]) {
         const validation = validateRoadWay(el);
         if (validation.valid && validation.road) {
           const segment = normalizeRoadSegment(validation.road);
-          this.cache.set(segment.id, segment);
+          if (!this.cache.has(segment.id)) {
+            this.cache.set(segment.id, segment);
+            newSegments.push(segment);
+          }
         }
       }
 
-      // Persist seed roads to PostGIS if DATABASE_URL is available
-      if (process.env.DATABASE_URL && this.cache.size > 0) {
-        this.persistBatchToDatabase(Array.from(this.cache.values())).catch(() => {});
+      // Persist newly added seed roads to PostGIS if DATABASE_URL is available
+      if (process.env.DATABASE_URL && newSegments.length > 0) {
+        await this.persistBatchToDatabase(newSegments);
       }
     }
 

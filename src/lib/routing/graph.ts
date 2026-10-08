@@ -581,8 +581,8 @@ export function buildGraphFromRoadSegments(
   const edges: RouteEdge[] = [];
   const nodeById: Record<string, RouteNode> = {};
 
-  // Track existing node positions to snap within ~100m (0.001 deg)
-  const SNAP_THRESHOLD_KM = 0.12;
+  // Track existing node positions to snap within ~150m (0.0013 deg) for genuine road junctions
+  const SNAP_THRESHOLD_KM = 0.15;
 
   function findOrAddNode(
     coord: [number, number],
@@ -609,34 +609,100 @@ export function buildGraphFromRoadSegments(
     return newNode;
   }
 
-  // 1. Process real road segments into edges and nodes
+  // 1. Detect junction intersections across all road segments
+  const junctionIndicesPerSeg: Map<string, number[]> = new Map();
+
+  for (const s of segments) {
+    if (s.coordinates.length < 2) continue;
+    // Endpoints are always junctions
+    junctionIndicesPerSeg.set(s.id, [0, s.coordinates.length - 1]);
+  }
+
+  // Find physical intersections where two road segments meet
+  for (let i = 0; i < segments.length; i++) {
+    const s1 = segments[i];
+    if (s1.coordinates.length < 2) continue;
+
+    for (let j = i + 1; j < segments.length; j++) {
+      const s2 = segments[j];
+      if (s2.coordinates.length < 2) continue;
+
+      for (let p1 = 0; p1 < s1.coordinates.length; p1++) {
+        const c1 = s1.coordinates[p1];
+        for (let p2 = 0; p2 < s2.coordinates.length; p2++) {
+          const c2 = s2.coordinates[p2];
+          const dist = haversineDistanceKm(c1[1], c1[0], c2[1], c2[0]);
+          if (dist <= SNAP_THRESHOLD_KM) {
+            junctionIndicesPerSeg.get(s1.id)?.push(p1);
+            junctionIndicesPerSeg.get(s2.id)?.push(p2);
+          }
+        }
+      }
+    }
+  }
+
+  // 2. Build continuous navigable edges between consecutive junctions on each segment
   for (const seg of segments) {
     if (seg.coordinates.length < 2) continue;
 
-    const startCoord = seg.coordinates[0];
-    const endCoord = seg.coordinates[seg.coordinates.length - 1];
+    const rawIndices = junctionIndicesPerSeg.get(seg.id) || [0, seg.coordinates.length - 1];
+    const sortedIndices = Array.from(new Set(rawIndices)).sort((a, b) => a - b);
 
-    const startNode = findOrAddNode(startCoord, `${seg.name} (West/Start)`, 'JUNCTION');
-    const endNode = findOrAddNode(endCoord, `${seg.name} (East/End)`, 'JUNCTION');
+    for (let k = 0; k < sortedIndices.length - 1; k++) {
+      const idxStart = sortedIndices[k];
+      const idxEnd = sortedIndices[k + 1];
+      if (idxStart === idxEnd) continue;
 
-    const edge: RouteEdge = {
-      id: `edge-${seg.id}`,
-      from: startNode.id,
-      to: endNode.id,
-      roadName: seg.name,
-      roadCode: seg.code,
-      distanceKm: seg.lengthKm && seg.lengthKm > 0 ? seg.lengthKm : 1.0,
-      roadType: seg.roadType || 'MAJOR_ROAD',
-      status: seg.status || 'OPEN',
-      riskScore: seg.travelRisk?.score || 10,
-      roadSegmentId: seg.id,
-      coordinates: seg.coordinates,
-    };
+      const subCoords = seg.coordinates.slice(idxStart, idxEnd + 1);
+      if (subCoords.length < 2) continue;
 
-    edges.push(edge);
+      const startCoord = subCoords[0];
+      const endCoord = subCoords[subCoords.length - 1];
+
+      const startNode = findOrAddNode(
+        startCoord,
+        idxStart === 0 ? `${seg.name} (Start)` : `${seg.name} (Junction ${idxStart})`,
+        'JUNCTION',
+      );
+      const endNode = findOrAddNode(
+        endCoord,
+        idxEnd === seg.coordinates.length - 1 ? `${seg.name} (End)` : `${seg.name} (Junction ${idxEnd})`,
+        'JUNCTION',
+      );
+
+      if (startNode.id === endNode.id) continue;
+
+      // Calculate exact sub-segment length via haversine
+      let subDist = 0;
+      for (let m = 0; m < subCoords.length - 1; m++) {
+        subDist += haversineDistanceKm(
+          subCoords[m][1],
+          subCoords[m][0],
+          subCoords[m + 1][1],
+          subCoords[m + 1][0],
+        );
+      }
+      subDist = Math.max(0.1, Math.round(subDist * 100) / 100);
+
+      const edge: RouteEdge = {
+        id: `edge-${seg.id}-${idxStart}-${idxEnd}`,
+        from: startNode.id,
+        to: endNode.id,
+        roadName: seg.name,
+        roadCode: seg.code,
+        distanceKm: subDist,
+        roadType: seg.roadType || 'MAJOR_ROAD',
+        status: seg.status || 'OPEN',
+        riskScore: seg.travelRisk?.score || 10,
+        roadSegmentId: seg.id,
+        coordinates: subCoords,
+      };
+
+      edges.push(edge);
+    }
   }
 
-  // 2. Attach real shelters to the nearest road network node
+  // 3. Attach real shelters to the nearest road network node
   for (const shelter of shelters) {
     const shelterNode: RouteNode = {
       id: `node-${shelter.id}`,
