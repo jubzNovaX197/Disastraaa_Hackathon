@@ -137,6 +137,9 @@ export function alertsToGeoJSON(
         issuedAt: a.issuedAt,
         expiresAt: a.expiresAt ?? null,
         isActive: a.isActive,
+        sourceAgency: (a as unknown as Record<string, unknown>).sourceAgency ?? null,
+        instruction: (a as unknown as Record<string, unknown>).instruction ?? null,
+        freshnessStatus: (a as unknown as Record<string, unknown>).freshnessStatus ?? null,
       },
     })),
   };

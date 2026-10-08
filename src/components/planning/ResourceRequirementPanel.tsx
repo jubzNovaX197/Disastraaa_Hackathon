@@ -234,7 +234,7 @@ export function ResourceRequirementPanel({
                 📦 Resource Planning
               </span>
               <span className="text-[9px] px-1.5 py-0.2 rounded bg-slate-200/80 dark:bg-white/10 text-slate-700 dark:text-slate-300 font-mono">
-                PROTOTYPE
+                SIMULATION MODEL
               </span>
               <span className={cn('text-[9px] font-bold px-1.5 py-0.2 rounded border uppercase', severityBadge)}>
                 {planning.severity}
@@ -377,7 +377,7 @@ export function ResourceRequirementPanel({
         {/* ── Planning Recommendations (Requirement 7) ── */}
         <div>
           <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 flex items-center justify-between">
-            <span>Prototype Planning Recommendations</span>
+            <span>Simulation Planning Recommendations</span>
             <span className="text-[9px] px-1 rounded bg-info/10 text-info">RULES-BASED</span>
           </div>
 
@@ -421,14 +421,14 @@ export function ResourceRequirementPanel({
           </div>
         )}
 
-        {/* ── Prototype Assumptions (Collapsible) ── */}
+        {/* ── Planning Assumptions (Collapsible) ── */}
         <div className="rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-white/[0.02] overflow-hidden">
           <button
             type="button"
             onClick={() => setShowAssumptions((prev) => !prev)}
             className="w-full px-3 py-2 flex items-center justify-between text-left text-[11px] font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-colors"
           >
-            <span>Key Prototype Assumptions ({planning.assumptions.length})</span>
+            <span>Key Planning Assumptions ({planning.assumptions.length})</span>
             <span className="text-xs font-mono">{showAssumptions ? '▴ Hide' : '▾ Show'}</span>
           </button>
           {showAssumptions && (
@@ -443,10 +443,10 @@ export function ResourceRequirementPanel({
           )}
         </div>
 
-        {/* ── Prototype Disclaimer (Requirement 11) ── */}
+        {/* ── Simulation Disclaimer (Requirement 11) ── */}
         <div className="rounded-lg border border-warning/30 bg-warning/10 p-2.5">
           <div className="text-[10px] text-warning/90 leading-relaxed">
-            ⚠️ <strong>Decision-Support Prototype:</strong> All estimates are deterministic calculations combining exposure, risk severity, hazard factors, and demo district inventories. They do not constitute official government relief standards or emergency instructions.
+            ⚠️ <strong>Decision-Support Simulation:</strong> All estimates are deterministic calculations combining exposure, risk severity, hazard factors, and demo district inventories. They do not constitute official government relief standards or emergency instructions.
           </div>
         </div>
 
@@ -454,7 +454,7 @@ export function ResourceRequirementPanel({
         <div className="text-[10px] text-slate-400 dark:text-slate-500 text-right font-mono">
           Computed: {new Date(planning.calculatedAt).toLocaleTimeString('en-IN', {
             hour: '2-digit', minute: '2-digit', second: '2-digit',
-          })} · PROTOTYPE ENGINE
+          })} · SIMULATION ENGINE
         </div>
       </div>
     </div>

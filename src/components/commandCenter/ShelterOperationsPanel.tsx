@@ -29,7 +29,7 @@ export function ShelterOperationsPanel({ shelterOperations }: ShelterOperationsP
           </span>
           <div>
             <CardTitle className="text-sm font-bold text-slate-100">
-              Shelter Operations & Evacuation Capacity (Task 7)
+              Shelter Operations & Evacuation Capacity
             </CardTitle>
             <p className="text-[11px] text-slate-400">
               Projected demand versus emergency accommodation capacity
@@ -149,7 +149,7 @@ export function ShelterOperationsPanel({ shelterOperations }: ShelterOperationsP
       </div>
 
       <div className="p-3 border-t border-white/[0.06] text-[10px] text-slate-500 text-center">
-        ⚠️ Prototype estimates for decision-support · Not guaranteed real-world capacity.
+        ⚠️ Simulation estimates for decision-support · Verify with on-ground shelter authorities.
       </div>
     </Card>
   );

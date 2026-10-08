@@ -10,13 +10,13 @@ export function Footer() {
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-6">
             <p className="text-xs text-slate-500">
-              {brand.version} · Prototype
+              {brand.version} · Decision Support System
             </p>
             <p className="text-xs text-slate-500">
               Disaster intelligence for India
             </p>
-            <p className="text-xs text-slate-600">
-              Demo data only — not for operational use
+            <p className="text-xs text-slate-500">
+              Authoritative Feeds &amp; Public Incident Intelligence
             </p>
           </div>
         </div>

@@ -110,7 +110,7 @@ export function CommandCenterKpiRow({ kpis }: CommandCenterKpiRowProps) {
                 </span>
               </div>
               <span className="text-[10px] font-mono text-slate-400 uppercase">
-                Task 4 Impact Engine
+                Impact Assessment Engine
               </span>
             </div>
 

@@ -24,7 +24,7 @@ export function ActiveAlertsOperationsPanel({ alerts }: ActiveAlertsOperationsPa
           </span>
           <div>
             <CardTitle className="text-sm font-bold text-slate-100">
-              Active Warnings & Broadcast Alerts (Task 9)
+              Active Warnings & Broadcast Alerts
             </CardTitle>
             <p className="text-[11px] text-slate-400">
               Common Alerting Protocol (CAP) synchronized warnings

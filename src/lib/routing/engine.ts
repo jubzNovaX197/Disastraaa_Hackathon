@@ -212,7 +212,7 @@ function buildRiskExplanation(segs: RS[], score: number, severity: Severity): st
   if (highRiskSegs.length && !blocked.length)
     parts.push(`${highRiskSegs.length} high-risk road segment${highRiskSegs.length > 1 ? 's' : ''}.`);
 
-  parts.push('⚠️ Prototype estimate — verify with local authorities.');
+  parts.push('⚠️ Simulation estimate — verify with local authorities.');
   return parts.join(' ');
 }
 

@@ -34,10 +34,11 @@ import { INCIDENT_TYPES, type Incident } from '@/lib/incidents/types';
 import { getAllReports } from '@/lib/reports/store';
 import { getIncidents } from '@/lib/incidents/store';
 
+import { alertStore } from '@/lib/alerts/alertStore';
+
 export class RealAlertProvider implements AlertProvider {
   async getAlerts(): Promise<DemoAlert[]> {
-    // In real mode, returns active operational alerts (empty array when no event is active)
-    return [];
+    return alertStore.getAlerts(true);
   }
 }
 
@@ -223,6 +224,7 @@ export class RealDisasterDataProvider implements DisasterDataProvider {
   private hazardProvider = new RealHazardProvider();
   private roadProvider = new RealRoadProvider();
   private shelterProvider = new RealShelterProvider();
+  private alertProvider = new RealAlertProvider();
 
   async getDataset(): Promise<DisasterDataset> {
     const realReports = getAllReports('REAL');
@@ -230,6 +232,7 @@ export class RealDisasterDataProvider implements DisasterDataProvider {
       [blockedRoads, roads],
       shelters,
       [riskZones, floodAreas, cycloneZones],
+      alerts,
     ] = await Promise.all([
       Promise.all([
         this.roadProvider.getBlockedRoads(),
@@ -241,6 +244,7 @@ export class RealDisasterDataProvider implements DisasterDataProvider {
         this.hazardProvider.getFloodAreas(),
         this.hazardProvider.getCycloneZones(),
       ]),
+      this.alertProvider.getAlerts(),
     ]);
 
     // Map real reports to citizen reports format for map display
@@ -261,7 +265,7 @@ export class RealDisasterDataProvider implements DisasterDataProvider {
       riskZones,
       floodAreas,
       shelters,
-      alerts: [],
+      alerts,
       infrastructure: [],
       blockedRoads,
       citizenReports: mappedReports,

@@ -33,7 +33,7 @@ export function BlockedRoadsOperationsPanel({ roadOperations }: BlockedRoadsOper
           </span>
           <div>
             <CardTitle className="text-sm font-bold text-slate-100">
-              Road Network Operations & Closures (Task 12)
+              Road Network Operations & Closures
             </CardTitle>
             <p className="text-[11px] text-slate-400">
               Transit corridor accessibility & structural obstruction tracking

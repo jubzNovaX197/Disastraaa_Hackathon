@@ -1,12 +1,12 @@
 'use client';
 
 /**
- * Travel Safety & Road Intelligence Page (Task 12)
+ * Travel Safety & Road Intelligence Page
  *
  * Provides real-time road conditions, disaster hazard exposure,
  * citizen blockage reports, and authority road verifications.
  *
- * ⚠️ PROTOYPE DECISION SUPPORT — NOT AN OFFICIAL EMERGENCY BROADCAST
+ * Operational Decision Support System
  */
 
 import { useState, useMemo, useEffect } from 'react';

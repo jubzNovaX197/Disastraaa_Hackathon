@@ -3,9 +3,9 @@
 /**
  * TravelRiskCard — Combined Route & Destination Risk Intelligence
  *
- * ⚠️  PROTOTYPE DECISION SUPPORT — NOT LIVE EMERGENCY ROUTING
+ * Operational Decision Support System
  *
- * Shows unified Overall Travel Risk calculated from Task 13 Route Risk
+ * Shows unified Overall Travel Risk calculated from Route Risk
  * and Destination Safety Risk, along with factual route option comparisons.
  */
 

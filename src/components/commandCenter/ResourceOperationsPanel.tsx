@@ -21,7 +21,7 @@ export function ResourceOperationsPanel({ resourceOperations }: ResourceOperatio
           </span>
           <div>
             <CardTitle className="text-sm font-bold text-slate-100">
-              Emergency Logistics & Resource Deficits (Task 8)
+              Emergency Logistics & Resource Deficits
             </CardTitle>
             <p className="text-[11px] text-slate-400">
               Statewide stockpile coverage & inter-district replenishment requirements
@@ -128,7 +128,7 @@ export function ResourceOperationsPanel({ resourceOperations }: ResourceOperatio
       </div>
 
       <div className="p-3 border-t border-white/[0.06] text-[10px] text-slate-500 text-center">
-        Logistics dispatch recommendations derived from Task 8 Decision Support Model.
+        Logistics dispatch recommendations derived from Operational Decision Support Model.
       </div>
     </Card>
   );

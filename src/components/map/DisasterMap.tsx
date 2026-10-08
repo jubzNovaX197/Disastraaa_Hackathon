@@ -11,6 +11,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import type { Map as MLMap } from 'maplibre-gl';
 import { MapContainer } from './MapContainer';
 import { LayerControl, type LayerToggle } from './LayerControl';
@@ -384,7 +385,7 @@ export function DisasterMap({ dataset, className, center, zoom, initialLayers, e
         }
       }
 
-      // ── Road network clicked → open road detail panel (Task 12) ──
+      // ── Road network clicked → open road detail panel ──
       if (layerId === mapLayerIds.blockedRoads || layerId === `${mapLayerIds.blockedRoads}-casing`) {
         popupRef.current?.remove();
         setActivePanel(null);
@@ -579,23 +580,23 @@ export function DisasterMap({ dataset, className, center, zoom, initialLayers, e
       onMapReady={handleMapReady}
     >
       {/* Real / Demo Environment banner */}
-      <div className="absolute top-0 left-0 right-0 flex justify-center pointer-events-none z-20 px-4">
+      <div className="absolute top-0 left-0 right-0 flex justify-center pointer-events-none z-20 px-2 sm:px-4">
         {isDemo ? (
-          <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 text-[11px] font-medium backdrop-blur-sm whitespace-nowrap map-panel">
+          <div className="mt-1.5 sm:mt-2 inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 text-[10px] sm:text-[11px] font-medium backdrop-blur-sm whitespace-nowrap map-panel">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse-slow flex-shrink-0" />
-            SIMULATION ENVIRONMENT — Controlling simulated disaster scenario data
+            <span className="hidden sm:inline">SIMULATION ENVIRONMENT — </span>Controlling simulated disaster scenario data
           </div>
         ) : (
-          <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[11px] font-medium backdrop-blur-sm whitespace-nowrap map-panel">
+          <div className="mt-1.5 sm:mt-2 inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[10px] sm:text-[11px] font-medium backdrop-blur-sm whitespace-nowrap map-panel">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-slow flex-shrink-0" />
-            OPERATIONAL ENVIRONMENT — Live Feed Active · India Geographic Monitoring
+            <span className="hidden sm:inline">OPERATIONAL ENVIRONMENT — </span>Live Feed Active · India Geographic Monitoring
           </div>
         )}
       </div>
 
       {/* Map tools: Layer control + Basemap selector + Report Incident + Travel Intelligence */}
-      <div className="absolute left-3 top-4 pointer-events-none z-20 flex flex-col items-start gap-2">
-        <div className="flex items-center gap-2 flex-wrap">
+      <div className="absolute left-2 sm:left-3 top-8 sm:top-10 pointer-events-none z-20 flex flex-col items-start gap-1.5 sm:gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
           {/* Minimizable Map Layers */}
           <LayerControl layers={layers} onToggle={handleToggle} />
 
@@ -608,15 +609,16 @@ export function DisasterMap({ dataset, className, center, zoom, initialLayers, e
           <button
             type="button"
             onClick={() => setIsReportFormOpen(true)}
-            className="pointer-events-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-accent text-slate-950 hover:bg-accent/90 shadow-lg backdrop-blur-md transition-all active:scale-98 border border-accent/40"
+            className="pointer-events-auto inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold bg-accent text-slate-950 hover:bg-accent/90 shadow-lg backdrop-blur-md transition-all active:scale-98 border border-accent/40"
             title="Submit a ground disaster report"
           >
             <span>📢</span>
-            <span>Report Incident</span>
+            <span className="hidden xs:inline">Report Incident</span>
+            <span className="xs:hidden">Report</span>
           </button>
         </div>
 
-        {/* Task 13 + 14 + 15: Route, Destination & Journey Intelligence */}
+        {/* Safe Route & Journey Intelligence */}
         <div className="pointer-events-auto">
           <RouteMapOverlay
             environment={envMode}
@@ -630,7 +632,7 @@ export function DisasterMap({ dataset, className, center, zoom, initialLayers, e
       </div>
 
       {/* Top right container: Weather Widget + Alert badge */}
-      <div className="absolute top-4 right-3 pointer-events-none z-20 flex items-center gap-2">
+      <div className="absolute top-8 sm:top-10 right-2 sm:right-3 pointer-events-none z-20 flex flex-col sm:flex-row items-end sm:items-center gap-1.5 sm:gap-2">
         <LiveWeatherWidget
           environment={envMode}
           coordinates={center ?? [85.8, 20.0]}
@@ -639,7 +641,11 @@ export function DisasterMap({ dataset, className, center, zoom, initialLayers, e
 
         {/* Alert badge */}
         {activeAlerts.length > 0 ? (
-          <div className="pointer-events-auto flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-elevated/95 border border-white/10 shadow-lg backdrop-blur-sm map-panel">
+          <Link
+            href="/alerts"
+            className="pointer-events-auto flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-lg bg-surface-elevated/95 border border-critical/30 shadow-lg backdrop-blur-sm map-panel hover:border-critical/60 hover:bg-critical/10 transition-colors"
+            title="View all live bulletins and alerts"
+          >
             <span className="w-2 h-2 rounded-full bg-critical animate-pulse-slow flex-shrink-0" />
             <span className="text-xs font-semibold text-slate-200 whitespace-nowrap">
               {activeAlerts.length} Active Alert{activeAlerts.length !== 1 ? 's' : ''}
@@ -649,14 +655,18 @@ export function DisasterMap({ dataset, className, center, zoom, initialLayers, e
                 {criticalCount} CRITICAL
               </span>
             )}
-          </div>
+          </Link>
         ) : !isDemo ? (
-          <div className="pointer-events-auto flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-elevated/95 border border-emerald-500/20 shadow-lg backdrop-blur-sm map-panel">
+          <Link
+            href="/alerts"
+            className="pointer-events-auto flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-lg bg-surface-elevated/95 border border-emerald-500/20 shadow-lg backdrop-blur-sm map-panel hover:border-emerald-500/40 hover:bg-emerald-500/10 transition-colors"
+            title="Inspect alert feed status"
+          >
             <span className="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0" />
             <span className="text-xs font-medium text-emerald-400 whitespace-nowrap">
               0 Active Alerts · All Sectors Normal
             </span>
-          </div>
+          </Link>
         ) : null}
       </div>
 
@@ -883,7 +893,7 @@ export function DisasterMap({ dataset, className, center, zoom, initialLayers, e
         </div>
       )}
 
-      {/* Road Intelligence Detail Panel (Task 12) */}
+      {/* Road Intelligence Detail Panel */}
       {activeRoad && (
         <div className={cn(
           'absolute z-20 pointer-events-auto',
