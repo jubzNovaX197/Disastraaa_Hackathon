@@ -55,15 +55,37 @@ export class HazardRepository {
       // 3. Persist to Neon PostgreSQL if DATABASE_URL is available
       if (process.env.DATABASE_URL) {
         try {
+          if (
+            !Array.isArray(event.coordinates) ||
+            event.coordinates.length !== 2 ||
+            typeof event.coordinates[0] !== 'number' ||
+            typeof event.coordinates[1] !== 'number' ||
+            isNaN(event.coordinates[0]) ||
+            isNaN(event.coordinates[1]) ||
+            event.coordinates[0] < -180 ||
+            event.coordinates[0] > 180 ||
+            event.coordinates[1] < -90 ||
+            event.coordinates[1] > 90
+          ) {
+            continue;
+          }
+
           const [lon, lat] = event.coordinates;
 
           // Check if record exists
-          const existingDb = await executeQuery<{ id: string }>(
-            'SELECT id FROM hazards WHERE id = $1 LIMIT 1;',
+          const existingDb = await executeQuery<{ id: string; updated_at: string }>(
+            'SELECT id, updated_at FROM hazards WHERE id = $1 LIMIT 1;',
             [event.id],
           );
 
           if (existingDb.length > 0) {
+            const existingUpdated = new Date(existingDb[0].updated_at).getTime();
+            const incomingUpdated = new Date(event.updatedAt).getTime();
+            if (!isNaN(existingUpdated) && !isNaN(incomingUpdated) && incomingUpdated < existingUpdated) {
+              // Preserve newer hazard observation
+              continue;
+            }
+
             await executeQuery(
               `UPDATE hazards SET
                 title = $1,
