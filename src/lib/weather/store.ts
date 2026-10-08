@@ -49,7 +49,43 @@ export function getAllCachedWeather(): NormalizedWeather[] {
  * Persists normalized operational weather into Neon PostgreSQL + PostGIS
  * and updates memory cache. Deduplicates by ID and observation timestamp.
  */
-export async function saveWeatherTelemetry(weather: NormalizedWeather): Promise<void> {
+export interface WeatherSaveResult {
+  success: boolean;
+  persistedToDb: boolean;
+  isNewer: boolean;
+  error?: string;
+}
+
+/**
+ * Persists normalized operational weather into Neon PostgreSQL + PostGIS
+ * and updates memory cache. Deduplicates by ID, enforces temporal ordering
+ * (rejects overwriting newer observations with older ones), and validates coordinates.
+ */
+export async function saveWeatherTelemetry(weather: NormalizedWeather): Promise<WeatherSaveResult> {
+  // Validate coordinates and numbers
+  if (
+    !weather ||
+    !Array.isArray(weather.coordinates) ||
+    weather.coordinates.length !== 2 ||
+    typeof weather.coordinates[0] !== 'number' ||
+    typeof weather.coordinates[1] !== 'number' ||
+    isNaN(weather.coordinates[0]) ||
+    isNaN(weather.coordinates[1]) ||
+    weather.coordinates[0] < -180 ||
+    weather.coordinates[0] > 180 ||
+    weather.coordinates[1] < -90 ||
+    weather.coordinates[1] > 90 ||
+    typeof weather.temperatureC !== 'number' ||
+    isNaN(weather.temperatureC)
+  ) {
+    return {
+      success: false,
+      persistedToDb: false,
+      isNewer: false,
+      error: 'Malformed coordinates or invalid numeric weather observations',
+    };
+  }
+
   const [lon, lat] = weather.coordinates;
   const key = getCacheKey(lat, lon);
 
@@ -75,16 +111,36 @@ export async function saveWeatherTelemetry(weather: NormalizedWeather): Promise<
   }
 
   // Persist to Neon PostgreSQL if DATABASE_URL is available
-  if (!process.env.DATABASE_URL) return;
+  if (!process.env.DATABASE_URL) {
+    return {
+      success: true,
+      persistedToDb: false,
+      isNewer: true,
+      error: 'DATABASE_URL not configured; cached in memory only',
+    };
+  }
 
   try {
-    // Deduplication check: check if record for this ID already exists
+    // Deduplication & temporal ordering check
     const existing = await executeQuery<{ id: string; observed_at: string }>(
       'SELECT id, observed_at FROM weather_telemetry WHERE id = $1 LIMIT 1;',
       [weather.id],
     );
 
     if (existing.length > 0) {
+      const existingObservedMs = new Date(existing[0].observed_at).getTime();
+      const incomingObservedMs = new Date(weather.observedAt).getTime();
+
+      // Avoid overwriting a valid observation with an older observation
+      if (!isNaN(existingObservedMs) && !isNaN(incomingObservedMs) && incomingObservedMs < existingObservedMs) {
+        return {
+          success: true,
+          persistedToDb: false,
+          isNewer: false,
+          error: 'Incoming observation is older than existing record; preserved newer record',
+        };
+      }
+
       // Update existing record rather than inserting duplicate row
       await executeQuery(
         `UPDATE weather_telemetry SET
@@ -115,6 +171,8 @@ export async function saveWeatherTelemetry(weather: NormalizedWeather): Promise<
           weather.id,
         ],
       );
+
+      return { success: true, persistedToDb: true, isNewer: true };
     } else {
       // Insert new normalized row with PostGIS Point geometry
       await executeQuery(
@@ -166,8 +224,16 @@ export async function saveWeatherTelemetry(weather: NormalizedWeather): Promise<
           weather.environment,
         ],
       );
+
+      return { success: true, persistedToDb: true, isNewer: true };
     }
   } catch (err: any) {
     console.warn('[WEATHER-STORE] Failed to persist to PostgreSQL (falling back to memory cache):', err.message);
+    return {
+      success: false,
+      persistedToDb: false,
+      isNewer: true,
+      error: `Database persistence failed: ${err.message}`,
+    };
   }
 }

@@ -29,6 +29,51 @@ export class RealWeatherProvider implements WeatherProvider {
     const result = await openMeteoClient.fetchForecast(lat, lon);
     if (!result.success || !result.data) {
       console.warn(`[REAL-WEATHER-PROVIDER] Ingestion failed for [${lat}, ${lon}]:`, result.error);
+
+      // Fallback: check database for last-known-good persisted weather
+      if (process.env.DATABASE_URL) {
+        try {
+          const rows = await executeQuery<any>(
+            `SELECT *, ST_X(coordinates::geometry) as lng, ST_Y(coordinates::geometry) as lat
+             FROM weather_telemetry
+             WHERE environment = 'REAL'
+             ORDER BY ST_Distance(coordinates, ST_SetSRID(ST_MakePoint($1, $2), 4326)) ASC
+             LIMIT 1;`,
+            [lon, lat],
+          );
+          if (rows.length > 0) {
+            const r = rows[0];
+            return {
+              id: r.id,
+              locationName: r.location_name,
+              state: r.state,
+              district: r.district,
+              coordinates: [Number(r.lng) || lon, Number(r.lat) || lat],
+              temperatureC: Number(r.temperature_c),
+              relativeHumidityPct: r.relative_humidity_pct,
+              precipitationMm: Number(r.precipitation_mm),
+              windSpeedKmh: Number(r.wind_speed_kmh),
+              windDirectionDeg: r.wind_direction_deg,
+              surfacePressureHpa: Number(r.surface_pressure_hpa),
+              weatherCode: r.weather_code,
+              condition: r.weather_condition,
+              icon: '⛅',
+              isDay: true,
+              source: `${r.source} (Last-Known-Good DB Fallback)`,
+              sourceId: r.id,
+              retrievedAt: new Date().toISOString(),
+              observedAt: new Date(r.observed_at).toISOString(),
+              validFrom: new Date(r.observed_at).toISOString(),
+              validUntil: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+              freshnessStatus: 'STALE',
+              hourlyForecast: Array.isArray(r.forecast_json) ? r.forecast_json : [],
+              environment: 'REAL',
+            };
+          }
+        } catch {
+          // Fall through to null
+        }
+      }
       return null;
     }
 

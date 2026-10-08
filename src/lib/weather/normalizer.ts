@@ -96,14 +96,48 @@ export function normalizeOpenMeteoResponse(
   state?: string,
   district?: string,
 ): NormalizedWeather | null {
-  if (!raw.current) return null;
+  if (!raw || !raw.current) return null;
+
+  // Strict coordinate validation
+  if (
+    typeof raw.latitude !== 'number' ||
+    typeof raw.longitude !== 'number' ||
+    isNaN(raw.latitude) ||
+    isNaN(raw.longitude) ||
+    raw.latitude < -90 ||
+    raw.latitude > 90 ||
+    raw.longitude < -180 ||
+    raw.longitude > 180
+  ) {
+    return null;
+  }
 
   const current = raw.current;
-  const conditionInfo = interpretWmoCode(current.weather_code);
+
+  // Strict numeric telemetry validation
+  if (
+    typeof current.temperature_2m !== 'number' ||
+    isNaN(current.temperature_2m) ||
+    typeof current.precipitation !== 'number' ||
+    isNaN(current.precipitation) ||
+    typeof current.wind_speed_10m !== 'number' ||
+    isNaN(current.wind_speed_10m)
+  ) {
+    return null;
+  }
+
+  const conditionInfo = interpretWmoCode(current.weather_code ?? 0);
   const nowIso = new Date().toISOString();
-  
-  // Format observed time: Open-Meteo returns ISO-like 'YYYY-MM-DDTHH:mm'
-  const observedAtIso = current.time ? new Date(current.time).toISOString() : nowIso;
+
+  // Validate observation timestamp safely
+  let observedAtIso = nowIso;
+  if (current.time && typeof current.time === 'string') {
+    const parsedTime = new Date(current.time);
+    if (!isNaN(parsedTime.getTime())) {
+      observedAtIso = parsedTime.toISOString();
+    }
+  }
+
   const validUntilIso = new Date(Date.now() + 60 * 60 * 1000).toISOString(); // valid 1h
   const freshness = computeFreshnessStatus(observedAtIso);
 
