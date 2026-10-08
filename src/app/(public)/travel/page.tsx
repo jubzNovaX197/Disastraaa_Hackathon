@@ -53,6 +53,22 @@ export default function TravelPage() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeReportModal, setActiveReportModal] = useState<CitizenReportItem | null>(null);
 
+  // Sync real operational roads from OSM API when in REAL mode
+  useEffect(() => {
+    if (environment === 'REAL') {
+      fetch('/api/roads?env=REAL')
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success && Array.isArray(data.roads) && data.roads.length > 0) {
+            setLocalRoads(data.roads);
+          }
+        })
+        .catch(() => {});
+    } else {
+      setLocalRoads(null);
+    }
+  }, [environment]);
+
   // Sync selected road if roads change
   useEffect(() => {
     if (roads.length > 0 && (!selectedRoadId || !roads.some((r) => r.id === selectedRoadId))) {

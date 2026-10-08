@@ -6,7 +6,7 @@
  * adapter without changing UI components.
  */
 
-import type { RouteEdge, RouteMode, RouteRequest, RouteResult, RouteSegment } from './types';
+import type { RouteNode, RouteEdge, RouteMode, RouteRequest, RouteResult, RouteSegment } from './types';
 import { NODE_BY_ID, buildAdjacency, DEMO_EDGES } from './graph';
 import {
   shortestCost,
@@ -29,9 +29,13 @@ function getAdj(): Map<string, RouteEdge[]> {
 
 // ── Heuristic (Euclidean distance in degrees — good enough for A* on small graph) ──
 
-function heuristic(nodeId: string, goalId: string): number {
-  const a = NODE_BY_ID[nodeId];
-  const b = NODE_BY_ID[goalId];
+function heuristic(
+  nodeId: string,
+  goalId: string,
+  nodeMap: Record<string, RouteNode> = NODE_BY_ID,
+): number {
+  const a = nodeMap[nodeId];
+  const b = nodeMap[goalId];
   if (!a || !b) return 0;
   const dx = a.coordinates[0] - b.coordinates[0];
   const dy = a.coordinates[1] - b.coordinates[1];
@@ -53,12 +57,12 @@ function astar(
   originId:      string,
   destinationId: string,
   costFn:        CostFn,
+  adj:           Map<string, RouteEdge[]> = getAdj(),
+  nodeMap:       Record<string, RouteNode> = NODE_BY_ID,
 ): AStarResult {
-  const adj = getAdj();
-
   // Priority queue via sorted array (small graph — fine for prototype)
   type Entry = { nodeId: string; g: number; f: number };
-  const open: Entry[] = [{ nodeId: originId, g: 0, f: heuristic(originId, destinationId) }];
+  const open: Entry[] = [{ nodeId: originId, g: 0, f: heuristic(originId, destinationId, nodeMap) }];
 
   const gScore: Record<string, number>          = { [originId]: 0 };
   const cameFromNode: Record<string, string>    = {};
@@ -95,7 +99,7 @@ function astar(
         gScore[edge.to]    = tentative;
         cameFromNode[edge.to] = nodeId;
         cameFromEdge[edge.to] = edge;
-        open.push({ nodeId: edge.to, g: tentative, f: tentative + heuristic(edge.to, destinationId) });
+        open.push({ nodeId: edge.to, g: tentative, f: tentative + heuristic(edge.to, destinationId, nodeMap) });
       }
     }
   }
@@ -238,12 +242,23 @@ function buildSummary(
  * Calculate all three route options for a given origin/destination pair.
  * Pure function — no side-effects, no external calls.
  */
-export function calculateRoutes(req: RouteRequest): {
+export function calculateRoutes(
+  req: RouteRequest,
+  customGraph?: {
+    nodes?: RouteNode[];
+    edges?: RouteEdge[];
+    nodeById?: Record<string, RouteNode>;
+  },
+): {
   shortest:    RouteResult;
   safest:      RouteResult;
   alternative: RouteResult;
 } {
   const { originNodeId, destinationNodeId } = req;
+  const nodeMap =
+    customGraph?.nodeById ??
+    (customGraph?.nodes ? Object.fromEntries(customGraph.nodes.map((n) => [n.id, n])) : NODE_BY_ID);
+  const adj = customGraph?.edges ? buildAdjacency(customGraph.edges) : getAdj();
 
   if (originNodeId === destinationNodeId) {
     const msg = 'Origin and destination are the same location.';
@@ -251,23 +266,22 @@ export function calculateRoutes(req: RouteRequest): {
     return { shortest: empty, safest: { ...empty, mode: 'SAFEST' }, alternative: { ...empty, mode: 'ALTERNATIVE' } };
   }
 
-  if (!NODE_BY_ID[originNodeId] || !NODE_BY_ID[destinationNodeId]) {
+  if (!nodeMap[originNodeId] || !nodeMap[destinationNodeId]) {
     const msg = 'Selected location not found in routing network.';
     const empty = buildResult('SHORTEST', [], [], false, msg);
     return { shortest: empty, safest: { ...empty, mode: 'SAFEST' }, alternative: { ...empty, mode: 'ALTERNATIVE' } };
   }
 
   // ── Shortest ────────────────────────────────────────────────────────────────
-  const shortestRaw = astar(originNodeId, destinationNodeId, shortestCost);
+  const shortestRaw = astar(originNodeId, destinationNodeId, shortestCost, adj, nodeMap);
   const shortest    = buildResult('SHORTEST', shortestRaw.nodePath, shortestRaw.edgePath, shortestRaw.found);
 
   // ── Safest ──────────────────────────────────────────────────────────────────
-  const safestRaw = astar(originNodeId, destinationNodeId, safestCost);
+  const safestRaw = astar(originNodeId, destinationNodeId, safestCost, adj, nodeMap);
   const safest    = buildResult('SAFEST', safestRaw.nodePath, safestRaw.edgePath, safestRaw.found);
 
   // Fill in blockedAvoided (compare safest path against blocked edges)
   if (safest.found && shortest.found) {
-    const shortestEdgeIds = new Set(shortest.segments.map((s) => s.edgeId));
     const safestEdgeIds   = new Set(safest.segments.map((s) => s.edgeId));
     // Count blocked segments that shortest uses but safest avoids
     let avoided = 0;
@@ -284,6 +298,8 @@ export function calculateRoutes(req: RouteRequest): {
     originNodeId,
     destinationNodeId,
     (edge) => alternativeCost(edge, safestEdgeIds),
+    adj,
+    nodeMap,
   );
   const alternative = buildResult('ALTERNATIVE', altRaw.nodePath, altRaw.edgePath, altRaw.found);
 
