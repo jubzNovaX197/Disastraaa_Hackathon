@@ -47,6 +47,21 @@ export function detectAssistantIntent(
     }
   }
 
+  // 0. Emergency Situation Report (SitRep)
+  if (
+    q.includes('sitrep') ||
+    q.includes('sit-rep') ||
+    q.includes('situation report') ||
+    q.includes('eoc report') ||
+    q.includes('operational report') ||
+    q.includes('emergency situation report') ||
+    q.includes('disaster report') ||
+    q.includes('generate briefing report') ||
+    q.includes('formal briefing')
+  ) {
+    return { intent: 'SITREP_GENERATION', confidence: 0.98, extractedLocation };
+  }
+
   // 1. Live Changes / Recent updates
   if (
     q.includes('changed recently') ||

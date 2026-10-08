@@ -9,6 +9,7 @@ import type { Role } from '@/types/roles';
 import type { LiveDataOverrides } from '@/lib/realtime/types';
 
 export type AssistantIntent =
+  | 'SITREP_GENERATION'
   | 'SITUATION_SUMMARY'
   | 'RISK_ANALYSIS'
   | 'FLOOD_ANALYSIS'
@@ -32,7 +33,9 @@ export type DataQualityBadge =
   | 'SIMULATED'
   | 'CITIZEN_REPORT'
   | 'HISTORICAL'
-  | 'LIVE_UPDATED';
+  | 'LIVE_UPDATED'
+  | 'UNAVAILABLE'
+  | 'STALE';
 
 export interface StructuredSections {
   situation: string;
@@ -42,12 +45,86 @@ export interface StructuredSections {
   dataFreshness: string;
 }
 
+export interface EmergencySitRepPayload {
+  reportId: string;
+  generatedAt: string;
+  classification: 'OFFICIAL_EOC_DIRECTIVE' | 'PUBLIC_SAFETY_ADVISORY';
+  targetScope: string;
+  sections: {
+    reportingScope: {
+      timestamp: string;
+      geographicalScope: string;
+      issuingAuthority: string;
+    };
+    hazardsAndRisk: {
+      activeHazards: string[];
+      highestRiskZone: string;
+      compositeRiskScore: number | 'UNAVAILABLE';
+      dominantThreat: string;
+    };
+    weatherAndFreshness: {
+      status: 'LIVE' | 'STALE' | 'UNAVAILABLE' | 'SIMULATED';
+      source: string;
+      observedAt: string;
+      summary: string;
+      metrics: Record<string, string | number>;
+    };
+    affectedPopulation: {
+      estimatedExposed: number | 'UNAVAILABLE';
+      affectedDistricts: string[];
+      basisOfEstimate: string;
+    };
+    shelterCapacityAndGaps: {
+      totalShelters: number | 'UNAVAILABLE';
+      activeCapacity: number | 'UNAVAILABLE';
+      currentOccupancy: number | 'UNAVAILABLE';
+      capacityGap: number | 'UNAVAILABLE';
+      statusSummary: string;
+    };
+    blockedRoutesAndEvidence: {
+      disruptedCorridorsCount: number;
+      criticalSegments: {
+        corridor: string;
+        status: string;
+        cause: string;
+        evidence: string;
+      }[];
+    };
+    incidentsAndReports: {
+      verifiedIncidentsCount: number;
+      dispatchedTeamsCount: number;
+      citizenReportsTotal: number;
+      verifiedReportsCount: number;
+      pendingReportsCount: number;
+      cautionaryNote: string;
+    };
+    priorityRecommendations: {
+      immediateActions: string[];
+      operationalDirectives: string[];
+      decisionSupportDisclaimer: string;
+    };
+    dataLimitations: {
+      unavailableSensors: string[];
+      staleFeeds: string[];
+      unverifiedItems: string[];
+      groundCheckRequired: string[];
+    };
+    provenanceMetadata: {
+      sources: string[];
+      environment: 'REAL' | 'DEMO';
+      authorizedRole: Role;
+      providerUsed: string;
+    };
+  };
+}
+
 export interface AssistantResponsePayload {
   text: string;
   intent: AssistantIntent;
   sources: string[];
   dataQuality: DataQualityBadge[];
   structuredSections: StructuredSections;
+  sitRep?: EmergencySitRepPayload;
   providerUsed: string;
   locationFocus?: string;
   timestamp: string;
@@ -147,6 +224,40 @@ export interface StructuredContextPayload {
     timeFormatted: string;
     summary: string;
   }[];
+  telemetryWeather?: {
+    status: 'LIVE' | 'STALE' | 'UNAVAILABLE' | 'SIMULATED';
+    source: string;
+    locationName?: string;
+    temperatureC?: number;
+    relativeHumidityPct?: number;
+    precipitationMm?: number;
+    windSpeedKmh?: number;
+    surfacePressureHpa?: number;
+    weatherCondition?: string;
+    observedAt?: string;
+    provenanceNote?: string;
+  };
+  verifiedIncidents?: {
+    id: string;
+    title: string;
+    severity: string;
+    status: string;
+    address: string;
+    hazardType: string;
+    assignedTeam?: string;
+    createdAt: string;
+  }[];
+  dataSourceProvenance?: {
+    databaseConnected: boolean;
+    environment: 'REAL' | 'DEMO';
+    weatherSource: string;
+    hazardsSource: string;
+    alertsSource: string;
+    roadsSource: string;
+    sheltersSource: string;
+    incidentsSource: string;
+    reportsSource: string;
+  };
 }
 
 export interface AssistantQueryRequest {

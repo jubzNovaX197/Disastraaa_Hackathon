@@ -6,7 +6,7 @@
  */
 
 import { detectAssistantIntent } from './intent';
-import { buildStructuredContext } from './context';
+import { buildGroundedContext } from './context';
 import { GeminiProvider } from './providers/gemini-provider';
 import { DeterministicProvider } from './providers/deterministic-provider';
 import type { AssistantQueryRequest, AssistantResponsePayload } from './types';
@@ -16,18 +16,19 @@ export class AssistantEngine {
   private deterministicProvider = new DeterministicProvider();
 
   async processQuery(request: AssistantQueryRequest): Promise<AssistantResponsePayload> {
-    const { question, locationFocus, liveOverrides, secondsSinceSync } = request;
+    const { question, locationFocus, liveOverrides, secondsSinceSync, role } = request;
 
     // 1. Detect Intent & Location Focus
     const { intent, extractedLocation } = detectAssistantIntent(question, locationFocus);
     const activeLocation = extractedLocation || locationFocus;
 
-    // 2. Build Structured Context Slice
-    const context = buildStructuredContext({
+    // 2. Build Structured Context Slice with live database grounding
+    const context = await buildGroundedContext({
       intent,
       targetLocation: activeLocation,
       liveOverrides,
       secondsSinceSync,
+      role,
     });
 
     // 3. Choose Provider: If Gemini has key, use it; otherwise use Deterministic engine
@@ -41,6 +42,7 @@ export class AssistantEngine {
       intent,
       context,
       locationFocus: activeLocation,
+      role,
     });
 
     return response;
