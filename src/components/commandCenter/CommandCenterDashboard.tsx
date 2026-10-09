@@ -22,6 +22,7 @@ import { AuthorityAccessGate } from '@/components/auth/AuthorityAccessGate';
 import { CommandCenterHeader } from './CommandCenterHeader';
 import { CommandCenterKpiRow } from './CommandCenterKpiRow';
 import { SituationSummaryPanel } from './SituationSummaryPanel';
+import { DisasterIntelligenceSection } from './DisasterIntelligenceSection';
 import { OperationsFiltersBar } from './OperationsFiltersBar';
 import { PriorityLocationsTable } from './PriorityLocationsTable';
 import { LocationDetailDrawer } from './LocationDetailDrawer';
@@ -204,6 +205,9 @@ export function CommandCenterDashboard({
 
       {/* ── 3. Operational Situation Brief (Dynamic Narrative) ── */}
       <SituationSummaryPanel narrative={baseData.narrative} />
+
+      {/* ── 3.1 AI Disaster Intelligence & Decision Support ── */}
+      <DisasterIntelligenceSection />
 
       {/* ── 4. Operations Filter Bar ── */}
       <OperationsFiltersBar
