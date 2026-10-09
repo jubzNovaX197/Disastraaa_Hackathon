@@ -9,6 +9,7 @@
     "lint": "eslint src --ext .ts,.tsx",
     "type-check": "tsc --noEmit",
     "test": "tsx --test tests/*.test.ts",
+    "audit:secrets": "node scripts/audit-secrets.mjs",
     "test:e2e": "playwright test"
   },
   "dependencies": {
