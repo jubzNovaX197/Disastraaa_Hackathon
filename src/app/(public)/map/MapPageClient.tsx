@@ -14,6 +14,7 @@ import { demoDataset } from '@/data/demo';
 import type { AppEnvironment } from '@/lib/env';
 import { cn } from '@/lib/utils';
 import { Activity, Sparkles } from 'lucide-react';
+import { DemoScenarioControls } from '@/components/demo/DemoScenarioControls';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -190,22 +191,23 @@ export function MapPageClient({ initialDataset, environment }: MapPageClientProp
 
   return (
     <div className="relative w-full h-full">
-      {/* Environment Mode Switcher (Real Mode vs Simulation) */}
-      <div className="absolute bottom-14 right-2 sm:bottom-auto sm:top-16 sm:right-3 z-30 pointer-events-auto flex items-center bg-slate-900/90 dark:bg-surface-elevated/90 backdrop-blur-md p-1 rounded-xl border border-white/10 shadow-xl">
+      {/* Environment Mode Switcher (Real Mode vs Simulation) — Centered horizontally at top */}
+      <div className="absolute top-2.5 sm:top-3 left-1/2 -translate-x-1/2 z-30 pointer-events-auto flex items-center bg-slate-900/90 dark:bg-surface-elevated/95 backdrop-blur-md p-1 rounded-full border border-white/10 shadow-xl max-w-[calc(100%-1rem)]">
         <button
           type="button"
           onClick={() => handleToggleEnvironment('REAL')}
           disabled={isSwitching}
           className={cn(
-            'flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition-all',
+            'flex items-center gap-1.5 px-3 sm:px-3.5 py-1 rounded-full text-xs font-semibold transition-all',
             currentEnv === 'REAL'
               ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-sm'
               : 'text-slate-400 hover:text-slate-200',
           )}
           title="Switch to Real Operation Mode (Live feed & real observations)"
+          aria-pressed={currentEnv === 'REAL'}
         >
-          <Activity className="w-3.5 h-3.5 text-emerald-400" />
-          <span>Real Mode</span>
+          <Activity className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+          <span className="whitespace-nowrap">Real Mode</span>
         </button>
 
         <button
@@ -213,22 +215,29 @@ export function MapPageClient({ initialDataset, environment }: MapPageClientProp
           onClick={() => handleToggleEnvironment('DEMO')}
           disabled={isSwitching}
           className={cn(
-            'flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition-all',
+            'flex items-center gap-1.5 px-3 sm:px-3.5 py-1 rounded-full text-xs font-semibold transition-all',
             currentEnv === 'DEMO'
               ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-sm'
               : 'text-slate-400 hover:text-slate-200',
           )}
           title="Switch to Demo Simulation Mode (Simulated disaster scenario)"
+          aria-pressed={currentEnv === 'DEMO'}
         >
-          <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-          <span>Simulation</span>
+          <Sparkles className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
+          <span className="whitespace-nowrap">Simulation</span>
         </button>
       </div>
 
       {modeError && (
-        <p role="alert" className="absolute top-28 right-2 z-40 bg-slate-900 text-rose-300 rounded-lg p-2 text-xs">
+        <p role="alert" className="absolute top-14 left-1/2 -translate-x-1/2 z-40 bg-slate-900/95 text-rose-300 rounded-lg px-3 py-1.5 text-xs border border-rose-500/30 shadow-lg">
           {modeError}
         </p>
+      )}
+
+      {currentEnv === 'DEMO' && (
+        <aside aria-label="Simulation scenario" className="absolute bottom-6 left-3 sm:left-4 z-20 max-w-[calc(100vw-2rem)] sm:max-w-xs md:max-w-sm pointer-events-auto">
+          <DemoScenarioControls />
+        </aside>
       )}
 
       <DisasterMap

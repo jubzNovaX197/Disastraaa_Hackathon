@@ -99,53 +99,67 @@ export default function TravelPage() {
       <main className="pt-20 min-h-screen bg-slate-50 dark:bg-surface-base text-slate-900 dark:text-slate-100 font-sans pb-16 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
-          {/* Header & Breadcrumb */}
+          {/* Page Header: Safe Routes & Journey Risk */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 dark:border-white/10 pb-6">
             <div>
               <div className="flex items-center gap-2 text-xs font-semibold text-accent uppercase tracking-wider mb-1">
                 <Navigation className="w-3.5 h-3.5" />
-                <span>Road Intelligence, Safe Transit &amp; Journey Risk</span>
+                <span>Geospatial Transit Intelligence</span>
                 <span className="text-slate-400 dark:text-slate-600">•</span>
-                <span className="text-slate-500 dark:text-slate-400">Operational Transit Network</span>
+                {environment === 'REAL' ? (
+                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    REAL ROAD NETWORK (OSM)
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                    SIMULATION SCENARIO
+                  </span>
+                )}
               </div>
               <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">
-                Disaster Roadway Intelligence &amp; Safe Journey Planning
+                Safe Routes &amp; Journey Risk
               </h1>
               <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1 max-w-3xl leading-relaxed">
-                Real-time roadway conditions, multi-hazard corridor exposure, destination safety checks, and alternative safe transit routing under disaster conditions.
+                Plan safe transit corridors during disasters using genuine road network data, real-time hazard exposure, and destination safety analysis.
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <button
+                type="button"
+                onClick={() => switchEnvironment(environment === 'REAL' ? 'DEMO' : 'REAL')}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl border border-slate-300 dark:border-white/10 bg-white dark:bg-surface-elevated hover:bg-slate-50 dark:hover:bg-white/5 transition-all text-slate-700 dark:text-slate-200 shadow-xs"
+                title={environment === 'REAL' ? 'Switch to Simulation Mode' : 'Switch to Real Data Mode'}
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                <span>{environment === 'REAL' ? 'Switch to Simulation' : 'Switch to Real Mode'}</span>
+              </button>
+
               <Link
                 href="/map"
-                className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-xl bg-accent text-slate-950 font-bold hover:bg-accent/90 shadow-sm transition-all"
+                className="inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-semibold rounded-xl bg-accent text-slate-950 font-bold hover:bg-accent/90 shadow-sm transition-all"
               >
-                <MapIcon className="w-4 h-4" />
-                <span>View on GIS Map</span>
+                <MapIcon className="w-3.5 h-3.5" />
+                <span>View Full GIS Map</span>
               </Link>
             </div>
           </div>
 
-          {/* Journey Risk, Destination Safety & Route Planning section */}
+          {/* Journey Risk, Destination Safety & Route Planning Section */}
           <div className="bg-white dark:bg-surface-card rounded-2xl border border-slate-200 dark:border-white/10 shadow-2xl backdrop-blur-xl overflow-hidden ring-1 ring-black/5 dark:ring-white/5">
-            <div className="px-6 py-4.5 border-b border-slate-200 dark:border-white/10 bg-slate-50/80 dark:bg-surface-elevated/80 flex items-center justify-between">
+            <div className="px-6 py-4 border-b border-slate-200 dark:border-white/10 bg-slate-50/80 dark:bg-surface-elevated/80 flex items-center justify-between">
               <div>
-                <div className="text-[10px] font-bold uppercase tracking-widest text-accent mb-0.5">
-                  OPERATIONAL DECISION SUPPORT · NATIONAL TRANSIT MONITOR
-                </div>
-                <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                  <span>🗺️ Safe Corridor Planning &amp; Journey Risk Intelligence</span>
-                  <span className="text-xs font-mono font-normal text-slate-500 dark:text-slate-400">
-                    · Multi-Factor Assessment
-                  </span>
+                <h2 className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                  <span>🗺️ Route Search &amp; Safety Evaluation</span>
                 </h2>
-                <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
-                  Analyze origin-to-destination transit corridors, hazard exposures, road conditions, active alerts, and time-aware scenarios.
+                <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
+                  Select starting origin and destination shelter or hospital to calculate verified passable roads and hazard exposure.
                 </p>
               </div>
             </div>
-            <div className="p-5 sm:p-7 min-h-[580px]">
+            <div className="p-5 sm:p-7 min-h-[560px]">
               <DemoScenarioControls />
               <RoutePlanner initialOriginId="node-puri-shelter-1" initialDestinationId="node-puri-dhh" autoCalculate />
             </div>

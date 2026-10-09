@@ -123,7 +123,7 @@ export function MapContainer({
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Handle dynamic style switching (e.g. Light mode <-> Dark mode)
+  // Handle dynamic style switching (e.g. Light <-> Dark <-> Satellite <-> Streets)
   useEffect(() => {
     const map = mapRef.current;
     const targetStyle = style ?? mapConfig.defaultStyle;
@@ -133,26 +133,43 @@ export function MapContainer({
     if (currentAppliedStyleRef.current === targetStyle) return;
 
     currentAppliedStyleRef.current = targetStyle;
-    map.setStyle(targetStyle);
+
+    let executed = false;
+    const handleStyleReady = () => {
+      if (executed) return;
+      executed = true;
+      map.resize();
+      readyCallbackRef.current?.(map);
+    };
 
     const onStyleData = () => {
       if (map.isStyleLoaded()) {
         map.off('styledata', onStyleData);
-        map.resize();
-        onMapReady?.(map);
+        handleStyleReady();
       }
     };
+
+    // Attach listeners BEFORE setStyle to capture both async and sync style load events
+    map.once('style.load', handleStyleReady);
     map.on('styledata', onStyleData);
 
+    map.setStyle(targetStyle);
+
+    // If style loaded synchronously (common for inline StyleSpecification objects)
+    if (map.isStyleLoaded()) {
+      handleStyleReady();
+    }
+
     return () => {
+      map.off('style.load', handleStyleReady);
       map.off('styledata', onStyleData);
     };
-  }, [style, onMapReady]);
+  }, [style]);
 
   return (
-    <div className={cn('relative w-full h-full overflow-hidden', className)}>
-      {/* MapLibre renders into this div */}
-      <div ref={containerRef} className="w-full h-full" />
+    <div className={cn('relative w-full h-full overflow-hidden bg-[#0b0f19]', className)}>
+      {/* MapLibre renders into this div — dark background prevents white flash during tile loading / zooming */}
+      <div ref={containerRef} className="w-full h-full bg-[#0b0f19]" />
 
       {/* UI overlay slot — individual children control pointer-events */}
       <div className="absolute inset-0 pointer-events-none z-10">

@@ -7,6 +7,7 @@
  * without changing any map or UI component.
  */
 
+import { DEMO_REFERENCE_TIME } from './clock';
 import type { DisasterDataset } from '@/data/types';
 import { demoAlerts } from './alerts';
 import { demoBlockedRoads } from './blockedRoads';
@@ -26,7 +27,7 @@ export const demoDataset: DisasterDataset = {
   blockedRoads:   demoBlockedRoads,
   citizenReports: demoCitizenReports,
   roads:          demoRoadSegments,
-  lastRefreshed:  new Date().toISOString(),
+  lastRefreshed:  DEMO_REFERENCE_TIME,
 };
 
 // Re-export individual collections for components that only need one type

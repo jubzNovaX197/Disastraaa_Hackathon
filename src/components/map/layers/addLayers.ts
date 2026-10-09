@@ -63,7 +63,7 @@ export function addRiskZoneLayers(
       source: 'risk-zones',
       paint: {
         'fill-color': severityColorExpr(),
-        'fill-opacity': severityOpacityExpr(0.18),
+        'fill-opacity': severityOpacityExpr(0.28),
       },
     });
   }
@@ -75,8 +75,8 @@ export function addRiskZoneLayers(
       source: 'risk-zones',
       paint: {
         'line-color': severityColorExpr(),
-        'line-width': ['match', ['get', 'severity'], 'CRITICAL', 2.5, 'HIGH', 2, 'MODERATE', 1.5, 1] as ExpressionSpecification,
-        'line-opacity': 0.8,
+        'line-width': ['match', ['get', 'severity'], 'CRITICAL', 3, 'HIGH', 2.5, 'MODERATE', 2, 1.5] as ExpressionSpecification,
+        'line-opacity': 0.95,
         'line-dasharray': [3, 2],
       },
     });

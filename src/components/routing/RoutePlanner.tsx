@@ -35,6 +35,7 @@ import { DEMO_EDGES, NODE_BY_ID } from '@/lib/routing/graph';
 import type { RouteNode, RouteResult } from '@/lib/routing/types';
 import { cn } from '@/lib/utils';
 import {
+  ArrowUpDown,
   Compass,
   Globe,
   Loader2,
@@ -559,6 +560,18 @@ export function RoutePlanner({
     }
   }, [requestLocation, nodeOptions]);
 
+  const handleSwapEndpoints = useCallback(() => {
+    if (!originId && !destinationId) return;
+    const prevOriginId = originId;
+    setOriginId(destinationId);
+    setOriginCustomLabel(destNode?.name ?? null);
+    setDestinationId(prevOriginId);
+    setOriginQuery('');
+    setDestQuery('');
+    setCalculated(false);
+    setError('');
+  }, [originId, destinationId, destNode]);
+
   const handleCalculate = useCallback(() => {
     setError('');
     if (!originId) {
@@ -779,36 +792,8 @@ export function RoutePlanner({
             </button>
           </div>
 
-          {originId ? (
-            <div className="flex items-center justify-between p-2.5 rounded-lg bg-white dark:bg-surface-base border border-slate-200 dark:border-white/10 text-xs">
-              <div className="flex items-center gap-2 min-w-0">
-                <span className="text-base flex-shrink-0">{originNode ? NODE_ICON[originNode.type] : '📍'}</span>
-                <div className="min-w-0">
-                  <div className="font-bold text-slate-900 dark:text-slate-100 truncate">
-                    {originCustomLabel || originNode?.name || 'Selected Origin'}
-                  </div>
-                  {originNode && (
-                    <div className="text-[10px] text-slate-400 font-mono">
-                      {originNode.coordinates[1].toFixed(4)}°N, {originNode.coordinates[0].toFixed(4)}°E · {originNode.type}
-                    </div>
-                  )}
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setOriginId('');
-                  setOriginCustomLabel(null);
-                  setCalculated(false);
-                }}
-                className="p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5"
-                title="Change origin"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-1.5">
+          <div className="space-y-1.5">
+            {nodeOptions.length > 8 && (
               <div className="relative">
                 <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
                 <input
@@ -819,33 +804,39 @@ export function RoutePlanner({
                   className="w-full pl-9 pr-3 py-1.5 rounded-lg bg-white dark:bg-surface-base border border-slate-300 dark:border-white/15 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-accent"
                 />
               </div>
-              <select
-                value={originId}
-                onChange={(e) => {
-                  setOriginId(e.target.value);
-                  setOriginCustomLabel(null);
-                  setCalculated(false);
-                }}
-                className={cn(
-                  'w-full rounded-xl border text-xs px-3 py-2',
-                  'bg-white dark:bg-surface-elevated border-slate-300 dark:border-white/15',
-                  'text-slate-900 dark:text-slate-100 font-medium',
-                  'focus:outline-none focus:ring-2 focus:ring-accent/50'
-                )}
-              >
-                <option value="" className="bg-white dark:bg-surface-elevated text-slate-900 dark:text-slate-100">
-                  Select origin from {nodeOptions.length} points…
-                </option>
-                {nodeOptions
-                  .filter((n) => !originQuery || n.name.toLowerCase().includes(originQuery.toLowerCase()) || n.type.toLowerCase().includes(originQuery.toLowerCase()))
-                  .map((n) => (
-                    <option key={n.id} value={n.id} disabled={n.id === destinationId} className="bg-white dark:bg-surface-elevated text-slate-900 dark:text-slate-100">
-                      {NODE_ICON[n.type]} {n.name} ({n.type})
-                    </option>
-                  ))}
-              </select>
-            </div>
-          )}
+            )}
+            <select
+              value={originId}
+              onChange={(e) => {
+                setOriginId(e.target.value);
+                setOriginCustomLabel(null);
+                setCalculated(false);
+              }}
+              className={cn(
+                'w-full rounded-xl border text-xs px-3 py-2',
+                'bg-white dark:bg-surface-elevated border-slate-300 dark:border-white/15',
+                'text-slate-900 dark:text-slate-100 font-medium',
+                'focus:outline-none focus:ring-2 focus:ring-accent/50'
+              )}
+            >
+              <option value="" className="bg-white dark:bg-surface-elevated text-slate-900 dark:text-slate-100">
+                Select origin from {nodeOptions.length} points…
+              </option>
+              {nodeOptions
+                .filter((n) => !originQuery || n.id === originId || n.name.toLowerCase().includes(originQuery.toLowerCase()) || n.type.toLowerCase().includes(originQuery.toLowerCase()))
+                .map((n) => (
+                  <option key={n.id} value={n.id} disabled={n.id === destinationId} className="bg-white dark:bg-surface-elevated text-slate-900 dark:text-slate-100">
+                    {NODE_ICON[n.type]} {n.name} ({n.type})
+                  </option>
+                ))}
+            </select>
+            {originNode && (
+              <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 font-mono px-1">
+                <span className="truncate">{originCustomLabel || originNode.name}</span>
+                <span className="flex-shrink-0">{originNode.coordinates[1].toFixed(4)}°N, {originNode.coordinates[0].toFixed(4)}°E</span>
+              </div>
+            )}
+          </div>
 
           {locationNotice && (
             <div className="text-[10px] text-blue-700 dark:text-blue-300 bg-blue-500/10 border border-blue-500/20 rounded p-1.5 flex items-center gap-1.5 animate-fade-in">
@@ -853,6 +844,21 @@ export function RoutePlanner({
               <span>{locationNotice}</span>
             </div>
           )}
+        </div>
+
+        {/* Swap Control */}
+        <div className="flex justify-center -my-1.5 relative z-10 pointer-events-auto">
+          <button
+            type="button"
+            onClick={handleSwapEndpoints}
+            disabled={!originId && !destinationId}
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-white dark:bg-surface-elevated hover:bg-slate-100 dark:hover:bg-surface-overlay text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-white/15 shadow-xs transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+            title="Swap Starting Origin and Destination"
+            aria-label="Swap starting origin and destination"
+          >
+            <ArrowUpDown className="w-3.5 h-3.5 text-accent" />
+            <span>Swap Locations</span>
+          </button>
         </div>
 
         {/* Destination Field */}
@@ -868,35 +874,8 @@ export function RoutePlanner({
             )}
           </div>
 
-          {destinationId ? (
-            <div className="flex items-center justify-between p-2.5 rounded-lg bg-white dark:bg-surface-base border border-slate-200 dark:border-white/10 text-xs">
-              <div className="flex items-center gap-2 min-w-0">
-                <span className="text-base flex-shrink-0">{destNode ? NODE_ICON[destNode.type] : '📍'}</span>
-                <div className="min-w-0">
-                  <div className="font-bold text-slate-900 dark:text-slate-100 truncate">
-                    {destNode?.name || 'Selected Destination'}
-                  </div>
-                  {destNode && (
-                    <div className="text-[10px] text-slate-400 font-mono">
-                      {destNode.coordinates[1].toFixed(4)}°N, {destNode.coordinates[0].toFixed(4)}°E · {destNode.type}
-                    </div>
-                  )}
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setDestinationId('');
-                  setCalculated(false);
-                }}
-                className="p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5"
-                title="Change destination"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-1.5">
+          <div className="space-y-1.5">
+            {nodeOptions.length > 8 && (
               <div className="relative">
                 <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
                 <input
@@ -907,35 +886,41 @@ export function RoutePlanner({
                   className="w-full pl-9 pr-3 py-1.5 rounded-lg bg-white dark:bg-surface-base border border-slate-300 dark:border-white/15 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-accent"
                 />
               </div>
-              <select
-                value={destinationId}
-                onChange={(e) => {
-                  setDestinationId(e.target.value);
-                  setCalculated(false);
-                  if (e.target.value) {
-                    setActiveTab('DESTINATION');
-                  }
-                }}
-                className={cn(
-                  'w-full rounded-xl border text-xs px-3 py-2',
-                  'bg-white dark:bg-surface-elevated border-slate-300 dark:border-white/15',
-                  'text-slate-900 dark:text-slate-100 font-medium',
-                  'focus:outline-none focus:ring-2 focus:ring-accent/50'
-                )}
-              >
-                <option value="" className="bg-white dark:bg-surface-elevated text-slate-900 dark:text-slate-100">
-                  Select destination from {nodeOptions.length} points…
-                </option>
-                {nodeOptions
-                  .filter((n) => !destQuery || n.name.toLowerCase().includes(destQuery.toLowerCase()) || n.type.toLowerCase().includes(destQuery.toLowerCase()))
-                  .map((n) => (
-                    <option key={n.id} value={n.id} disabled={n.id === originId} className="bg-white dark:bg-surface-elevated text-slate-900 dark:text-slate-100">
-                      {NODE_ICON[n.type]} {n.name} ({n.type})
-                    </option>
-                  ))}
-              </select>
-            </div>
-          )}
+            )}
+            <select
+              value={destinationId}
+              onChange={(e) => {
+                setDestinationId(e.target.value);
+                setCalculated(false);
+                if (e.target.value) {
+                  setActiveTab('DESTINATION');
+                }
+              }}
+              className={cn(
+                'w-full rounded-xl border text-xs px-3 py-2',
+                'bg-white dark:bg-surface-elevated border-slate-300 dark:border-white/15',
+                'text-slate-900 dark:text-slate-100 font-medium',
+                'focus:outline-none focus:ring-2 focus:ring-accent/50'
+              )}
+            >
+              <option value="" className="bg-white dark:bg-surface-elevated text-slate-900 dark:text-slate-100">
+                Select destination from {nodeOptions.length} points…
+              </option>
+              {nodeOptions
+                .filter((n) => !destQuery || n.id === destinationId || n.name.toLowerCase().includes(destQuery.toLowerCase()) || n.type.toLowerCase().includes(destQuery.toLowerCase()))
+                .map((n) => (
+                  <option key={n.id} value={n.id} disabled={n.id === originId} className="bg-white dark:bg-surface-elevated text-slate-900 dark:text-slate-100">
+                    {NODE_ICON[n.type]} {n.name} ({n.type})
+                  </option>
+                ))}
+            </select>
+            {destNode && (
+              <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 font-mono px-1">
+                <span className="truncate">{destNode.name}</span>
+                <span className="flex-shrink-0">{destNode.coordinates[1].toFixed(4)}°N, {destNode.coordinates[0].toFixed(4)}°E</span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -946,25 +931,29 @@ export function RoutePlanner({
         </div>
       )}
 
-      {/* Action buttons */}
-      <div className="flex gap-2">
+      {/* Action buttons: Find Safe Route & Reset */}
+      <div className="flex flex-col sm:flex-row gap-2.5 pt-1">
         <button
+          type="button"
           onClick={handleCalculate}
           disabled={!originId || !destinationId}
           className={cn(
-            'flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-sm',
-            'bg-accent text-slate-950 hover:bg-accent/90',
-            'disabled:opacity-40 disabled:cursor-not-allowed'
+            'flex-1 py-3 px-5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-md flex items-center justify-center gap-2',
+            'bg-accent text-slate-950 hover:bg-accent/90 active:scale-98',
+            'disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-accent'
           )}
         >
-          Calculate Route &amp; Travel Risk
+          <Compass className="w-4 h-4 text-slate-950" />
+          <span>Find Safe Route</span>
         </button>
-        {(calculated || destinationId) && (
+
+        {(calculated || originId || destinationId) && (
           <button
+            type="button"
             onClick={handleClear}
-            className="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
+            className="py-3 px-5 rounded-xl text-xs sm:text-sm font-semibold border border-slate-300 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
           >
-            Clear
+            Reset Route
           </button>
         )}
       </div>

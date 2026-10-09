@@ -7,6 +7,7 @@ import { safestCost, shortestCost, aggregateRouteRisk } from '../src/lib/routing
 import type { RoadSegment } from '../src/lib/roads/types';
 import type { Shelter } from '../src/data/types';
 import { haversineDistanceKm } from '../src/lib/geo/osm/validation';
+import { SATELLITE_BASEMAP_STYLE, mapConfig } from '../src/config/map';
 
 // ── TASK 1 & TASK 4: MAP LOCATION & GEOLOCATION VALIDATION ──────────────────
 
@@ -345,4 +346,51 @@ test('server-side coordinate validation rules for incident reports', () => {
   assert.equal(validateReportCoordinates([NaN, 19.81]).valid, false);
   assert.equal(validateReportCoordinates([200, 19.81]).valid, false);
   assert.equal(validateReportCoordinates([85.832, 100]).valid, false);
+});
+
+test('satellite basemap style specification contains background layer and valid zoom range', () => {
+  assert.ok(
+    SATELLITE_BASEMAP_STYLE.layers.some((l) => l.type === 'background'),
+    'Satellite style must have background layer to prevent blank canvas',
+  );
+  assert.ok(
+    mapConfig.minZoom <= 2.0,
+    'minZoom must allow wide regional zoom without clipping',
+  );
+});
+
+test('swap-endpoints preserves bidirectional pathfinding connectivity', () => {
+  const sampleRoads = [
+    {
+      id: 'osm-nh-16',
+      name: 'National Highway 16 Corridor',
+      code: 'NH-16',
+      status: 'OPEN',
+      roadType: 'HIGHWAY',
+      coordinates: [
+        [85.80, 20.25],
+        [85.84, 20.30],
+      ],
+      travelRisk: {
+        score: 10,
+        severity: 'LOW',
+        explanation: 'Operational',
+        factors: [],
+        travelAdvice: 'Clear',
+        safeToTravel: true,
+      },
+      lastUpdated: new Date().toISOString(),
+    },
+  ] as unknown as RoadSegment[];
+
+  const graph = buildGraphFromRoadSegments(sampleRoads);
+  const startNode = graph.nodes[0];
+  const endNode = graph.nodes[1];
+
+  const forward = calculateRoutes({ originNodeId: startNode.id, destinationNodeId: endNode.id }, graph);
+  const reverse = calculateRoutes({ originNodeId: endNode.id, destinationNodeId: startNode.id }, graph);
+
+  assert.equal(forward.safest.found, true);
+  assert.equal(reverse.safest.found, true);
+  assert.equal(forward.safest.totalDistanceKm, reverse.safest.totalDistanceKm);
 });

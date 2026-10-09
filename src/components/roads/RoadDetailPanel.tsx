@@ -25,7 +25,7 @@ import {
   applyAuthorityRoadAction,
   type RoadSegment,
 } from '@/lib/roads';
-import { cn, severityConfig, timeAgo } from '@/lib/utils';
+import { cn, formatTimestampIST, severityConfig, timeAgo } from '@/lib/utils';
 import {
   AlertTriangle,
   ArrowRight,
@@ -156,7 +156,7 @@ export function RoadDetailPanel({
         <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-200/60 dark:border-white/10 flex-wrap gap-2 text-xs">
           <div className="flex items-center gap-1 text-slate-500 dark:text-slate-400 text-[11px]">
             <Clock className="w-3.5 h-3.5" />
-            <span>Updated {timeAgo(road.lastUpdated)}</span>
+            <span suppressHydrationWarning>Updated {timeAgo(road.lastUpdated)}</span>
             <span>·</span>
             <span className="capitalize">{road.source.replace('_', ' ').toLowerCase()}</span>
           </div>
@@ -397,7 +397,7 @@ export function RoadDetailPanel({
                 </p>
               )}
               <div className="text-[9px] text-slate-400 font-mono pt-1 border-t border-slate-100 dark:border-white/5">
-                Timestamp: {new Date(road.authorityVerification.reviewedAt).toLocaleString('en-IN')}
+                Timestamp: {formatTimestampIST(road.authorityVerification.reviewedAt)}
               </div>
             </div>
           ) : (
@@ -515,3 +515,4 @@ export function RoadDetailPanel({
     </div>
   );
 }
+

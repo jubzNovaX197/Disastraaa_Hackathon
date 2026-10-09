@@ -423,7 +423,7 @@ export function CitizenReportForm({
       </div>
 
       {/* ── Form Body ── */}
-      <form onSubmit={handleSubmit} className="p-5 space-y-4 max-h-[78vh] overflow-y-auto">
+      <form onSubmit={handleSubmit} className="p-5 sm:p-6 space-y-4 sm:space-y-5">
         {errorMessage && (
           <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 text-xs flex items-center gap-2.5 animate-fade-in">
             <AlertTriangle className="w-4 h-4 flex-shrink-0" />

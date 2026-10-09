@@ -106,19 +106,21 @@ export function DemoScenarioControls({ compact = false }: { compact?: boolean })
       {!compact && (
         <div className="text-xs space-y-1.5 border-t border-white/10 pt-2.5 bg-slate-900/40 -mx-4 -mb-4 px-4 py-3 rounded-b-2xl">
           <div className="flex items-center justify-between">
-            <span className="text-slate-400">{copy.capacity}:</span>
-            <strong className="font-semibold text-slate-100">
-              {occupied.toLocaleString()} / {capacity.toLocaleString()}
-            </strong>
+            <span className="text-slate-400">
+              {copy.capacity}:{' '}
+              <strong className="font-semibold text-slate-100">
+                {occupied.toLocaleString('en-US')} / {capacity.toLocaleString('en-US')}
+              </strong>
+            </span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-slate-400">{copy.risk}:</span>
-            <strong className="font-semibold text-slate-100">{population.toLocaleString()}</strong>
+            <strong className="font-semibold text-slate-100">{population.toLocaleString('en-US')}</strong>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-slate-400">{copy.gap}:</span>
             <strong className={`font-semibold ${demand > capacity ? 'text-amber-400' : 'text-emerald-400'}`}>
-              {Math.max(0, demand - capacity).toLocaleString()}
+              {Math.max(0, demand - capacity).toLocaleString('en-US')}
             </strong>
           </div>
           <p className="text-slate-500 text-[10px] pt-1 leading-relaxed border-t border-white/5">

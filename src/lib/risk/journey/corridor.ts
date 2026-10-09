@@ -13,6 +13,7 @@
  *  - Emergency shelters & resource depots
  */
 
+import { formatTimeIST } from '@/lib/utils';
 import {
   computedMultiHazardRisks,
   demoCycloneZones,
@@ -256,7 +257,7 @@ export function analyzeCorridorAlerts(
         summary: alert.message,
         affectedArea: alert.regionName,
         validPeriod: alert.expiresAt
-          ? `Valid until ${new Date(alert.expiresAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+          ? `Valid until ${formatTimeIST(alert.expiresAt)}`
           : 'Active 24h Advisory',
         routeExposureKm: Math.round(Math.max(1.2, 12.0 - dist) * 10) / 10,
         distanceToRouteKm: dist,

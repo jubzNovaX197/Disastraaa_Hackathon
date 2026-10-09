@@ -707,15 +707,15 @@ export function DisasterMap({ dataset, className, center, zoom, initialLayers, e
       viewState={{ center: center ?? [85.8, 20.0], zoom: zoom ?? 7.0 }}
       onMapReady={handleMapReady}
     >
-      {/* Real / Demo Environment banner */}
-      <div className="absolute top-0 left-0 right-0 flex justify-center pointer-events-none z-20 px-2 sm:px-4">
+      {/* Real / Demo Environment banner — positioned below top-center mode selector */}
+      <div className="absolute top-12 sm:top-13 left-0 right-0 flex justify-center pointer-events-none z-20 px-2 sm:px-4">
         {isDemo ? (
-          <div className="mt-1.5 sm:mt-2 inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 text-[10px] sm:text-[11px] font-medium backdrop-blur-sm whitespace-nowrap map-panel">
+          <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 text-[10px] sm:text-[11px] font-medium backdrop-blur-sm whitespace-nowrap map-panel">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse-slow flex-shrink-0" />
             <span className="hidden sm:inline">SIMULATION ENVIRONMENT — </span>Controlling simulated disaster scenario data
           </div>
         ) : (
-          <div className="mt-1.5 sm:mt-2 inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[10px] sm:text-[11px] font-medium backdrop-blur-sm whitespace-nowrap map-panel">
+          <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[10px] sm:text-[11px] font-medium backdrop-blur-sm whitespace-nowrap map-panel">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-slow flex-shrink-0" />
             <span className="hidden sm:inline">Live API — </span>{getFeedLabel('REAL', feedStatus, dataset.alerts.filter(alert => alert.isActive).length)}
           </div>
@@ -1081,10 +1081,10 @@ export function DisasterMap({ dataset, className, center, zoom, initialLayers, e
         </div>
       )}
 
-      {/* Citizen Report Form Modal */}
+      {/* Citizen Report Form Modal — z-[60] with safe top clearance to prevent header cutoff */}
       {isReportFormOpen && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 pointer-events-auto animate-fade-in">
-          <div className="w-full max-w-2xl max-h-[92vh] overflow-y-auto">
+        <div className="fixed inset-0 z-[60] bg-black/75 backdrop-blur-sm overflow-y-auto flex justify-center p-3 sm:p-4 md:p-6 pt-20 sm:pt-20 pb-8 sm:pb-12 pointer-events-auto animate-fade-in">
+          <div className="w-full max-w-2xl my-auto">
             <CitizenReportForm
               onViewOnMap={(report) => {
                 setIsReportFormOpen(false);

@@ -2,6 +2,7 @@
 
 import { useLiveIntelligence } from '@/context/LiveIntelligenceContext';
 import { Activity, Clock, Cpu, Database } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 export function DataProvenance({
   model = false,
@@ -13,6 +14,11 @@ export function DataProvenance({
   source?: 'Simulated' | 'Live API' | 'User report' | 'Role simulation';
 }) {
   const { environment, lastSuccessfulSync } = useLiveIntelligence();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const effectiveSource = source ?? (environment === 'DEMO' ? 'Simulated' : 'Live API / cached observations');
   const isSimulation = environment === 'DEMO' || effectiveSource === 'Simulated';
 
@@ -40,8 +46,8 @@ export function DataProvenance({
       </div>
       <div className="flex items-center gap-1 text-[10px] text-slate-600 dark:text-slate-300 font-mono ml-auto">
         <Clock className="w-3 h-3 text-slate-600 dark:text-slate-300" />
-        <span>
-          Last updated: {lastSuccessfulSync
+        <span suppressHydrationWarning>
+          Last updated: {mounted && lastSuccessfulSync
             ? new Date(lastSuccessfulSync).toLocaleTimeString('en-IN', {
                 timeZone: 'Asia/Kolkata',
                 hour12: false,
