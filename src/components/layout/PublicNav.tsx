@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 import { ROLES, type Role } from '@/types/roles';
 import { LogOut, Menu, Shield, X } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 interface SafeUser {
@@ -31,6 +31,29 @@ export function PublicNav() {
   const [realUser, setRealUser] = useState<SafeUser | null>(null);
   const [isDemo, setIsDemo] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleToggleEnvironment = async (newEnv: 'REAL' | 'DEMO') => {
+    if (newEnv === environment) return;
+    try {
+      const res = await fetch('/api/env', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ environment: newEnv }),
+      });
+      if (res.ok) {
+        window.location.reload();
+      }
+    } catch {}
+  };
+
+  const handleOpenReport = () => {
+    if (pathname === '/map') {
+      window.dispatchEvent(new CustomEvent('disastraaa:open-report'));
+    } else {
+      router.push('/reports');
+    }
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -174,6 +197,15 @@ export function PublicNav() {
 
         {/* Desktop Action Controls */}
         <div className="hidden md:flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleOpenReport}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-accent text-slate-950 hover:bg-accent/90 border border-accent/40 shadow-sm transition-all active:scale-95 flex-shrink-0"
+            title="Report Disaster Incident"
+          >
+            <span>📢</span>
+            <span>Report Incident</span>
+          </button>
           <ThemeToggle size="sm" showLabel={false} />
 
           {/* STATE 1: REAL AUTHENTICATED USER */}
@@ -237,7 +269,52 @@ export function PublicNav() {
 
         {/* Mobile menu button */}
         <div className="md:hidden flex items-center gap-2">
-          <ThemeToggle size="sm" />
+          {/* Mobile REAL / SIMULATION Mode Selector */}
+          <div className="flex items-center p-0.5 rounded-full bg-slate-900/90 dark:bg-surface-elevated/95 border border-white/10 shadow-xs">
+            <button
+              type="button"
+              onClick={() => handleToggleEnvironment('REAL')}
+              className={cn(
+                'flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] xs:text-[11px] font-semibold transition-all',
+                environment === 'REAL'
+                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-xs'
+                  : 'text-slate-400 hover:text-slate-200',
+              )}
+              title="Switch to Real Operational Mode"
+              aria-pressed={environment === 'REAL'}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              <span>Real</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleToggleEnvironment('DEMO')}
+              className={cn(
+                'flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] xs:text-[11px] font-semibold transition-all',
+                environment === 'DEMO'
+                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-xs'
+                  : 'text-slate-400 hover:text-slate-200',
+              )}
+              title="Switch to Demo Simulation Mode"
+              aria-pressed={environment === 'DEMO'}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+              <span>Sim</span>
+            </button>
+          </div>
+
+          {/* Compact Report Button on Mobile */}
+          <button
+            type="button"
+            onClick={handleOpenReport}
+            className="inline-flex items-center gap-1 px-2 xs:px-2.5 py-1 rounded-lg text-xs font-bold bg-accent text-slate-950 hover:bg-accent/90 border border-accent/40 shadow-xs transition-all active:scale-95 flex-shrink-0"
+            title="Report Disaster Incident"
+          >
+            <span>📢</span>
+            <span className="hidden xs:inline">Report</span>
+          </button>
+
+          <ThemeToggle size="sm" className="hidden sm:inline-flex" />
 
           <button
             className="p-2 rounded-lg text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
@@ -334,6 +411,15 @@ export function PublicNav() {
                 </>
               )}
             </div>
+
+            <div className="pt-2 border-t border-slate-200 dark:border-white/[0.06] flex items-center justify-between px-1">
+              <span className="text-xs text-slate-500">Theme Appearance</span>
+              <ThemeToggle size="sm" showLabel={true} />
+            </div>
+
+
+
+
           </div>
         </div>
       )}

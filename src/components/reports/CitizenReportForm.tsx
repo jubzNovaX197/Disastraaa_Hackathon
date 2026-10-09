@@ -387,25 +387,25 @@ export function CitizenReportForm({
   return (
     <div
       className={cn(
-        'rounded-2xl bg-white dark:bg-surface-card border border-slate-200 dark:border-white/10 shadow-2xl overflow-hidden font-sans transition-colors',
+        'rounded-2xl bg-white dark:bg-surface-card border border-slate-200 dark:border-white/10 shadow-2xl overflow-hidden font-sans transition-colors flex flex-col max-h-[calc(100dvh-5.5rem)]',
         className,
       )}
       role="region"
       aria-label="Citizen / Field Disaster Incident Reporting"
     >
-      {/* ── Form Header ── */}
-      <div className="px-5 py-4 border-b border-slate-200 dark:border-white/10 bg-slate-50/80 dark:bg-white/[0.02] flex items-center justify-between">
+      {/* ── Form Header: Sticky top with close button always accessible ── */}
+      <div className="flex-shrink-0 sticky top-0 z-20 px-4 sm:px-5 py-3 sm:py-4 border-b border-slate-200 dark:border-white/10 bg-white/95 dark:bg-surface-card/95 backdrop-blur-md flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2">
             <span className="text-xl">📢</span>
-            <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">
+            <h2 className="text-sm sm:text-base font-bold text-slate-900 dark:text-slate-100">
               Report Disaster Incident
             </h2>
             <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-accent/20 text-cyan-800 dark:text-accent border border-accent/40 font-mono">
               CITIZEN / FIELD
             </span>
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1">
             Submit verified ground observations, live location, and photo evidence to emergency command.
           </p>
         </div>
@@ -414,7 +414,7 @@ export function CitizenReportForm({
           <button
             type="button"
             onClick={onCancel}
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-white/10 transition-colors"
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-white/10 transition-colors flex-shrink-0 ml-2"
             aria-label="Close report form"
           >
             <X className="w-4 h-4" />
@@ -422,8 +422,8 @@ export function CitizenReportForm({
         )}
       </div>
 
-      {/* ── Form Body ── */}
-      <form onSubmit={handleSubmit} className="p-5 sm:p-6 space-y-4 sm:space-y-5">
+      {/* ── Form Body: Independently scrollable ── */}
+      <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-5">
         {errorMessage && (
           <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 text-xs flex items-center gap-2.5 animate-fade-in">
             <AlertTriangle className="w-4 h-4 flex-shrink-0" />

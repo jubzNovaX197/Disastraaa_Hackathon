@@ -10,15 +10,16 @@
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { useLiveIntelligence } from '@/context/LiveIntelligenceContext';
 import { cn } from '@/lib/utils';
-import { Zap } from 'lucide-react';
+import { Menu, Zap } from 'lucide-react';
 import { LiveStatusIndicator } from './LiveStatusIndicator';
 
 interface LiveTopBarBannerProps {
   className?: string;
   onOpenFeed?: () => void;
+  onOpenMenu?: () => void;
 }
 
-export function LiveTopBarBanner({ className, onOpenFeed }: LiveTopBarBannerProps) {
+export function LiveTopBarBanner({ className, onOpenFeed, onOpenMenu }: LiveTopBarBannerProps) {
   const { recentEvents, status } = useLiveIntelligence();
   const latestEvent = recentEvents[0];
 
@@ -32,6 +33,16 @@ export function LiveTopBarBanner({ className, onOpenFeed }: LiveTopBarBannerProp
     >
       {/* Left: Latest Event Ticker */}
       <div className="flex items-center gap-2 overflow-hidden flex-1 min-w-0">
+        {onOpenMenu && (
+          <button
+            type="button"
+            onClick={onOpenMenu}
+            aria-label="Open navigation sidebar"
+            className="lg:hidden p-1 -ml-1 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors flex-shrink-0"
+          >
+            <Menu className="w-4 h-4" />
+          </button>
+        )}
         <span className="flex items-center gap-1 font-bold text-purple-600 dark:text-purple-400 flex-shrink-0 text-[11px] uppercase tracking-wider">
           <Zap className="w-3.5 h-3.5 fill-current" />
           <span className="hidden sm:inline">Operational Stream:</span>

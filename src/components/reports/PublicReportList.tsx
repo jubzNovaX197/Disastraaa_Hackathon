@@ -106,10 +106,10 @@ export function PublicReportList() {
 
   return (
     <div className="space-y-6">
-      {/* ── Submission Modal — z-[60] with safe top clearance to prevent header cutoff ── */}
+      {/* ── Submission Modal — safely below navbar without top cutoff ── */}
       {isFormOpen && (
-        <div className="fixed inset-0 z-[60] bg-black/75 backdrop-blur-sm overflow-y-auto flex justify-center p-3 sm:p-4 md:p-6 pt-20 sm:pt-20 pb-8 sm:pb-12 animate-fade-in">
-          <div className="w-full max-w-2xl my-auto">
+        <div className="fixed inset-0 z-[60] bg-black/75 backdrop-blur-sm overflow-y-auto flex items-start justify-center p-2.5 sm:p-4 md:p-6 pt-16 sm:pt-20 pb-8 animate-fade-in">
+          <div className="w-full max-w-2xl my-2 sm:my-4 flex flex-col">
             <CitizenReportForm
               onSubmitReport={handleCreateReport}
               onViewOnMap={() => {

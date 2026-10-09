@@ -65,3 +65,142 @@ test('signed sessions reject tampering and unknown roles', async () => {
   assert.equal(await verifySessionToken(token + 'invalid'), null);
   assert.equal(await verifySessionToken('forged.token'), null);
 });
+
+test('session secret resolution supports multiple aliases and handles whitespace/quotes', async () => {
+  const origAuth = process.env.AUTH_SECRET;
+  const origSess = process.env.SESSION_SECRET;
+  const origNext = process.env.NEXTAUTH_SECRET;
+  const origJwt = process.env.JWT_SECRET;
+
+  try {
+    delete process.env.AUTH_SECRET;
+    delete process.env.SESSION_SECRET;
+    delete process.env.NEXTAUTH_SECRET;
+    delete process.env.JWT_SECRET;
+
+    // Test alias SESSION_SECRET with quotes
+    process.env.SESSION_SECRET = '"valid-session-secret-with-at-least-32-chars-2026"';
+    const token1 = await createSessionToken({ uid: '1', name: 'User 1', email: 'u1@demo.com', role: 'REGISTERED_USER' });
+    assert.equal((await verifySessionToken(token1))?.email, 'u1@demo.com');
+
+    // Test alias NEXTAUTH_SECRET with whitespace
+    delete process.env.SESSION_SECRET;
+    process.env.NEXTAUTH_SECRET = '   valid-nextauth-secret-with-at-least-32-chars-2026   ';
+    const token2 = await createSessionToken({ uid: '2', name: 'User 2', email: 'u2@demo.com', role: 'REGISTERED_USER' });
+    assert.equal((await verifySessionToken(token2))?.email, 'u2@demo.com');
+
+    // Test alias JWT_SECRET
+    delete process.env.NEXTAUTH_SECRET;
+    process.env.JWT_SECRET = 'valid-jwt-secret-with-at-least-32-chars-2026';
+    const token3 = await createSessionToken({ uid: '3', name: 'User 3', email: 'u3@demo.com', role: 'REGISTERED_USER' });
+    assert.equal((await verifySessionToken(token3))?.email, 'u3@demo.com');
+  } finally {
+    process.env.AUTH_SECRET = origAuth;
+    process.env.SESSION_SECRET = origSess;
+    process.env.NEXTAUTH_SECRET = origNext;
+    process.env.JWT_SECRET = origJwt;
+  }
+});
+
+test('session token creation throws descriptive error when secret is missing or too short in production', async () => {
+  const origNodeEnv = process.env.NODE_ENV;
+  const origAuth = process.env.AUTH_SECRET;
+  const origSess = process.env.SESSION_SECRET;
+  const origNext = process.env.NEXTAUTH_SECRET;
+  const origJwt = process.env.JWT_SECRET;
+
+  try {
+    (process.env as any).NODE_ENV = 'production';
+    delete process.env.AUTH_SECRET;
+    delete process.env.SESSION_SECRET;
+    delete process.env.NEXTAUTH_SECRET;
+    delete process.env.JWT_SECRET;
+
+    await assert.rejects(
+      async () => {
+        await createSessionToken({ uid: '1', name: 'User 1', email: 'u1@demo.com', role: 'REGISTERED_USER' });
+      },
+      /AUTH_SECRET must contain at least 32 characters/,
+    );
+
+    // Too short secret
+    process.env.AUTH_SECRET = 'short-secret-less-than-32-chars';
+    await assert.rejects(
+      async () => {
+        await createSessionToken({ uid: '1', name: 'User 1', email: 'u1@demo.com', role: 'REGISTERED_USER' });
+      },
+      /AUTH_SECRET must contain at least 32 characters/,
+    );
+  } finally {
+    (process.env as any).NODE_ENV = origNodeEnv;
+    process.env.AUTH_SECRET = origAuth;
+    process.env.SESSION_SECRET = origSess;
+    process.env.NEXTAUTH_SECRET = origNext;
+    process.env.JWT_SECRET = origJwt;
+  }
+});
+
+test('POST /api/auth/login rejects invalid credentials with 401 and creates session for valid credentials', async () => {
+  process.env.AUTH_SECRET = 'test-only-random-secret-for-signature-tests-2026';
+  const { POST } = await import('../src/app/api/auth/login/route');
+
+  // Bad credentials
+  const badReq = new Request('http://localhost:3000/api/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: 'superadmin@disastraaa.gov.demo', password: 'WrongPassword' }),
+  });
+  const badRes = await POST(badReq);
+  assert.equal(badRes.status, 401);
+  const badBody = await badRes.json();
+  assert.equal(badBody.success, false);
+  assert.equal(badBody.error, 'Invalid email or password.');
+
+  // Valid credentials
+  const goodReq = new Request('http://localhost:3000/api/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: 'superadmin@disastraaa.gov.demo', password: 'Password123!' }),
+  });
+  const goodRes = await POST(goodReq);
+  assert.equal(goodRes.status, 200);
+  const goodBody = await goodRes.json();
+  assert.equal(goodBody.success, true);
+  assert.equal(goodBody.user.email, 'superadmin@disastraaa.gov.demo');
+  assert.equal(goodBody.user.role, 'SUPER_ADMIN');
+  assert.ok(goodRes.headers.get('set-cookie')?.includes('disastraaa-session='));
+});
+
+test('POST /api/auth/login fails safely with 500 when secret is missing in production and logs sanitized error', async () => {
+  const origNodeEnv = process.env.NODE_ENV;
+  const origAuth = process.env.AUTH_SECRET;
+  const origSess = process.env.SESSION_SECRET;
+  const origNext = process.env.NEXTAUTH_SECRET;
+  const origJwt = process.env.JWT_SECRET;
+
+  try {
+    (process.env as any).NODE_ENV = 'production';
+    delete process.env.AUTH_SECRET;
+    delete process.env.SESSION_SECRET;
+    delete process.env.NEXTAUTH_SECRET;
+    delete process.env.JWT_SECRET;
+
+    const { POST } = await import('../src/app/api/auth/login/route');
+    const goodReq = new Request('http://localhost:3000/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: 'superadmin@disastraaa.gov.demo', password: 'Password123!' }),
+    });
+    const res = await POST(goodReq);
+    assert.equal(res.status, 500);
+    const body = await res.json();
+    assert.equal(body.success, false);
+    assert.equal(body.error, 'Login failed. Please try again.');
+  } finally {
+    (process.env as any).NODE_ENV = origNodeEnv;
+    process.env.AUTH_SECRET = origAuth;
+    process.env.SESSION_SECRET = origSess;
+    process.env.NEXTAUTH_SECRET = origNext;
+    process.env.JWT_SECRET = origJwt;
+  }
+});

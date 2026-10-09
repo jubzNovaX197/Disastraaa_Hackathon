@@ -207,6 +207,12 @@ export function DisasterMap({ dataset, className, center, zoom, initialLayers, e
   const [activeReport, setActiveReport] = useState<CitizenReportItem | null>(null);
   const [activeRoad, setActiveRoad] = useState<RoadSegment | null>(null);
   const [isReportFormOpen, setIsReportFormOpen] = useState(false);
+
+  useEffect(() => {
+    const handleOpen = () => setIsReportFormOpen(true);
+    window.addEventListener('disastraaa:open-report', handleOpen);
+    return () => window.removeEventListener('disastraaa:open-report', handleOpen);
+  }, []);
   const [activeTab, setActiveTab]     = useState<ZoneDetailTab>('risk');
   const [, setActiveRouteMode] = useState<RouteResult['mode'] | null>(null);
   const mapRef                        = useRef<MLMap | null>(null);
@@ -1081,10 +1087,10 @@ export function DisasterMap({ dataset, className, center, zoom, initialLayers, e
         </div>
       )}
 
-      {/* Citizen Report Form Modal — z-[60] with safe top clearance to prevent header cutoff */}
+      {/* Citizen Report Form Modal — safely below navbar without top cutoff */}
       {isReportFormOpen && (
-        <div className="fixed inset-0 z-[60] bg-black/75 backdrop-blur-sm overflow-y-auto flex justify-center p-3 sm:p-4 md:p-6 pt-20 sm:pt-20 pb-8 sm:pb-12 pointer-events-auto animate-fade-in">
-          <div className="w-full max-w-2xl my-auto">
+        <div className="fixed inset-0 z-[60] bg-black/75 backdrop-blur-sm overflow-y-auto flex items-start justify-center p-2.5 sm:p-4 md:p-6 pt-16 sm:pt-20 pb-8 pointer-events-auto animate-fade-in">
+          <div className="w-full max-w-2xl my-2 sm:my-4 flex flex-col">
             <CitizenReportForm
               onViewOnMap={(report) => {
                 setIsReportFormOpen(false);
