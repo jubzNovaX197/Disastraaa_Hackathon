@@ -4,11 +4,8 @@
 
 export { calculateMultiHazardRisk } from './calculate';
 export type { MultiHazardInputs } from './calculate';
-export { explainMultiHazardRisk, DATA_QUALITY_LABEL, HAZARD_LABEL } from './explain';
-export { MULTI_HAZARD_WEIGHTS } from './weights';
+export { DATA_QUALITY_LABEL, HAZARD_LABEL, explainMultiHazardRisk } from './explain';
 export type {
-  HazardContribution,
-  MultiHazardRiskResult,
-  MultiHazardRiskExplanation,
-  DataQuality,
+  DataQuality, HazardContribution, MultiHazardRiskExplanation, MultiHazardRiskResult
 } from './types';
+export { MULTI_HAZARD_WEIGHTS } from './weights';

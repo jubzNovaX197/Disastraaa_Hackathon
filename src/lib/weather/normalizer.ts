@@ -5,9 +5,9 @@
  * Translates WMO weather codes and computes real-time data freshness states.
  */
 
-import type { OpenMeteoRawResponse } from './openMeteoClient';
-import type { NormalizedWeather, WeatherFreshnessStatus, WeatherForecastPoint } from './types';
 import { parseLocationFromText } from '@/lib/geo/regions';
+import type { OpenMeteoRawResponse } from './openMeteoClient';
+import type { NormalizedWeather, WeatherForecastPoint, WeatherFreshnessStatus } from './types';
 
 export interface WeatherConditionInfo {
   label: string;

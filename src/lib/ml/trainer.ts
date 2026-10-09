@@ -14,22 +14,22 @@
  */
 
 import {
-  prepareFloodDataset,
-  fitScaler,
-  scaleFeatureVector,
-  FEATURE_NAMES,
-} from './features';
-import {
-  MajorityClassClassifier,
-  LogisticRegressionModel,
-  DecisionTreeClassifier,
-} from './models';
-import {
   evaluateClassification,
   evaluateDeterministicRiskBaseline,
 } from './evaluator';
+import {
+  FEATURE_NAMES,
+  fitScaler,
+  prepareFloodDataset,
+  scaleFeatureVector,
+} from './features';
+import {
+  DecisionTreeClassifier,
+  LogisticRegressionModel,
+  MajorityClassClassifier,
+} from './models';
 import { saveModelArtifact } from './registry';
-import type { ModelEvaluationMetrics, ModelArtifact } from './types';
+import type { ModelArtifact, ModelEvaluationMetrics } from './types';
 
 export interface ExperimentResults {
   timestamp: string;

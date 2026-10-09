@@ -17,13 +17,13 @@
  * a cycloneZone id, or a shared location slug where both overlap.
  */
 
+import type { MultiHazardRiskExplanation } from '@/lib/risk/multiHazard';
 import {
   calculateMultiHazardRisk,
   explainMultiHazardRisk,
 } from '@/lib/risk/multiHazard';
-import type { MultiHazardRiskExplanation } from '@/lib/risk/multiHazard';
-import { computedFloodRisks }   from './computedFloodRisks';
 import { computedCycloneRisks } from './computedCycloneRisks';
+import { computedFloodRisks } from './computedFloodRisks';
 
 /**
  * Location definitions for composite assessment.

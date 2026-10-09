@@ -7,20 +7,19 @@
  */
 
 import type {
-  DisasterDataset,
-  RiskZone,
-  FloodArea,
-  Shelter,
-  DemoAlert,
-  Infrastructure,
   BlockedRoad,
-  DemoCitizenReport,
   CycloneTrack,
+  DemoAlert,
+  DemoCitizenReport,
+  DisasterDataset,
+  FloodArea,
+  RiskZone,
+  Shelter
 } from '@/data/types';
-import type { RoadSegment } from '@/lib/roads/types';
-import type { CitizenReportItem } from '@/lib/reports/types';
-import type { Incident } from '@/lib/incidents/types';
 import type { AppEnvironment } from '@/lib/env';
+import type { Incident } from '@/lib/incidents/types';
+import type { CitizenReportItem } from '@/lib/reports/types';
+import type { RoadSegment } from '@/lib/roads/types';
 
 export interface DataProvenance {
   source: string;

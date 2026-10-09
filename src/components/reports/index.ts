@@ -3,6 +3,6 @@
  */
 
 export { CitizenReportForm } from './CitizenReportForm';
-export { ReportDetailPanel } from './ReportDetailPanel';
-export { PublicReportList } from './PublicReportList';
 export { EvidencePreview } from './EvidencePreview';
+export { PublicReportList } from './PublicReportList';
+export { ReportDetailPanel } from './ReportDetailPanel';

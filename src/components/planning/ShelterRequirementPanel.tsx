@@ -17,9 +17,10 @@
  * Dark + light mode via design system tokens.
  */
 
-import { useCallback, useState } from 'react';
+import { DataProvenance } from '@/components/demo/DataProvenance';
 import type { ShelterPlanningResult, ShelterSummaryItem } from '@/lib/planning/shelter/types';
 import { cn } from '@/lib/utils';
+import { useCallback, useState } from 'react';
 
 // ── Status styling ────────────────────────────────────────────────────────────
 
@@ -149,6 +150,7 @@ export function ShelterRequirementPanel({
       role="dialog"
       aria-label={`Future Shelter Requirement Prediction for ${planning.zoneName}`}
     >
+      <DataProvenance model />
       {/* ── Header ── */}
       <div className={cn('px-4 pt-4 pb-3', cfg.bg)}>
         <div className="flex items-start justify-between gap-2">

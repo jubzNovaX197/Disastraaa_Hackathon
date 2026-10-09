@@ -5,10 +5,10 @@
  * Maps NASA categories and magnitudes into Disastraaa canonical types and severities.
  */
 
-import type { EonetEventRaw, EonetGeometry } from '../clients/eonetClient';
-import type { IngestedHazardEvent } from '../types';
 import type { HazardType, Severity } from '@/types';
+import type { EonetEventRaw, EonetGeometry } from '../clients/eonetClient';
 import { evaluateFreshness } from '../freshness';
+import type { IngestedHazardEvent } from '../types';
 
 function mapEonetCategoryToHazardType(categoryId: string): HazardType {
   const normalized = categoryId.toLowerCase();

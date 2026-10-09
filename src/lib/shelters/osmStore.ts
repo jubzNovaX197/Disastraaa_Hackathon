@@ -6,12 +6,12 @@
  * unless source/operator confirms authority sanction.
  */
 
-import { executeQuery } from '@/lib/db';
 import type { Shelter } from '@/data/types';
-import { overpassClient } from '@/lib/geo/osm/overpassClient';
-import { validateShelterElement } from '@/lib/geo/osm/validation';
+import { executeQuery } from '@/lib/db';
 import { normalizeShelter, type NormalizedShelter } from '@/lib/geo/osm/normalization';
+import { overpassClient } from '@/lib/geo/osm/overpassClient';
 import type { IngestionResult, ShelterIngestionOptions } from '@/lib/geo/osm/types';
+import { validateShelterElement } from '@/lib/geo/osm/validation';
 
 // Curated public OSM emergency shelter baseline for Odisha operational sector
 const BASELINE_OSM_SHELTERS: NormalizedShelter[] = [

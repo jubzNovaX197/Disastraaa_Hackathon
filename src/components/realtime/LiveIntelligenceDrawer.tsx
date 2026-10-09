@@ -11,33 +11,29 @@
  * Professional emergency operations decision support.
  */
 
-import { useState, useMemo, useEffect } from 'react';
-import { createPortal } from 'react-dom';
+import { useLiveIntelligence } from '@/context/LiveIntelligenceContext';
+import type { LiveEvent } from '@/lib/realtime/types';
+import { cn, formatNumber } from '@/lib/utils';
 import {
-  X,
-  Radio,
-  RefreshCw,
-  Pause,
-  Play,
-  Zap,
-  RotateCcw,
-  WifiOff,
-  Clock,
-  Filter,
-  CheckCircle2,
-  AlertTriangle,
-  Waves,
+  Activity,
   Car,
+  Clock,
+  FileText,
+  Filter,
   Home,
   Package,
-  FileText,
-  Shield,
-  Activity,
+  Pause,
+  Play,
+  Radio,
+  RefreshCw,
+  RotateCcw,
+  Waves,
+  WifiOff,
+  X,
+  Zap
 } from 'lucide-react';
-import { useLiveIntelligence } from '@/context/LiveIntelligenceContext';
-import { formatNumber } from '@/lib/utils';
-import { cn } from '@/lib/utils';
-import type { LiveEvent } from '@/lib/realtime/types';
+import { useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 interface LiveIntelligenceDrawerProps {
   onClose: () => void;

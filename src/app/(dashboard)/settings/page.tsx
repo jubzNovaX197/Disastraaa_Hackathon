@@ -1,6 +1,6 @@
-import type { Metadata } from 'next';
-import { Settings } from 'lucide-react';
 import { PlannedFeaturePage } from '@/components/dashboard/PlannedFeaturePage';
+import { Settings } from 'lucide-react';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Platform System Settings',

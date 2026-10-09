@@ -4,10 +4,9 @@
  * AI Disaster Intelligence Assistant — Header
  */
 
-import { Bot, Sparkles, Trash2, MapPin, Shield } from 'lucide-react';
 import { LiveStatusIndicator } from '@/components/realtime/LiveStatusIndicator';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
-import { cn } from '@/lib/utils';
+import { Bot, MapPin, Sparkles, Trash2 } from 'lucide-react';
 
 export const OPERATIONAL_DISTRICTS = [
   'All Operational Sectors',

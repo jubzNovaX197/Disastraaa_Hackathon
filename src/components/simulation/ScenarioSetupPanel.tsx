@@ -1,25 +1,25 @@
 'use client';
 
-import { useState } from 'react';
-import {
-  Waves,
-  Wind,
-  Layers,
-  ChevronDown,
-  ChevronUp,
-  Settings2,
-  MapPin,
-  Clock,
-  Gauge,
-  Users,
-} from 'lucide-react';
+import { DataProvenance } from '@/components/demo/DataProvenance';
 import type {
   ScenarioConfiguration,
+  ScenarioDuration,
   ScenarioHazard,
   ScenarioIntensity,
-  ScenarioDuration,
 } from '@/lib/simulation/types';
 import { cn } from '@/lib/utils';
+import {
+  ChevronDown,
+  ChevronUp,
+  Gauge,
+  Layers,
+  MapPin,
+  Settings2,
+  Users,
+  Waves,
+  Wind
+} from 'lucide-react';
+import { useState } from 'react';
 
 interface ScenarioSetupPanelProps {
   config: ScenarioConfiguration;
@@ -115,6 +115,7 @@ export function ScenarioSetupPanel({
 
   return (
     <div className="p-4 rounded-xl bg-white dark:bg-surface-card border border-slate-200 dark:border-white/[0.08] shadow-sm space-y-4">
+      <DataProvenance model source="Simulated" />
       <div className="flex items-center justify-between pb-2.5 border-b border-slate-100 dark:border-white/[0.06]">
         <h2 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-2">
           <Settings2 className="w-4 h-4 text-purple-500" />

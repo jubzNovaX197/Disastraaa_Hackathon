@@ -9,8 +9,8 @@
  */
 
 import { executeQuery, getDbClient } from '@/lib/db';
-import { storeRawPayload } from './storage';
 import { upsertDailyAggregates } from './db';
+import { storeRawPayload } from './storage';
 import type { RetentionDryRunReport, RetentionTableDryRun, TelemetryDailyAggregate } from './types';
 
 export interface RetentionPolicyOptions {

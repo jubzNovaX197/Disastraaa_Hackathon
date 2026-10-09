@@ -7,7 +7,7 @@
  * Decision-support only · Not a live forecast · Does not alter real-world data
  */
 
-import type { HazardType, Severity } from '@/types';
+import type { Severity } from '@/types';
 
 // ── Scenario Inputs ──────────────────────────────────────────────────────────
 

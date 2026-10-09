@@ -7,13 +7,13 @@
  * Decision-support only · No autonomous emergency control
  */
 
-import type { HazardType, Severity, ReportStatus } from '@/types';
-import type { RoadStatus, RoadSegment } from '@/lib/roads/types';
 import type { DemoAlert } from '@/data/types';
-import type { CitizenReportItem } from '@/lib/reports/types';
 import type { HistoricalDisasterEvent, HistoricalSummary } from '@/lib/historical/types';
-import type { ShelterPlanningStatus } from '@/lib/planning/shelter/types';
 import type { ResourceStatus } from '@/lib/planning/resources/types';
+import type { ShelterPlanningStatus } from '@/lib/planning/shelter/types';
+import type { CitizenReportItem } from '@/lib/reports/types';
+import type { RoadSegment } from '@/lib/roads/types';
+import type { HazardType, Severity } from '@/types';
 
 // ── Overview KPIs ────────────────────────────────────────────────────────────
 

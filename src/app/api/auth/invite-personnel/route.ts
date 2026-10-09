@@ -1,15 +1,15 @@
-import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { SESSION_COOKIE_NAME, verifySessionToken } from '@/lib/auth/session';
-import { findUserById } from '@/lib/auth/users';
+import { recordAuditEvent } from '@/lib/audit/log';
 import {
   createAuthorityInvitation,
   listAllInvitations,
   type RegistrableAuthorityType,
 } from '@/lib/auth/authorityRegistry';
 import { canInvite, getScopeConstraint, hasInvitePrivileges } from '@/lib/auth/inviteMatrix';
-import { recordAuditEvent } from '@/lib/audit/log';
+import { SESSION_COOKIE_NAME, verifySessionToken } from '@/lib/auth/session';
+import { findUserById } from '@/lib/auth/users';
 import { ROLES } from '@/types/roles';
+import { cookies } from 'next/headers';
+import { NextResponse } from 'next/server';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 

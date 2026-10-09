@@ -15,7 +15,15 @@
  * - Interactive report detail panel viewer
  */
 
-import { useState, useMemo } from 'react';
+import { useLiveIntelligence } from '@/context/LiveIntelligenceContext';
+import {
+  filterAndSortReports,
+  REPORT_STATUS_CONFIG,
+  REPORT_TYPE_CONFIG,
+  type CitizenReportItem,
+  type CreateReportInput
+} from '@/lib/reports';
+import { cn, severityConfig, timeAgo } from '@/lib/utils';
 import {
   AlertTriangle,
   Camera,
@@ -25,22 +33,11 @@ import {
   MapPin,
   Plus,
   Search,
-  Shield,
   ShieldAlert,
-  ThumbsUp,
+  ThumbsUp
 } from 'lucide-react';
-import type { Severity } from '@/types';
-import { cn, severityConfig, timeAgo } from '@/lib/utils';
-import {
-  filterAndSortReports,
-  REPORT_STATUS_CONFIG,
-  REPORT_TYPE_CONFIG,
-  type CitizenReportItem,
-  type CreateReportInput,
-  createCitizenReport,
-} from '@/lib/reports';
 import { useRouter } from 'next/navigation';
-import { useLiveIntelligence } from '@/context/LiveIntelligenceContext';
+import { useMemo, useState } from 'react';
 import { CitizenReportForm } from './CitizenReportForm';
 import { ReportDetailPanel } from './ReportDetailPanel';
 
@@ -109,10 +106,10 @@ export function PublicReportList() {
 
   return (
     <div className="space-y-6">
-      {/* ── Submission Modal ── */}
+      {/* ── Submission Modal — z-[60] with safe top clearance to prevent header cutoff ── */}
       {isFormOpen && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-fade-in">
-          <div className="w-full max-w-2xl max-h-[92vh] overflow-y-auto">
+        <div className="fixed inset-0 z-[60] bg-black/75 backdrop-blur-sm overflow-y-auto flex justify-center p-3 sm:p-4 md:p-6 pt-20 sm:pt-20 pb-8 sm:pb-12 animate-fade-in">
+          <div className="w-full max-w-2xl my-auto">
             <CitizenReportForm
               onSubmitReport={handleCreateReport}
               onViewOnMap={() => {

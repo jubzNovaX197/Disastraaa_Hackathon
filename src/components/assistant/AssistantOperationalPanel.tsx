@@ -6,24 +6,20 @@
  * Provides live situational telemetry, data grounding status, and instant briefing triggers.
  */
 
+import { useLiveIntelligence } from '@/context/LiveIntelligenceContext';
 import {
-  ShieldAlert,
-  Zap,
   Activity,
-  Layers,
-  Radio,
-  FileText,
-  Clock,
   Car,
-  Home,
-  Package,
-  Sparkles,
   CheckCircle2,
   ChevronRight,
+  Home,
+  Layers,
+  Package,
+  Radio,
+  ShieldAlert,
+  Sparkles,
+  Zap
 } from 'lucide-react';
-import { useLiveIntelligence } from '@/context/LiveIntelligenceContext';
-import { formatNumber } from '@/lib/utils';
-import { cn } from '@/lib/utils';
 
 interface AssistantOperationalPanelProps {
   onTriggerPrompt: (promptText: string) => void;

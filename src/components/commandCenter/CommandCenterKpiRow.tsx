@@ -1,24 +1,18 @@
 'use client';
 
-import {
-  AlertTriangle,
-  Flame,
-  Users,
-  Building2,
-  Navigation,
-  HeartPulse,
-  GraduationCap,
-  Bell,
-  CheckCircle2,
-  Home,
-  PackageX,
-  Waves,
-  Wind,
-  Layers,
-} from 'lucide-react';
-import { Card, CardHeader, CardTitle, Badge } from '@/components/ui';
-import { cn, formatNumber } from '@/lib/utils';
+import { Badge, Card } from '@/components/ui';
 import type { CommandOverviewKpis } from '@/lib/commandCenter/types';
+import { cn, formatNumber } from '@/lib/utils';
+import {
+  Bell,
+  Building2,
+  Flame,
+  Layers,
+  Navigation,
+  Users,
+  Waves,
+  Wind
+} from 'lucide-react';
 
 interface CommandCenterKpiRowProps {
   kpis: CommandOverviewKpis;

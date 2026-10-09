@@ -13,11 +13,11 @@
  * ⚠️  All data shown is DEMO / SIMULATED — labelled clearly in UI.
  */
 
-import { useState } from 'react';
+import { DataProvenance } from '@/components/demo/DataProvenance';
+import { sortByImpact, sortByRecent } from '@/lib/historical/engine';
 import type { HistoricalDisasterEvent, HistoricalSummary } from '@/lib/historical/types';
-import { sortByRecent, sortByImpact } from '@/lib/historical/engine';
-import { formatNumber } from '@/lib/utils';
-import { cn } from '@/lib/utils';
+import { cn, formatNumber } from '@/lib/utils';
+import { useState } from 'react';
 
 // ── Shared helpers ────────────────────────────────────────────────────────────
 
@@ -195,6 +195,7 @@ export function HistoricalAnalysisPanel({
       role="region"
       aria-label="Historical Disaster Analysis"
     >
+      <DataProvenance model />
       {/* Header */}
       <div className="px-4 pt-4 pb-3 bg-slate-50/80 dark:bg-white/[0.03] border-b border-slate-200/80 dark:border-white/[0.07]">
         <div className="flex items-start justify-between gap-2">

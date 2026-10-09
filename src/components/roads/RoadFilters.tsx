@@ -6,8 +6,8 @@
  * Filter tabs and search controls for Road Intelligence and Travel Safety.
  */
 
-import { Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Search, X } from 'lucide-react';
 
 export interface RoadFiltersState {
   statusFilter: string;

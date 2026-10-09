@@ -1,30 +1,30 @@
 'use client';
 
-import { useState, useMemo, useCallback, useEffect } from 'react';
-import { ShieldAlert } from 'lucide-react';
-import { isAuthorizedForOperations } from '@/lib/auth/roles';
 import { AuthorityAccessGate } from '@/components/auth/AuthorityAccessGate';
-import { SimulatorHeader } from './SimulatorHeader';
-import { ScenarioSetupPanel } from './ScenarioSetupPanel';
-import { ScenarioSummaryBanner } from './ScenarioSummaryBanner';
-import { BeforeAfterComparisonGrid } from './BeforeAfterComparisonGrid';
-import { RiskImpactSimulationPanel } from './RiskImpactSimulationPanel';
-import { ShelterResourceSimulationPanel } from './ShelterResourceSimulationPanel';
-import { RoadAlertSimulationPanel } from './RoadAlertSimulationPanel';
-import { ResponseRequirementsCard } from './ResponseRequirementsCard';
-import { SimulationTimelineStepper } from './SimulationTimelineStepper';
-import { SimulationMapSection } from './SimulationMapSection';
-import { ScenarioComparisonModal } from './ScenarioComparisonModal';
-import { DEFAULT_SCENARIO_CONFIG } from '@/lib/simulation/presets';
-import { runSimulation } from '@/lib/simulation/engine';
-import { aggregateCommandCenterData } from '@/lib/commandCenter/aggregator';
 import { useLiveIntelligence } from '@/context/LiveIntelligenceContext';
+import { isAuthorizedForOperations } from '@/lib/auth/roles';
+import { aggregateCommandCenterData } from '@/lib/commandCenter/aggregator';
+import { runSimulation } from '@/lib/simulation/engine';
+import { DEFAULT_SCENARIO_CONFIG } from '@/lib/simulation/presets';
 import type {
   ScenarioConfiguration,
-  SimulationResult,
   ScenarioPreset,
+  SimulationResult,
 } from '@/lib/simulation/types';
 import { ROLES, type Role } from '@/types/roles';
+import { ShieldAlert } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { BeforeAfterComparisonGrid } from './BeforeAfterComparisonGrid';
+import { ResponseRequirementsCard } from './ResponseRequirementsCard';
+import { RiskImpactSimulationPanel } from './RiskImpactSimulationPanel';
+import { RoadAlertSimulationPanel } from './RoadAlertSimulationPanel';
+import { ScenarioComparisonModal } from './ScenarioComparisonModal';
+import { ScenarioSetupPanel } from './ScenarioSetupPanel';
+import { ScenarioSummaryBanner } from './ScenarioSummaryBanner';
+import { ShelterResourceSimulationPanel } from './ShelterResourceSimulationPanel';
+import { SimulationMapSection } from './SimulationMapSection';
+import { SimulationTimelineStepper } from './SimulationTimelineStepper';
+import { SimulatorHeader } from './SimulatorHeader';
 
 interface ResponseSimulatorDashboardProps {
   initialRole?: Role;

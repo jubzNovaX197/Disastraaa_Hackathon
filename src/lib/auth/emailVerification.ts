@@ -26,8 +26,8 @@
  *     assembled from anything the client supplied directly.
  */
 
-import { randomBytes, randomInt, createHash } from 'crypto';
 import type { Role } from '@/types/roles';
+import { createHash, randomBytes, randomInt } from 'crypto';
 
 export interface PendingAuthorityAccount {
   id: string;

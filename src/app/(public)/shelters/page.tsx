@@ -1,7 +1,7 @@
-import type { Metadata } from 'next';
 import { brand } from '@/config/brand';
 import { resolveServerEnvironment } from '@/lib/env';
 import { getShelterProvider } from '@/lib/providers';
+import type { Metadata } from 'next';
 import { SheltersPageClient } from './SheltersPageClient';
 
 export const metadata: Metadata = {

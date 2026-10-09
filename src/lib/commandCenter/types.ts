@@ -6,12 +6,12 @@
  * SITUATION → RISK → IMPACT → RESOURCES → ALERTS → GROUND REPORTS → RESPONSE
  */
 
-import type { HazardType, Severity, ReportStatus } from '@/types';
-import type { RoadStatus, RoadBlockageType, RoadSegment } from '@/lib/roads/types';
 import type { DemoAlert } from '@/data/types';
-import type { CitizenReportItem } from '@/lib/reports/types';
 import type { ResourceCategory, ResourceStatus } from '@/lib/planning/resources/types';
 import type { ShelterPlanningStatus } from '@/lib/planning/shelter/types';
+import type { CitizenReportItem } from '@/lib/reports/types';
+import type { RoadSegment, RoadStatus } from '@/lib/roads/types';
+import type { HazardType, ReportStatus, Severity } from '@/types';
 
 // ── Operational KPI Groups ───────────────────────────────────────────────────
 

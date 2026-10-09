@@ -8,9 +8,9 @@
  * Maintains explicit data provenance, source attribution, and clean geometries.
  */
 
-import type { RoadSegment, RoadType } from '@/lib/roads/types';
-import { ROAD_TYPES, ROAD_STATUSES, ROAD_BLOCKAGE_TYPES } from '@/lib/roads/types';
 import type { Shelter } from '@/data/types';
+import type { RoadSegment, RoadType } from '@/lib/roads/types';
+import { ROAD_BLOCKAGE_TYPES, ROAD_STATUSES, ROAD_TYPES } from '@/lib/roads/types';
 import type { ValidatedRoadWay, ValidatedShelterElement } from './validation';
 
 const HIGHWAY_CLASS_TO_ROAD_TYPE: Record<string, RoadType> = {

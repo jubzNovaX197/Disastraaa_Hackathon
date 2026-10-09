@@ -6,26 +6,26 @@
  * a real API adapter without touching any map component.
  */
 
-import type {
-  RiskZone,
-  FloodArea,
-  Shelter,
-  DemoAlert,
-  Infrastructure,
-  BlockedRoad,
-  DemoCitizenReport,
-  CycloneTrack,
-} from './types';
 import type { HistoricalDisasterEvent } from '@/lib/historical/types';
 import type { RoadSegment } from '@/lib/roads/types';
+import type {
+  BlockedRoad,
+  CycloneTrack,
+  DemoAlert,
+  DemoCitizenReport,
+  FloodArea,
+  Infrastructure,
+  RiskZone,
+  Shelter,
+} from './types';
 
 import type {
-  FeatureCollection,
   Feature,
-  Polygon,
-  Point,
-  LineString,
+  FeatureCollection,
   GeoJsonProperties,
+  LineString,
+  Point,
+  Polygon,
 } from 'geojson';
 
 // ── Risk Zones → Polygon FeatureCollection ────────────────────────────────────

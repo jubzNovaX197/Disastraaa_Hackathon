@@ -8,25 +8,25 @@
  * Professional emergency operations decision support.
  */
 
+import { demoRoadSegments } from '@/data/demo';
 import { aggregateCommandCenterData } from '@/lib/commandCenter/aggregator';
 import { buildResponseCoordinationData } from '@/lib/response/engine';
-import { demoRoadSegments } from '@/data/demo';
 import { formatNumber } from '@/lib/utils';
 import type { Severity } from '@/types';
 import type {
-  ScenarioConfiguration,
-  SimulationResult,
-  SimulatedRiskBreakdown,
-  SimulatedImpactBreakdown,
-  SimulatedShelterSummary,
-  SimulatedShelterItem,
-  SimulatedResourceItem,
-  SimulatedRoadStatus,
   ImpactedRoadSegment,
+  ScenarioConfiguration,
   SimulatedAlertItem,
+  SimulatedImpactBreakdown,
+  SimulatedResourceItem,
   SimulatedResponseSummary,
+  SimulatedRiskBreakdown,
+  SimulatedRoadStatus,
+  SimulatedShelterItem,
+  SimulatedShelterSummary,
   SimulatedTimelineStep,
   SimulationMetricChange,
+  SimulationResult,
 } from './types';
 
 function createMetricChange(baseline: number, simulated: number): SimulationMetricChange {

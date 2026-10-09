@@ -4,7 +4,6 @@
  * Types for raw OSM responses, ingestion parameters, validation, and normalization.
  */
 
-import type { LngLat } from '@/data/types';
 import type { RoadType } from '@/lib/roads/types';
 
 export interface BoundingBox {

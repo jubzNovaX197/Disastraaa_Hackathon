@@ -16,8 +16,8 @@
  */
 
 import type {
-  CycloneRiskInputs,
   CycloneFactorScores,
+  CycloneRiskInputs,
   CycloneRiskResult,
   CycloneSeverity,
 } from './types';

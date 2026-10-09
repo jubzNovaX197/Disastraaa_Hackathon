@@ -11,12 +11,12 @@
  * Operational decision support system.
  */
 
-import { useCallback, useState } from 'react';
-import { cn } from '@/lib/utils';
-import { RoutePlanner } from './RoutePlanner';
-import type { RouteResult } from '@/lib/routing/types';
 import type { LngLat } from '@/data/types';
-import type { DestinationSafetyResult, DestinationSafetyStatus } from '@/lib/destination/types';
+import type { DestinationSafetyStatus } from '@/lib/destination/types';
+import type { RouteResult } from '@/lib/routing/types';
+import { cn } from '@/lib/utils';
+import { useCallback, useState } from 'react';
+import { RoutePlanner } from './RoutePlanner';
 
 interface RouteMapOverlayProps {
   onRouteSelected: (coords: LngLat[], mode: RouteResult['mode']) => void;

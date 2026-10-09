@@ -1,8 +1,8 @@
-import { NextResponse } from 'next/server';
-import { findUserByEmail, toSafeUser } from '@/lib/auth/users';
 import { verifyPassword } from '@/lib/auth/password';
-import { createSessionToken, SESSION_COOKIE_NAME, AUTH_MARKER_COOKIE_NAME, SESSION_MAX_AGE_SECONDS } from '@/lib/auth/session';
 import { ROLE_COOKIE_NAME } from '@/lib/auth/roles';
+import { AUTH_MARKER_COOKIE_NAME, createSessionToken, SESSION_COOKIE_NAME, SESSION_MAX_AGE_SECONDS } from '@/lib/auth/session';
+import { findUserByEmail, toSafeUser } from '@/lib/auth/users';
+import { NextResponse } from 'next/server';
 
 /**
  * POST /api/auth/login

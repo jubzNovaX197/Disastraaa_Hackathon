@@ -5,7 +5,7 @@
  * Rejects corrupt geometries, degenerate polylines, and out-of-bounds coordinates.
  */
 
-import type { OverpassElement, OverpassCoordinate } from './types';
+import type { OverpassElement } from './types';
 
 export const ACCEPTED_ROAD_CLASSES = new Set([
   'motorway',

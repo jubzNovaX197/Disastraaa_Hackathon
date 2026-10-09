@@ -15,7 +15,7 @@
  *  this function and all UI need zero changes.
  */
 
-import type { FloodRiskInputs, FloodFactorScores, FloodRiskResult, FloodSeverity } from './types';
+import type { FloodFactorScores, FloodRiskInputs, FloodRiskResult, FloodSeverity } from './types';
 import { FLOOD_WEIGHTS } from './weights';
 
 // ── Normalisation helpers ─────────────────────────────────────────────────────

@@ -3,12 +3,8 @@
  */
 
 export { calculateCycloneRisk } from './calculateCycloneRisk';
-export { explainCycloneRisk, CYCLONE_FACTOR_LABELS } from './explainRisk';
-export { CYCLONE_WEIGHTS } from './weights';
+export { CYCLONE_FACTOR_LABELS, explainCycloneRisk } from './explainRisk';
 export type {
-  CycloneRiskInputs,
-  CycloneFactorScores,
-  CycloneRiskResult,
-  CycloneRiskExplanation,
-  CycloneSeverity,
+  CycloneFactorScores, CycloneRiskExplanation, CycloneRiskInputs, CycloneRiskResult, CycloneSeverity
 } from './types';
+export { CYCLONE_WEIGHTS } from './weights';

@@ -1,50 +1,41 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
-import {
-  Map,
-  Layers,
-  Activity,
-  FileText,
-  Home,
-  Package,
-  Shield,
-  Clock,
-  Sparkles,
-  RotateCcw,
-} from 'lucide-react';
+import { AuthorityAccessGate } from '@/components/auth/AuthorityAccessGate';
 import { DisasterMap } from '@/components/map/DisasterMap';
 import { demoDataset } from '@/data/demo';
-import { demoCitizenReports } from '@/data/demo/citizenReports';
-import { demoRoadSegments } from '@/data/demo';
 import { isAuthorizedForOperations } from '@/lib/auth/roles';
-import { AuthorityAccessGate } from '@/components/auth/AuthorityAccessGate';
-import { CommandCenterHeader } from './CommandCenterHeader';
-import { CommandCenterKpiRow } from './CommandCenterKpiRow';
-import { SituationSummaryPanel } from './SituationSummaryPanel';
-import { DisasterIntelligenceSection } from './DisasterIntelligenceSection';
-import { OperationsFiltersBar } from './OperationsFiltersBar';
-import { PriorityLocationsTable } from './PriorityLocationsTable';
-import { LocationDetailDrawer } from './LocationDetailDrawer';
-import { ActiveAlertsOperationsPanel } from './ActiveAlertsOperationsPanel';
-import { CitizenReportsOperationsPanel } from './CitizenReportsOperationsPanel';
-import { BlockedRoadsOperationsPanel } from './BlockedRoadsOperationsPanel';
-import { ShelterOperationsPanel } from './ShelterOperationsPanel';
-import { ResourceOperationsPanel } from './ResourceOperationsPanel';
-import { HazardBreakdownPanel } from './HazardBreakdownPanel';
-import { SituationTimelineTrend } from './SituationTimelineTrend';
 import {
-  aggregateCommandCenterData,
-  filterCommandCenterLocations,
+  filterCommandCenterLocations
 } from '@/lib/commandCenter/aggregator';
 import type {
-  CommandCenterData,
-  PriorityLocation,
   OperationsFilters,
+  PriorityLocation
 } from '@/lib/commandCenter/types';
-import { ROLES, type Role } from '@/types/roles';
-import { cn } from '@/lib/utils';
 import { createCircularPolygon } from '@/lib/ingestion/risk/weatherRiskService';
+import { cn } from '@/lib/utils';
+import { ROLES, type Role } from '@/types/roles';
+import {
+  Activity,
+  Clock,
+  Map,
+  Package,
+  Shield
+} from 'lucide-react';
+import { useCallback, useMemo, useState } from 'react';
+import { ActiveAlertsOperationsPanel } from './ActiveAlertsOperationsPanel';
+import { BlockedRoadsOperationsPanel } from './BlockedRoadsOperationsPanel';
+import { CitizenReportsOperationsPanel } from './CitizenReportsOperationsPanel';
+import { CommandCenterHeader } from './CommandCenterHeader';
+import { CommandCenterKpiRow } from './CommandCenterKpiRow';
+import { DisasterIntelligenceSection } from './DisasterIntelligenceSection';
+import { HazardBreakdownPanel } from './HazardBreakdownPanel';
+import { LocationDetailDrawer } from './LocationDetailDrawer';
+import { OperationsFiltersBar } from './OperationsFiltersBar';
+import { PriorityLocationsTable } from './PriorityLocationsTable';
+import { ResourceOperationsPanel } from './ResourceOperationsPanel';
+import { ShelterOperationsPanel } from './ShelterOperationsPanel';
+import { SituationSummaryPanel } from './SituationSummaryPanel';
+import { SituationTimelineTrend } from './SituationTimelineTrend';
 
 // Operational default map layers (Citizen reports & road disruptions visible for command response)
 const COMMAND_CENTER_MAP_LAYERS = [
@@ -102,21 +93,23 @@ export function CommandCenterDashboard({
           since: r.lastUpdated,
         }));
 
-      const riskZones = baseData.priorityLocations.map((loc) => ({
-        id: `rz-${loc.id}`,
-        name: loc.name,
-        severity: loc.severity,
-        coordinates: createCircularPolygon(loc.coordinates, 15),
-        primaryHazard: (loc.dominantHazard === 'MULTI_HAZARD'
-          ? (loc.cycloneRiskScore && loc.cycloneRiskScore > (loc.floodRiskScore ?? 0) ? 'CYCLONE' : 'FLOOD')
-          : loc.dominantHazard) as 'FLOOD' | 'CYCLONE',
-        riskScore: loc.riskScore,
-        affectedPopulation: loc.populationExposed,
-        description: `Operational Priority Sector: ${loc.severity} (${loc.riskScore}/100)`,
-      }));
+      const riskZones = baseData.priorityLocations
+        .filter((loc) => loc.riskScore >= 45)
+        .map((loc) => ({
+          id: `rz-${loc.id}`,
+          name: loc.name,
+          severity: loc.severity,
+          coordinates: createCircularPolygon(loc.coordinates, 15),
+          primaryHazard: (loc.dominantHazard === 'MULTI_HAZARD'
+            ? (loc.cycloneRiskScore && loc.cycloneRiskScore > (loc.floodRiskScore ?? 0) ? 'CYCLONE' : 'FLOOD')
+            : loc.dominantHazard) as 'FLOOD' | 'CYCLONE',
+          riskScore: loc.riskScore,
+          affectedPopulation: loc.populationExposed,
+          description: `Operational Priority Sector: ${loc.severity} (${loc.riskScore}/100)`,
+        }));
 
       const floodAreas = baseData.priorityLocations
-        .filter((loc) => (loc.floodRiskScore ?? 0) >= 25)
+        .filter((loc) => (loc.floodRiskScore ?? 0) >= 45)
         .map((loc) => ({
           id: `fa-${loc.id}`,
           name: `${loc.name} Hydrological Basin`,
@@ -131,12 +124,12 @@ export function CommandCenterDashboard({
       return {
         riskZones,
         floodAreas,
-        shelters: overrides.shelters,
-        alerts: overrides.alerts,
+        shelters: overrides.shelters.filter((s) => !s.id.startsWith('sh-puri-')),
+        alerts: overrides.alerts.filter((a) => !a.id.startsWith('demo-')),
         infrastructure: [],
         blockedRoads,
-        citizenReports: overrides.reports,
-        roads: overrides.roads,
+        citizenReports: overrides.reports.filter((r) => !r.id.startsWith('demo-') && !r.id.startsWith('rep-demo-')),
+        roads: overrides.roads.filter((r) => !r.id.startsWith('rd-puri-') && !r.id.startsWith('demo-')),
         cycloneZones: [],
         cycloneTrack: null,
         sourceType: 'LIVE_OPERATIONAL' as const,

@@ -13,23 +13,24 @@
  *  - Emergency shelters & resource depots
  */
 
-import type { LngLat } from '@/data/types';
-import type { Severity } from '@/types';
-import type { RouteResult } from '@/lib/routing/types';
+import { formatTimeIST } from '@/lib/utils';
 import {
-  demoDataset,
-  demoCycloneZones,
   computedMultiHazardRisks,
+  demoCycloneZones,
+  demoDataset,
   ZONE_TO_MULTI_HAZARD_ID,
 } from '@/data/demo';
 import { demoCitizenReports } from '@/data/demo/citizenReports';
 import { demoShelters } from '@/data/demo/shelters';
+import type { LngLat } from '@/data/types';
+import type { RouteResult } from '@/lib/routing/types';
+import type { Severity } from '@/types';
 import type {
   HazardCorridorItem,
-  RoadConditionBreakdown,
   JourneyAlertItem,
-  JourneyGroundIntelligence,
   JourneyEmergencyContext,
+  JourneyGroundIntelligence,
+  RoadConditionBreakdown,
 } from './types';
 
 // ── Great-Circle Distance ───────────────────────────────────────────────────
@@ -256,7 +257,7 @@ export function analyzeCorridorAlerts(
         summary: alert.message,
         affectedArea: alert.regionName,
         validPeriod: alert.expiresAt
-          ? `Valid until ${new Date(alert.expiresAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+          ? `Valid until ${formatTimeIST(alert.expiresAt)}`
           : 'Active 24h Advisory',
         routeExposureKm: Math.round(Math.max(1.2, 12.0 - dist) * 10) / 10,
         distanceToRouteKm: dist,

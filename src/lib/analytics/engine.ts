@@ -7,34 +7,34 @@
  * Professional emergency operations decision support.
  */
 
-import { aggregateCommandCenterData } from '@/lib/commandCenter/aggregator';
-import { demoCitizenReports } from '@/data/demo/citizenReports';
 import { demoRoadSegments } from '@/data/demo';
 import { demoAlerts } from '@/data/demo/alerts';
+import { demoCitizenReports } from '@/data/demo/citizenReports';
 import { demoHistoricalEvents } from '@/data/demo/historicalEvents';
+import { aggregateCommandCenterData } from '@/lib/commandCenter/aggregator';
 import { summariseEvents } from '@/lib/historical/engine';
 import { formatNumber } from '@/lib/utils';
 import type { HazardType, Severity } from '@/types';
 import type {
-  SituationAnalyticsData,
+  AlertAnalyticsData,
+  AnalyticsFilterState,
   AnalyticsOverviewKpis,
+  FieldIntelligenceAnalyticsData,
   HazardAnalyticsComparison,
   HazardMetricProfile,
-  RiskDistributionData,
-  SeverityDistributionBucket,
+  HistoricalComparisonData,
   ImpactAnalyticsData,
-  AlertAnalyticsData,
-  FieldIntelligenceAnalyticsData,
-  ReportCategoryCount,
   InfrastructureAnalyticsData,
   RegionalAnalyticsRow,
+  ReportCategoryCount,
+  RiskDistributionData,
+  SeverityDistributionBucket,
+  SituationAnalyticsData,
   TrendAnalysisPoint,
-  HistoricalComparisonData,
-  AnalyticsFilterState,
 } from './types';
 
-import type { CommandCenterData } from '@/lib/commandCenter/types';
 import type { DemoAlert as Alert } from '@/data/types';
+import type { CommandCenterData } from '@/lib/commandCenter/types';
 import type { CitizenReportItem } from '@/lib/reports/types';
 import type { RoadSegment } from '@/lib/roads/types';
 

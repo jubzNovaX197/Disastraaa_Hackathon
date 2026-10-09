@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server';
-import { getIncidents, getPersistedIncidents, saveIncident, createIncident, type CreateIncidentInput } from '@/lib/incidents';
-import { ROLES } from '@/types/roles';
+import { requireAuthority } from '@/lib/auth/requireAuthority';
 import { resolveServerEnvironment } from '@/lib/env';
+import { createIncident, getIncidents, getPersistedIncidents, saveIncident, type CreateIncidentInput } from '@/lib/incidents';
+import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
   try {
@@ -29,6 +29,8 @@ export async function GET(request: Request) {
 }
 
 export async function POST(req: Request) {
+  const access = await requireAuthority(true);
+  if (access.error) return access.error;
   try {
     const body = await req.json();
 
@@ -43,8 +45,6 @@ export async function POST(req: Request) {
       affectedArea,
       source = 'MANUAL',
       sourceReference,
-      createdBy = 'Authority Dispatcher',
-      createdByRole = ROLES.DISTRICT_AUTHORITY,
       evidence = [],
     } = body;
 
@@ -66,13 +66,13 @@ export async function POST(req: Request) {
       affectedArea: typeof affectedArea === 'string' ? affectedArea.trim() : undefined,
       source,
       sourceReference,
-      dataLabel: 'VERIFIED',
-      createdBy,
-      createdByRole,
+      dataLabel: access.environment === 'DEMO' ? 'SIMULATION' : 'VERIFIED',
+      createdBy: access.actor.name,
+      createdByRole: access.actor.role,
       evidence: Array.isArray(evidence) ? evidence : [],
     };
 
-    const env = await resolveServerEnvironment();
+    const env = access.environment;
     const incident = createIncident(input);
     await saveIncident(incident, env);
 

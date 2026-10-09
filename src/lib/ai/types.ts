@@ -5,8 +5,8 @@
  * User Question → Intent Detection → Relevant Disaster Data → Structured Analysis → AI Explanation → Sources
  */
 
-import type { Role } from '@/types/roles';
 import type { LiveDataOverrides } from '@/lib/realtime/types';
+import type { Role } from '@/types/roles';
 
 export type AssistantIntent =
   | 'SITREP_GENERATION'

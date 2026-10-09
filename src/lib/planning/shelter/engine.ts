@@ -7,12 +7,12 @@
  * Replace with real evacuation models / optimization without changing the UI.
  */
 
+import type { Severity } from '@/types';
 import type {
   ShelterPlanningInputs,
   ShelterPlanningResult,
   ShelterPlanningStatus,
 } from './types';
-import type { Severity } from '@/types';
 
 // ── Prototype assumptions ─────────────────────────────────────────────────────
 // These are made explicit so the UI can display them as labelled assumptions.

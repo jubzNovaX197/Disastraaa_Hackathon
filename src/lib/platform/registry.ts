@@ -6,7 +6,7 @@
  * retention boundaries, licensing rights, and storage tier assignments.
  */
 
-import type { RegisteredDataSource, DataCategory } from './types';
+import type { DataCategory, RegisteredDataSource } from './types';
 
 export const DATA_SOURCE_REGISTRY: Record<string, RegisteredDataSource> = {
   'open-meteo-weather': {

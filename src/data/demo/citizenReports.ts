@@ -6,8 +6,9 @@
  * Task 11 — Citizen Evidence Intelligence with structured metadata & preliminary assessment.
  */
 
-import type { CitizenReportItem } from '@/lib/reports/types';
+import { DEMO_REFERENCE_EPOCH } from './clock';
 import { assessPreliminaryEvidence } from '@/lib/reports/evidence';
+import type { CitizenReportItem } from '@/lib/reports/types';
 
 const rawDemoCitizenReports: CitizenReportItem[] = [
   // 1. Verified flood report with photo evidence (Cuttack North)
@@ -29,8 +30,8 @@ const rawDemoCitizenReports: CitizenReportItem[] = [
     severity: 'HIGH',
     status: 'COMMUNITY_CONFIRMED',
     confirmCount: 14,
-    createdAt: new Date(Date.now() - 45 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
+    createdAt: new Date(DEMO_REFERENCE_EPOCH - 45 * 60 * 1000).toISOString(),
+    updatedAt: new Date(DEMO_REFERENCE_EPOCH - 15 * 60 * 1000).toISOString(),
     evidence: [
       {
         id: 'ev-001',
@@ -39,7 +40,7 @@ const rawDemoCitizenReports: CitizenReportItem[] = [
         mimeType: 'image/jpeg',
         sizeBytes: 2450000,
         fileSize: '2.4 MB',
-        timestamp: new Date(Date.now() - 48 * 60 * 1000).toISOString(),
+        timestamp: new Date(DEMO_REFERENCE_EPOCH - 48 * 60 * 1000).toISOString(),
         source: 'CITIZEN_UPLOAD',
         status: 'ASSESSED',
         caption: 'Water level reached window sills of ground floor',
@@ -79,7 +80,7 @@ const rawDemoCitizenReports: CitizenReportItem[] = [
       summary: 'Preliminary Automated Analysis: High Confidence (Score 86/100). Validated against Cuttack Flood Zone.',
       potentialAlertTrigger: false,
       duplicateIndicator: false,
-      analyzedAt: new Date(Date.now() - 44 * 60 * 1000).toISOString(),
+      analyzedAt: new Date(DEMO_REFERENCE_EPOCH - 44 * 60 * 1000).toISOString(),
     },
     authorityVerification: {
       status: 'UNREVIEWED',
@@ -130,8 +131,8 @@ const rawDemoCitizenReports: CitizenReportItem[] = [
     severity: 'HIGH',
     status: 'VERIFIED',
     confirmCount: 22,
-    createdAt: new Date(Date.now() - 90 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
+    createdAt: new Date(DEMO_REFERENCE_EPOCH - 90 * 60 * 1000).toISOString(),
+    updatedAt: new Date(DEMO_REFERENCE_EPOCH - 30 * 60 * 1000).toISOString(),
     evidence: [
       {
         id: 'ev-002a',
@@ -140,7 +141,7 @@ const rawDemoCitizenReports: CitizenReportItem[] = [
         mimeType: 'image/jpeg',
         sizeBytes: 3200000,
         fileSize: '3.1 MB',
-        timestamp: new Date(Date.now() - 95 * 60 * 1000).toISOString(),
+        timestamp: new Date(DEMO_REFERENCE_EPOCH - 95 * 60 * 1000).toISOString(),
         source: 'FIELD_PATROL',
         status: 'ASSESSED',
         caption: 'Uprooted tree and snapped live wires',
@@ -180,12 +181,12 @@ const rawDemoCitizenReports: CitizenReportItem[] = [
       summary: 'Preliminary Automated Analysis: High Confidence (Score 92/100). Critical arterial road blocked.',
       potentialAlertTrigger: true,
       duplicateIndicator: false,
-      analyzedAt: new Date(Date.now() - 89 * 60 * 1000).toISOString(),
+      analyzedAt: new Date(DEMO_REFERENCE_EPOCH - 89 * 60 * 1000).toISOString(),
     },
     authorityVerification: {
       status: 'VERIFIED',
       reviewedBy: 'Puri District Disaster Management Authority (ODRAF Team 2)',
-      reviewedAt: new Date(Date.now() - 40 * 60 * 1000).toISOString(),
+      reviewedAt: new Date(DEMO_REFERENCE_EPOCH - 40 * 60 * 1000).toISOString(),
       notes: 'Confirmed by ODRAF patrol. Tree cutter teams dispatched with excavator.',
       actionTaken: 'ODRAF unit deployed for clearance. Traffic redirected via VIP Road.',
     },
@@ -227,8 +228,8 @@ const rawDemoCitizenReports: CitizenReportItem[] = [
     severity: 'CRITICAL',
     status: 'VERIFIED',
     confirmCount: 5,
-    createdAt: new Date(Date.now() - 25 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
+    createdAt: new Date(DEMO_REFERENCE_EPOCH - 25 * 60 * 1000).toISOString(),
+    updatedAt: new Date(DEMO_REFERENCE_EPOCH - 10 * 60 * 1000).toISOString(),
     evidence: [
       {
         id: 'ev-003',
@@ -237,7 +238,7 @@ const rawDemoCitizenReports: CitizenReportItem[] = [
         mimeType: 'image/jpeg',
         sizeBytes: 1850000,
         fileSize: '1.8 MB',
-        timestamp: new Date(Date.now() - 28 * 60 * 1000).toISOString(),
+        timestamp: new Date(DEMO_REFERENCE_EPOCH - 28 * 60 * 1000).toISOString(),
         source: 'CITIZEN_UPLOAD',
         status: 'ASSESSED',
         caption: 'Water surrounding house, approx 1.4m depth',
@@ -269,12 +270,12 @@ const rawDemoCitizenReports: CitizenReportItem[] = [
       summary: 'Preliminary Automated Analysis: Urgent Priority (Score 95/100). Immediate rescue dispatch recommended.',
       potentialAlertTrigger: true,
       duplicateIndicator: false,
-      analyzedAt: new Date(Date.now() - 24 * 60 * 1000).toISOString(),
+      analyzedAt: new Date(DEMO_REFERENCE_EPOCH - 24 * 60 * 1000).toISOString(),
     },
     authorityVerification: {
       status: 'VERIFIED',
       reviewedBy: 'Kendrapara District Emergency Control Room',
-      reviewedAt: new Date(Date.now() - 12 * 60 * 1000).toISOString(),
+      reviewedAt: new Date(DEMO_REFERENCE_EPOCH - 12 * 60 * 1000).toISOString(),
       notes: 'NDRF 3rd Battalion motorised boat deployed from Marshaghai base.',
       actionTaken: 'Rescue team on water. Expected ETA 15 minutes.',
     },
@@ -316,8 +317,8 @@ const rawDemoCitizenReports: CitizenReportItem[] = [
     severity: 'HIGH',
     status: 'COMMUNITY_CONFIRMED',
     confirmCount: 8,
-    createdAt: new Date(Date.now() - 180 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
+    createdAt: new Date(DEMO_REFERENCE_EPOCH - 180 * 60 * 1000).toISOString(),
+    updatedAt: new Date(DEMO_REFERENCE_EPOCH - 60 * 60 * 1000).toISOString(),
     // Incomplete evidence metadata: missing timestamp and dimension specs
     evidence: [
       {
@@ -359,7 +360,7 @@ const rawDemoCitizenReports: CitizenReportItem[] = [
       summary: 'Preliminary Automated Analysis: High Confidence (Score 82/100). Heavy earthmoving equipment needed.',
       potentialAlertTrigger: false,
       duplicateIndicator: false,
-      analyzedAt: new Date(Date.now() - 178 * 60 * 1000).toISOString(),
+      analyzedAt: new Date(DEMO_REFERENCE_EPOCH - 178 * 60 * 1000).toISOString(),
     },
     authorityVerification: {
       status: 'UNREVIEWED',
@@ -394,8 +395,8 @@ const rawDemoCitizenReports: CitizenReportItem[] = [
     severity: 'HIGH',
     status: 'VERIFIED',
     confirmCount: 31,
-    createdAt: new Date(Date.now() - 20 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+    createdAt: new Date(DEMO_REFERENCE_EPOCH - 20 * 60 * 1000).toISOString(),
+    updatedAt: new Date(DEMO_REFERENCE_EPOCH - 5 * 60 * 1000).toISOString(),
     evidence: [
       {
         id: 'ev-005',
@@ -404,7 +405,7 @@ const rawDemoCitizenReports: CitizenReportItem[] = [
         mimeType: 'image/jpeg',
         sizeBytes: 1950000,
         fileSize: '1.9 MB',
-        timestamp: new Date(Date.now() - 22 * 60 * 1000).toISOString(),
+        timestamp: new Date(DEMO_REFERENCE_EPOCH - 22 * 60 * 1000).toISOString(),
         source: 'CITIZEN_UPLOAD',
         status: 'ASSESSED',
         caption: 'Water level indicator showing 1.4m depth',
@@ -441,12 +442,12 @@ const rawDemoCitizenReports: CitizenReportItem[] = [
       summary: 'Preliminary Automated Analysis: High Confidence (Score 88/100). Stormwater pumps requested.',
       potentialAlertTrigger: false,
       duplicateIndicator: false,
-      analyzedAt: new Date(Date.now() - 19 * 60 * 1000).toISOString(),
+      analyzedAt: new Date(DEMO_REFERENCE_EPOCH - 19 * 60 * 1000).toISOString(),
     },
     authorityVerification: {
       status: 'VERIFIED',
       reviewedBy: 'GVMC Disaster Response Cell',
-      reviewedAt: new Date(Date.now() - 8 * 60 * 1000).toISOString(),
+      reviewedAt: new Date(DEMO_REFERENCE_EPOCH - 8 * 60 * 1000).toISOString(),
       notes: 'Traffic police have barricaded both ends. High-capacity dewatering pump set up.',
       actionTaken: 'Barricaded and pumped out. Route closed until water recedes.',
     },
@@ -481,8 +482,8 @@ const rawDemoCitizenReports: CitizenReportItem[] = [
     severity: 'HIGH',
     status: 'PENDING',
     confirmCount: 4,
-    createdAt: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
+    createdAt: new Date(DEMO_REFERENCE_EPOCH - 10 * 60 * 1000).toISOString(),
+    updatedAt: new Date(DEMO_REFERENCE_EPOCH - 10 * 60 * 1000).toISOString(),
     evidence: [
       {
         id: 'ev-006',
@@ -491,7 +492,7 @@ const rawDemoCitizenReports: CitizenReportItem[] = [
         mimeType: 'video/mp4',
         sizeBytes: 9800000,
         fileSize: '9.4 MB',
-        timestamp: new Date(Date.now() - 12 * 60 * 1000).toISOString(),
+        timestamp: new Date(DEMO_REFERENCE_EPOCH - 12 * 60 * 1000).toISOString(),
         source: 'CITIZEN_UPLOAD',
         status: 'ASSESSED',
         caption: 'Bridge shaking as canal overflow strikes central pier',
@@ -529,7 +530,7 @@ const rawDemoCitizenReports: CitizenReportItem[] = [
       summary: 'Preliminary Automated Analysis: Medium Confidence (Score 72/100). Awaiting police barricading.',
       potentialAlertTrigger: false,
       duplicateIndicator: false,
-      analyzedAt: new Date(Date.now() - 9 * 60 * 1000).toISOString(),
+      analyzedAt: new Date(DEMO_REFERENCE_EPOCH - 9 * 60 * 1000).toISOString(),
     },
     authorityVerification: {
       status: 'UNREVIEWED',
@@ -564,8 +565,8 @@ const rawDemoCitizenReports: CitizenReportItem[] = [
     severity: 'CRITICAL',
     status: 'ESCALATED',
     confirmCount: 19,
-    createdAt: new Date(Date.now() - 35 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+    createdAt: new Date(DEMO_REFERENCE_EPOCH - 35 * 60 * 1000).toISOString(),
+    updatedAt: new Date(DEMO_REFERENCE_EPOCH - 5 * 60 * 1000).toISOString(),
     evidence: [
       {
         id: 'ev-007a',
@@ -574,7 +575,7 @@ const rawDemoCitizenReports: CitizenReportItem[] = [
         mimeType: 'image/jpeg',
         sizeBytes: 3600000,
         fileSize: '3.6 MB',
-        timestamp: new Date(Date.now() - 38 * 60 * 1000).toISOString(),
+        timestamp: new Date(DEMO_REFERENCE_EPOCH - 38 * 60 * 1000).toISOString(),
         source: 'CITIZEN_UPLOAD',
         status: 'ASSESSED',
         caption: '20m gap in flood embankment with torrent pouring into village',
@@ -591,7 +592,7 @@ const rawDemoCitizenReports: CitizenReportItem[] = [
         mimeType: 'image/jpeg',
         sizeBytes: 2900000,
         fileSize: '2.9 MB',
-        timestamp: new Date(Date.now() - 36 * 60 * 1000).toISOString(),
+        timestamp: new Date(DEMO_REFERENCE_EPOCH - 36 * 60 * 1000).toISOString(),
         source: 'FIRST_RESPONDER',
         status: 'ASSESSED',
         caption: 'Rising flood waters surrounding Jagannathpur thatched homes',
@@ -629,12 +630,12 @@ const rawDemoCitizenReports: CitizenReportItem[] = [
       summary: 'Preliminary Automated Analysis: Urgent Priority (Score 96/100). Immediate sandbagging and evacuation sirens required.',
       potentialAlertTrigger: true,
       duplicateIndicator: false,
-      analyzedAt: new Date(Date.now() - 34 * 60 * 1000).toISOString(),
+      analyzedAt: new Date(DEMO_REFERENCE_EPOCH - 34 * 60 * 1000).toISOString(),
     },
     authorityVerification: {
       status: 'ESCALATED',
       reviewedBy: 'State Disaster Operations Centre (OSDMA)',
-      reviewedAt: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
+      reviewedAt: new Date(DEMO_REFERENCE_EPOCH - 15 * 60 * 1000).toISOString(),
       notes: 'Escalated to State Emergency Operations Centre. 2 NDRF teams diverted from Berhampur. Water Resources Dept engineering unit en route with sandbags.',
       actionTaken: 'High-alert siren sounded in Jagannathpur. Emergency evacuation to cyclone shelter initiated.',
     },
@@ -677,8 +678,8 @@ const rawDemoCitizenReports: CitizenReportItem[] = [
     severity: 'CRITICAL',
     status: 'REJECTED',
     confirmCount: 2,
-    createdAt: new Date(Date.now() - 50 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 25 * 60 * 1000).toISOString(),
+    createdAt: new Date(DEMO_REFERENCE_EPOCH - 50 * 60 * 1000).toISOString(),
+    updatedAt: new Date(DEMO_REFERENCE_EPOCH - 25 * 60 * 1000).toISOString(),
     evidence: [], // Intentionally empty to test NO_EVIDENCE flag
     communityConfirmations: {
       confirmCount: 2,
@@ -701,12 +702,12 @@ const rawDemoCitizenReports: CitizenReportItem[] = [
       summary: 'Preliminary Automated Analysis: Low Confidence (Score 32/100). Contradicts meteorological radar.',
       potentialAlertTrigger: false,
       duplicateIndicator: false,
-      analyzedAt: new Date(Date.now() - 48 * 60 * 1000).toISOString(),
+      analyzedAt: new Date(DEMO_REFERENCE_EPOCH - 48 * 60 * 1000).toISOString(),
     },
     authorityVerification: {
       status: 'REJECTED',
       reviewedBy: 'INCOIS / State Early Warning Cell',
-      reviewedAt: new Date(Date.now() - 28 * 60 * 1000).toISOString(),
+      reviewedAt: new Date(DEMO_REFERENCE_EPOCH - 28 * 60 * 1000).toISOString(),
       notes: 'Cross-checked with Gopalpur coastal radar and buoy data. No tsunami warning issued. Social media rumor rejected to avoid panic.',
       actionTaken: 'Report discarded. Fact-check notice posted on official dashboard.',
     },
@@ -732,8 +733,8 @@ const rawDemoCitizenReports: CitizenReportItem[] = [
     severity: 'HIGH',
     status: 'COMMUNITY_CONFIRMED',
     confirmCount: 16,
-    createdAt: new Date(Date.now() - 65 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
+    createdAt: new Date(DEMO_REFERENCE_EPOCH - 65 * 60 * 1000).toISOString(),
+    updatedAt: new Date(DEMO_REFERENCE_EPOCH - 15 * 60 * 1000).toISOString(),
     // Multiple photos attached
     evidence: [
       {
@@ -743,7 +744,7 @@ const rawDemoCitizenReports: CitizenReportItem[] = [
         mimeType: 'image/jpeg',
         sizeBytes: 2800000,
         fileSize: '2.7 MB',
-        timestamp: new Date(Date.now() - 70 * 60 * 1000).toISOString(),
+        timestamp: new Date(DEMO_REFERENCE_EPOCH - 70 * 60 * 1000).toISOString(),
         source: 'CITIZEN_UPLOAD',
         status: 'ASSESSED',
         caption: 'Corridors filled with evacuees, queue at dry water tap',
@@ -759,7 +760,7 @@ const rawDemoCitizenReports: CitizenReportItem[] = [
         mimeType: 'image/jpeg',
         sizeBytes: 2100000,
         fileSize: '2.1 MB',
-        timestamp: new Date(Date.now() - 67 * 60 * 1000).toISOString(),
+        timestamp: new Date(DEMO_REFERENCE_EPOCH - 67 * 60 * 1000).toISOString(),
         source: 'FIRST_RESPONDER',
         status: 'ASSESSED',
         caption: 'Empty water tank and family queue outside main hall',
@@ -791,7 +792,7 @@ const rawDemoCitizenReports: CitizenReportItem[] = [
       summary: 'Preliminary Automated Analysis: High Confidence (Score 84/100). Mobile water tanker dispatch advised.',
       potentialAlertTrigger: false,
       duplicateIndicator: false,
-      analyzedAt: new Date(Date.now() - 63 * 60 * 1000).toISOString(),
+      analyzedAt: new Date(DEMO_REFERENCE_EPOCH - 63 * 60 * 1000).toISOString(),
     },
     authorityVerification: {
       status: 'UNREVIEWED',
@@ -827,8 +828,8 @@ const rawDemoCitizenReports: CitizenReportItem[] = [
     severity: 'CRITICAL',
     status: 'UNDER_REVIEW',
     confirmCount: 7,
-    createdAt: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+    createdAt: new Date(DEMO_REFERENCE_EPOCH - 15 * 60 * 1000).toISOString(),
+    updatedAt: new Date(DEMO_REFERENCE_EPOCH - 5 * 60 * 1000).toISOString(),
     evidence: [
       {
         id: 'ev-010',
@@ -837,7 +838,7 @@ const rawDemoCitizenReports: CitizenReportItem[] = [
         mimeType: 'image/jpeg',
         sizeBytes: 3400000,
         fileSize: '3.3 MB',
-        timestamp: new Date(Date.now() - 17 * 60 * 1000).toISOString(),
+        timestamp: new Date(DEMO_REFERENCE_EPOCH - 17 * 60 * 1000).toISOString(),
         source: 'FIRST_RESPONDER',
         status: 'ASSESSED',
         caption: 'Crushed vehicle bonnet and medical first aid on roadside',
@@ -875,7 +876,7 @@ const rawDemoCitizenReports: CitizenReportItem[] = [
       summary: 'Preliminary Automated Analysis: Urgent Priority (Score 93/100). Emergency medical evacuation prioritized.',
       potentialAlertTrigger: true,
       duplicateIndicator: false,
-      analyzedAt: new Date(Date.now() - 14 * 60 * 1000).toISOString(),
+      analyzedAt: new Date(DEMO_REFERENCE_EPOCH - 14 * 60 * 1000).toISOString(),
     },
     authorityVerification: {
       status: 'UNREVIEWED',

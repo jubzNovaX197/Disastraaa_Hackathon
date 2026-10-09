@@ -4,6 +4,7 @@
  * ⚠️  SIMULATED DATA ONLY. Not real government data. For prototype demonstration.
  */
 
+import { DEMO_REFERENCE_EPOCH } from './clock';
 import type { FloodArea } from '@/data/types';
 
 export const demoFloodAreas: FloodArea[] = [
@@ -14,7 +15,7 @@ export const demoFloodAreas: FloodArea[] = [
     type: 'FLOOD',
     depthMeters: 2.4,
     areaKm2: 18.5,
-    lastUpdated: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
+    lastUpdated: new Date(DEMO_REFERENCE_EPOCH - 3 * 60 * 60 * 1000).toISOString(),
     description: 'Active flood — Mahanadi upstream release causing inundation of low-lying wards.',
     coordinates: [[
       [85.85, 20.52],
@@ -31,7 +32,7 @@ export const demoFloodAreas: FloodArea[] = [
     type: 'FLOOD',
     depthMeters: 1.8,
     areaKm2: 42.0,
-    lastUpdated: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
+    lastUpdated: new Date(DEMO_REFERENCE_EPOCH - 1 * 60 * 60 * 1000).toISOString(),
     description: 'Widespread flooding across Kendrapara district; 12 villages isolated.',
     coordinates: [[
       [86.40, 20.55],
@@ -48,7 +49,7 @@ export const demoFloodAreas: FloodArea[] = [
     type: 'STORM_SURGE',
     depthMeters: 3.1,
     areaKm2: 9.2,
-    lastUpdated: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
+    lastUpdated: new Date(DEMO_REFERENCE_EPOCH - 30 * 60 * 1000).toISOString(),
     description: 'Active storm surge inundation — cyclone landfall imminent. Evacuation in progress.',
     coordinates: [[
       [85.78, 19.82],
@@ -65,7 +66,7 @@ export const demoFloodAreas: FloodArea[] = [
     type: 'FLOOD',
     depthMeters: 1.2,
     areaKm2: 28.0,
-    lastUpdated: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
+    lastUpdated: new Date(DEMO_REFERENCE_EPOCH - 6 * 60 * 60 * 1000).toISOString(),
     description: 'Baitarani river overflow affecting agricultural land and riverside habitations.',
     coordinates: [[
       [86.48, 21.10],
@@ -82,7 +83,7 @@ export const demoFloodAreas: FloodArea[] = [
     type: 'FLOOD',
     depthMeters: 0.6,
     areaKm2: 7.5,
-    lastUpdated: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+    lastUpdated: new Date(DEMO_REFERENCE_EPOCH - 2 * 60 * 60 * 1000).toISOString(),
     description: 'Heavy rainfall causing urban waterlogging; road access disrupted.',
     coordinates: [[
       [83.22, 17.76],

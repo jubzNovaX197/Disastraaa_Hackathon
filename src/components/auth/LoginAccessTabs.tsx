@@ -10,11 +10,11 @@
  * never shares cookies or state between the two.
  */
 
-import { useState, Suspense } from 'react';
-import { KeyRound, ShieldCheck } from 'lucide-react';
 import type { Role } from '@/types/roles';
-import { DemoAccessPortal } from './DemoAccessPortal';
+import { KeyRound, ShieldCheck } from 'lucide-react';
+import { Suspense, useState } from 'react';
 import { AccountAuthForm } from './AccountAuthForm';
+import { DemoAccessPortal } from './DemoAccessPortal';
 
 interface LoginAccessTabsProps {
   initialRole?: Role;

@@ -10,9 +10,10 @@
  * - Weather-to-Risk model pipeline (Flood, Cyclone, Multi-Hazard)
  */
 
-import { NextResponse } from 'next/server';
-import { runOperationalIngestion, hazardRepository, firmsClient } from '@/lib/ingestion';
+import { requireAuthority } from '@/lib/auth/requireAuthority';
+import { firmsClient, hazardRepository, runOperationalIngestion } from '@/lib/ingestion';
 import { weatherRiskService } from '@/lib/ingestion/risk/weatherRiskService';
+import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
@@ -57,6 +58,8 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  const access = await requireAuthority();
+  if (access.error) return access.error;
   try {
     const body = await req.json().catch(() => ({}));
     const report = await runOperationalIngestion({

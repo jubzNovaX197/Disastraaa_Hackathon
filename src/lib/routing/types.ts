@@ -6,8 +6,8 @@
  * Replace the engine with OSRM / GraphHopper / pgRouting when ready.
  */
 
-import type { Severity } from '@/types';
 import type { LngLat } from '@/data/types';
+import type { Severity } from '@/types';
 
 // ── Graph primitives ──────────────────────────────────────────────────────────
 

@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
-import { ShieldCheck, AlertCircle, Info, ChevronDown, ChevronUp, RefreshCw, Radio } from 'lucide-react';
 import type { FeedStatusRecord } from '@/lib/alerts/types';
 import { cn } from '@/lib/utils';
+import { AlertCircle, ChevronDown, ChevronUp, Info, Radio, RefreshCw, ShieldCheck } from 'lucide-react';
+import { useState } from 'react';
 
 interface AlertFeedStatusBannerProps {
   feedStatuses: FeedStatusRecord[];

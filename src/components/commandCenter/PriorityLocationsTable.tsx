@@ -1,22 +1,17 @@
 'use client';
 
-import {
-  AlertTriangle,
-  ChevronRight,
-  Eye,
-  MapPin,
-  Waves,
-  Wind,
-  Layers,
-  Users,
-  ShieldAlert,
-  Car,
-  Home,
-  Package,
-} from 'lucide-react';
-import { Card, CardHeader, CardTitle, Badge } from '@/components/ui';
-import { formatNumber, cn } from '@/lib/utils';
+import { DataProvenance } from '@/components/demo/DataProvenance';
+import { Badge, Card, CardTitle } from '@/components/ui';
 import type { PriorityLocation } from '@/lib/commandCenter/types';
+import { cn, formatNumber } from '@/lib/utils';
+import {
+  Eye,
+  Layers,
+  MapPin,
+  ShieldAlert,
+  Waves,
+  Wind
+} from 'lucide-react';
 
 interface PriorityLocationsTableProps {
   locations: PriorityLocation[];
@@ -31,6 +26,7 @@ export function PriorityLocationsTable({
 }: PriorityLocationsTableProps) {
   return (
     <Card className="bg-surface-card/95 border-white/[0.08] shadow-xl overflow-hidden">
+      <DataProvenance />
       <div className="p-4 border-b border-white/[0.06] flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-2">
           <span className="p-1.5 rounded-lg bg-red-500/15 text-critical">

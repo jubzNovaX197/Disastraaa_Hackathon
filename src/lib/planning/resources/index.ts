@@ -5,12 +5,12 @@
  * Deterministic decision-support model — not official government standards.
  */
 
-import type { HazardType, Severity } from '@/types';
-import type { HistoricalDisasterEvent } from '@/lib/historical/types';
 import { getLocationHistory } from '@/lib/historical/engine';
-import { ZONE_TO_REGION_CODE } from '@/lib/planning/shelter';
+import type { HistoricalDisasterEvent } from '@/lib/historical/types';
 import type { ImpactResult } from '@/lib/impact/types';
+import { ZONE_TO_REGION_CODE } from '@/lib/planning/shelter';
 import type { ShelterPlanningResult } from '@/lib/planning/shelter/types';
+import type { HazardType, Severity } from '@/types';
 import { calculateResourceRequirement } from './engine';
 import type {
   ResourceCategory,
@@ -31,11 +31,11 @@ export type {
   ResourceRecommendation,
   ResourceRequirementItem,
   ResourceStatus,
-  ZoneResourceInventory,
+  ZoneResourceInventory
 };
 
-export { calculateResourceRequirement };
-export { HAZARD_MULTIPLIERS, BASE_RATES, STATUS_THRESHOLDS, deriveResourceStatus } from './rules';
+  export { BASE_RATES, deriveResourceStatus, HAZARD_MULTIPLIERS, STATUS_THRESHOLDS } from './rules';
+  export { calculateResourceRequirement };
 
 export interface BuildResourcePlanningParams {
   zoneId:              string;

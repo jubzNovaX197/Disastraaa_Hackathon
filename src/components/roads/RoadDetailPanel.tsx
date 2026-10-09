@@ -16,7 +16,16 @@
  * 7. Authority Verification Status & Workflow Actions (Verify, Mark Open, Partial, Closed, Escalate)
  */
 
-import { useState, useEffect } from 'react';
+import { DataProvenance } from '@/components/demo/DataProvenance';
+import type { CitizenReportItem } from '@/lib/reports/types';
+import {
+  ROAD_BLOCKAGE_CONFIG,
+  ROAD_STATUS_CONFIG,
+  ROAD_TYPE_CONFIG,
+  applyAuthorityRoadAction,
+  type RoadSegment,
+} from '@/lib/roads';
+import { cn, formatTimestampIST, severityConfig, timeAgo } from '@/lib/utils';
 import {
   AlertTriangle,
   ArrowRight,
@@ -25,24 +34,13 @@ import {
   Compass,
   FileText,
   Hospital,
-  Info,
   MapPin,
   Navigation,
   Shield,
-  ShieldAlert,
-  Sparkles,
   X,
-  XCircle,
+  XCircle
 } from 'lucide-react';
-import { cn, severityConfig, timeAgo } from '@/lib/utils';
-import {
-  ROAD_STATUS_CONFIG,
-  ROAD_BLOCKAGE_CONFIG,
-  ROAD_TYPE_CONFIG,
-  applyAuthorityRoadAction,
-  type RoadSegment,
-} from '@/lib/roads';
-import type { CitizenReportItem } from '@/lib/reports/types';
+import { useEffect, useState } from 'react';
 
 interface RoadDetailPanelProps {
   road: RoadSegment;
@@ -113,6 +111,7 @@ export function RoadDetailPanel({
       role="region"
       aria-label={`Road Travel Safety: ${road.name}`}
     >
+      <DataProvenance />
       {/* ── Header ── */}
       <div className={cn('p-4 border-b border-slate-200 dark:border-white/10 transition-colors', statusCfg.bg)}>
         <div className="flex items-start justify-between gap-2">
@@ -157,7 +156,7 @@ export function RoadDetailPanel({
         <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-200/60 dark:border-white/10 flex-wrap gap-2 text-xs">
           <div className="flex items-center gap-1 text-slate-500 dark:text-slate-400 text-[11px]">
             <Clock className="w-3.5 h-3.5" />
-            <span>Updated {timeAgo(road.lastUpdated)}</span>
+            <span suppressHydrationWarning>Updated {timeAgo(road.lastUpdated)}</span>
             <span>·</span>
             <span className="capitalize">{road.source.replace('_', ' ').toLowerCase()}</span>
           </div>
@@ -398,7 +397,7 @@ export function RoadDetailPanel({
                 </p>
               )}
               <div className="text-[9px] text-slate-400 font-mono pt-1 border-t border-slate-100 dark:border-white/5">
-                Timestamp: {new Date(road.authorityVerification.reviewedAt).toLocaleString('en-IN')}
+                Timestamp: {formatTimestampIST(road.authorityVerification.reviewedAt)}
               </div>
             </div>
           ) : (
@@ -516,3 +515,4 @@ export function RoadDetailPanel({
     </div>
   );
 }
+

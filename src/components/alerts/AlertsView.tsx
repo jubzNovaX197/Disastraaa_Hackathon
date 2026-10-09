@@ -1,25 +1,22 @@
 'use client';
 
-import { useState, useMemo, useTransition } from 'react';
+import { useLiveIntelligence } from '@/context/LiveIntelligenceContext';
+import type { DemoAlert } from '@/data/types';
+import type { FeedStatusRecord, RealAlert } from '@/lib/alerts/types';
+import { cn } from '@/lib/utils';
+import type { HazardType, Severity } from '@/types';
 import {
-  Bell,
-  Search,
+  AlertTriangle,
   Filter,
-  ShieldCheck,
+  History,
   Radio,
   RefreshCw,
-  Clock,
-  AlertTriangle,
-  History,
-  CheckCircle2,
+  Search,
+  ShieldCheck
 } from 'lucide-react';
-import type { RealAlert, FeedStatusRecord } from '@/lib/alerts/types';
-import type { DemoAlert } from '@/data/types';
-import type { Severity, HazardType } from '@/types';
+import { useMemo, useState, useTransition } from 'react';
 import { AlertCard } from './AlertCard';
 import { AlertFeedStatusBanner } from './AlertFeedStatusBanner';
-import { cn } from '@/lib/utils';
-import { useLiveIntelligence } from '@/context/LiveIntelligenceContext';
 
 interface AlertsViewProps {
   initialAlerts: (RealAlert | DemoAlert)[];

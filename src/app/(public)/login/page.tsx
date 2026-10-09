@@ -1,7 +1,7 @@
+import { AccountAuthForm } from '@/components/auth/AccountAuthForm';
+import { LogIn } from 'lucide-react';
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import { LogIn } from 'lucide-react';
-import { AccountAuthForm } from '@/components/auth/AccountAuthForm';
 
 export const metadata: Metadata = {
   title: 'Sign In',

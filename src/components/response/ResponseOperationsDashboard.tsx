@@ -1,36 +1,30 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
-import {
-  Map,
-  ShieldAlert,
-  Package,
-  Home,
-  Activity,
-  Layers,
-} from 'lucide-react';
-import { DisasterMap } from '@/components/map/DisasterMap';
-import { demoDataset } from '@/data/demo';
-import { demoCitizenReports } from '@/data/demo/citizenReports';
-import { demoRoadSegments } from '@/data/demo';
-import { isAuthorizedForOperations } from '@/lib/auth/roles';
 import { AuthorityAccessGate } from '@/components/auth/AuthorityAccessGate';
-import { ResponseOperationsHeader } from './ResponseOperationsHeader';
+import { DisasterMap } from '@/components/map/DisasterMap';
+import { demoDataset, demoRoadSegments } from '@/data/demo';
+import { demoCitizenReports } from '@/data/demo/citizenReports';
+import { isAuthorizedForOperations } from '@/lib/auth/roles';
+import type {
+  OperationalStatus,
+  ResponseFilters,
+  ResponseZoneItem
+} from '@/lib/response/types';
+import { cn } from '@/lib/utils';
+import { ROLES, type Role } from '@/types/roles';
+import {
+  Home,
+  Map,
+  Package
+} from 'lucide-react';
+import { useCallback, useMemo, useState } from 'react';
 import { OperationalOverviewBar } from './OperationalOverviewBar';
 import { ResourceReadinessGrid } from './ResourceReadinessGrid';
-import { ResponseZonesTable } from './ResponseZonesTable';
-import { ZoneDetailPanel } from './ZoneDetailPanel';
-import { ShelterOperationsSection } from './ShelterOperationsSection';
 import { ResponseFilterControls } from './ResponseFilterControls';
-import { buildResponseCoordinationData } from '@/lib/response/engine';
-import type {
-  ResponseCoordinationData,
-  ResponseZoneItem,
-  ResponseFilters,
-  OperationalStatus,
-} from '@/lib/response/types';
-import { ROLES, type Role } from '@/types/roles';
-import { cn } from '@/lib/utils';
+import { ResponseOperationsHeader } from './ResponseOperationsHeader';
+import { ResponseZonesTable } from './ResponseZonesTable';
+import { ShelterOperationsSection } from './ShelterOperationsSection';
+import { ZoneDetailPanel } from './ZoneDetailPanel';
 
 // Operational response default layers
 const RESPONSE_MAP_LAYERS = [

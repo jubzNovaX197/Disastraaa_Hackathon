@@ -1,33 +1,30 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
-import {
-  X,
-  MapPin,
-  Waves,
-  Wind,
-  Layers,
-  Users,
-  Building2,
-  Navigation,
-  HeartPulse,
-  GraduationCap,
-  Bell,
-  Home,
-  Package,
-  FileCheck2,
-  Car,
-  AlertTriangle,
-  ArrowRight,
-  ShieldAlert,
-} from 'lucide-react';
 import { Badge } from '@/components/ui';
-import { formatNumber, cn } from '@/lib/utils';
-import type { PriorityLocation } from '@/lib/commandCenter/types';
 import type { DemoAlert } from '@/data/types';
+import type { PriorityLocation } from '@/lib/commandCenter/types';
 import type { CitizenReportItem } from '@/lib/reports/types';
 import type { RoadSegment } from '@/lib/roads/types';
+import { cn, formatNumber } from '@/lib/utils';
+import {
+  ArrowRight,
+  Bell,
+  Building2,
+  Car,
+  FileCheck2,
+  GraduationCap,
+  HeartPulse,
+  Home,
+  MapPin,
+  Navigation,
+  Package,
+  ShieldAlert,
+  Waves,
+  Wind,
+  X
+} from 'lucide-react';
+import Link from 'next/link';
+import { useState } from 'react';
 
 interface LocationDetailDrawerProps {
   location: PriorityLocation | null;

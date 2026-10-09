@@ -1,11 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { resolveServerEnvironment } from '@/lib/env';
-import { executeQuery, getDbClient } from '@/lib/db';
-import { demoDataset } from '@/data/demo';
+import { demoDataset, demoRoadSegments } from '@/data/demo';
 import { demoCitizenReports } from '@/data/demo/citizenReports';
-import { demoRoadSegments } from '@/data/demo';
-import { getIncidents } from '@/lib/incidents';
+import { executeQuery, getDbClient } from '@/lib/db';
+import { resolveServerEnvironment } from '@/lib/env';
 import { parseLocationFromText } from '@/lib/geo/regions';
+import { getIncidents } from '@/lib/incidents';
+import { NextRequest, NextResponse } from 'next/server';
 
 /**
  * GET /api/stats

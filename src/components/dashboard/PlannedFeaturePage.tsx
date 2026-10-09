@@ -5,18 +5,13 @@
  * Prevents raw 404s and preserves the full operational dashboard layout.
  */
 
-import Link from 'next/link';
 import {
-  Sparkles,
   ArrowLeft,
-  Shield,
-  Layers,
-  Clock,
   CheckCircle2,
-  ExternalLink,
   ChevronRight,
+  Layers
 } from 'lucide-react';
-import { Card, CardTitle, Badge } from '@/components/ui';
+import Link from 'next/link';
 
 interface PlannedFeaturePageProps {
   title: string;

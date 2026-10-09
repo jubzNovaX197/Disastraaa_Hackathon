@@ -8,9 +8,9 @@
  *   HYDRO/MET SURGE → ROAD DISRUPTION → CITIZEN REPORT → ALERT ESCALATION → SHELTER SURGE → RESOURCE RELIEF
  */
 
-import type { LiveEvent, LiveDataOverrides } from './types';
 import type { CitizenReportItem } from '@/lib/reports/types';
 import type { RoadStatus } from '@/lib/roads/types';
+import type { LiveDataOverrides, LiveEvent } from './types';
 
 export const DETERMINISTIC_LIVE_EVENTS: LiveEvent[] = [
   {

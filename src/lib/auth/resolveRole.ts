@@ -17,10 +17,10 @@
  * `parseRoleFromCookie` already did on its own.
  */
 
+import { ROLES, type Role } from '@/types/roles';
 import { cookies } from 'next/headers';
 import { ROLE_COOKIE_NAME, parseRoleFromCookie } from './roles';
 import { SESSION_COOKIE_NAME, verifySessionToken } from './session';
-import { ROLES, type Role } from '@/types/roles';
 
 export async function resolveActiveRole(): Promise<Role> {
   const cookieStore = await cookies();

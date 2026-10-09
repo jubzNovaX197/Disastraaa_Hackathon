@@ -14,10 +14,10 @@
  * remain completely functional and independent above it.
  */
 
-import { useState, useRef, useEffect } from 'react';
-import { Globe, Check, ChevronDown } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { BASEMAP_OPTIONS, type BasemapStyleId } from '@/config/map';
+import { cn } from '@/lib/utils';
+import { Check, ChevronDown, Globe } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
 interface BasemapSelectorProps {
   currentBasemap: BasemapStyleId;

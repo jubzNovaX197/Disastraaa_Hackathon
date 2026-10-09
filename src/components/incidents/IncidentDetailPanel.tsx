@@ -8,34 +8,44 @@
  *        Timeline, Actions, Related Intelligence, Escalation controls.
  */
 
-import { useState, useCallback } from 'react';
-import Link from 'next/link';
-import {
-  X, MapPin, Clock, Users, Shield, ChevronDown, ChevronUp,
-  CheckCircle2, Zap, FileText, TrendingUp, Camera, ExternalLink, ArrowRight,
-} from 'lucide-react';
+import { DataProvenance } from '@/components/demo/DataProvenance';
 import { EvidencePreview } from '@/components/reports/EvidencePreview';
-import { cn, timeAgo, formatNumber } from '@/lib/utils';
 import {
-  INCIDENT_STATUS_CONFIG,
+  DATA_LABEL_CONFIG,
   INCIDENT_SEVERITY_CONFIG,
+  INCIDENT_STATUS_CONFIG,
   INCIDENT_TYPE_ICON,
   TEAM_LABEL,
-  DATA_LABEL_CONFIG,
   VALID_TRANSITIONS,
-  updateStatus,
-  assignTeam,
   addAction,
-  escalateIncident,
   addFieldNote,
+  assignTeam,
+  escalateIncident,
   updateActionStatus,
+  updateStatus,
   type Incident,
   type IncidentStatus,
   type ResponseTeam,
 } from '@/lib/incidents';
+import { cn, formatNumber, timeAgo } from '@/lib/utils';
 import type { Role } from '@/types/roles';
-import { ROLES } from '@/types/roles';
-import { rolePermissions } from '@/types/roles';
+import { ROLES, rolePermissions } from '@/types/roles';
+import {
+  Camera,
+  CheckCircle2,
+  ChevronDown, ChevronUp,
+  Clock,
+  ExternalLink,
+  FileText,
+  MapPin,
+  Shield,
+  TrendingUp,
+  Users,
+  X,
+  Zap
+} from 'lucide-react';
+import Link from 'next/link';
+import { useCallback, useState } from 'react';
 
 // ── Permission helpers ────────────────────────────────────────────────────────
 
@@ -220,6 +230,7 @@ export function IncidentDetailPanel({
       'border-l border-slate-200 dark:border-white/[0.06]',
       className,
     )}>
+      <DataProvenance />
       {/* ── Header ── */}
       <div className="flex items-start justify-between gap-2 px-4 py-4 border-b border-slate-200 dark:border-white/[0.06] flex-shrink-0">
         <div className="min-w-0">

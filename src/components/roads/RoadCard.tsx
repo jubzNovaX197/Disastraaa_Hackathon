@@ -7,20 +7,19 @@
  */
 
 import {
-  AlertTriangle,
+  ROAD_BLOCKAGE_CONFIG,
+  ROAD_STATUS_CONFIG,
+  ROAD_TYPE_CONFIG,
+  type RoadSegment,
+} from '@/lib/roads';
+import { cn, timeAgo } from '@/lib/utils';
+import {
   ArrowRight,
   Clock,
   MapPin,
   Navigation,
-  Shield,
+  Shield
 } from 'lucide-react';
-import { cn, timeAgo } from '@/lib/utils';
-import {
-  ROAD_STATUS_CONFIG,
-  ROAD_BLOCKAGE_CONFIG,
-  ROAD_TYPE_CONFIG,
-  type RoadSegment,
-} from '@/lib/roads';
 
 interface RoadCardProps {
   road: RoadSegment;
@@ -118,7 +117,7 @@ export function RoadCard({
       <div className="mt-3 pt-2 border-t border-slate-100 dark:border-white/5 flex items-center justify-between text-[11px] text-slate-400">
         <span className="flex items-center gap-1">
           <Clock className="w-3 h-3" />
-          <span>{timeAgo(road.lastUpdated)}</span>
+          <span suppressHydrationWarning>{timeAgo(road.lastUpdated)}</span>
         </span>
 
         <div className="flex items-center gap-2">

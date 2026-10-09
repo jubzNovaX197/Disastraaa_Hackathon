@@ -1,35 +1,34 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
-import { isAuthorizedForOperations } from '@/lib/auth/roles';
 import { AuthorityAccessGate } from '@/components/auth/AuthorityAccessGate';
-import { SituationAnalyticsHeader } from './SituationAnalyticsHeader';
-import { AnalyticsOverviewKpiRow } from './AnalyticsOverviewKpiRow';
-import { AnalyticsFilterBar } from './AnalyticsFilterBar';
-import { HazardAnalyticsComparison } from './HazardAnalyticsComparison';
-import { RiskDistributionChart } from './RiskDistributionChart';
-import { AlertAnalyticsPanel } from './AlertAnalyticsPanel';
-import { ImpactAnalyticsPanel } from './ImpactAnalyticsPanel';
-import { FieldIntelligenceAnalyticsPanel } from './FieldIntelligenceAnalyticsPanel';
-import { InfrastructureConditionsPanel } from './InfrastructureConditionsPanel';
-import { RegionalSituationTable } from './RegionalSituationTable';
-import { TrendAnalysisTimeline } from './TrendAnalysisTimeline';
-import { HistoricalComparisonSection } from './HistoricalComparisonSection';
-import { AnalyticsMapSection } from './AnalyticsMapSection';
-import { LocationDetailPanel } from './LocationDetailPanel';
 import {
-  buildSituationAnalyticsData,
-  filterRegionalRows,
+  filterRegionalRows
 } from '@/lib/analytics/engine';
 import type {
-  SituationAnalyticsData,
   AnalyticsFilterState,
   RegionalAnalyticsRow,
   RiskDistributionData,
   SeverityDistributionBucket,
+  SituationAnalyticsData,
 } from '@/lib/analytics/types';
+import { isAuthorizedForOperations } from '@/lib/auth/roles';
 import type { Severity } from '@/types';
 import { ROLES, type Role } from '@/types/roles';
+import { useCallback, useMemo, useState } from 'react';
+import { AlertAnalyticsPanel } from './AlertAnalyticsPanel';
+import { AnalyticsFilterBar } from './AnalyticsFilterBar';
+import { AnalyticsMapSection } from './AnalyticsMapSection';
+import { AnalyticsOverviewKpiRow } from './AnalyticsOverviewKpiRow';
+import { FieldIntelligenceAnalyticsPanel } from './FieldIntelligenceAnalyticsPanel';
+import { HazardAnalyticsComparison } from './HazardAnalyticsComparison';
+import { HistoricalComparisonSection } from './HistoricalComparisonSection';
+import { ImpactAnalyticsPanel } from './ImpactAnalyticsPanel';
+import { InfrastructureConditionsPanel } from './InfrastructureConditionsPanel';
+import { LocationDetailPanel } from './LocationDetailPanel';
+import { RegionalSituationTable } from './RegionalSituationTable';
+import { RiskDistributionChart } from './RiskDistributionChart';
+import { SituationAnalyticsHeader } from './SituationAnalyticsHeader';
+import { TrendAnalysisTimeline } from './TrendAnalysisTimeline';
 
 import { useLiveIntelligence } from '@/context/LiveIntelligenceContext';
 

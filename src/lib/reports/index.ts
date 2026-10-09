@@ -4,8 +4,8 @@
  * ⚠️  PROTOTYPE / DEMO SYSTEM
  */
 
-export * from './types';
-export * from './rules';
 export * from './engine';
 export * from './evidence';
+export * from './rules';
 export * from './store';
+export * from './types';

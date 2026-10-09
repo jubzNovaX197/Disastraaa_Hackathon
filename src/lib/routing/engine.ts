@@ -6,18 +6,18 @@
  * adapter without changing UI components.
  */
 
-import type { RouteNode, RouteEdge, RouteMode, RouteRequest, RouteResult, RouteSegment } from './types';
-import { NODE_BY_ID, buildAdjacency, DEMO_EDGES } from './graph';
-import {
-  shortestCost,
-  safestCost,
-  alternativeCost,
-  estimateTravelMinutes,
-  aggregateRouteRisk,
-  segmentRiskSeverity,
-  BASE_SPEED_KMH,
-} from './scoring';
 import type { LngLat } from '@/data/types';
+import { buildAdjacency, DEMO_EDGES, NODE_BY_ID } from './graph';
+import {
+  aggregateRouteRisk,
+  alternativeCost,
+  BASE_SPEED_KMH,
+  estimateTravelMinutes,
+  safestCost,
+  segmentRiskSeverity,
+  shortestCost,
+} from './scoring';
+import type { RouteEdge, RouteMode, RouteNode, RouteRequest, RouteResult, RouteSegment } from './types';
 
 // ── Lazy adjacency (built once) ───────────────────────────────────────────────
 

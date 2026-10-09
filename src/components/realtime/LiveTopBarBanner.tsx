@@ -7,11 +7,11 @@
  * Displays live event ticker, feed status, data freshness, and direct controls.
  */
 
-import { Activity, Bell, ChevronRight, Zap } from 'lucide-react';
-import { useLiveIntelligence } from '@/context/LiveIntelligenceContext';
-import { LiveStatusIndicator } from './LiveStatusIndicator';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
+import { useLiveIntelligence } from '@/context/LiveIntelligenceContext';
 import { cn } from '@/lib/utils';
+import { Zap } from 'lucide-react';
+import { LiveStatusIndicator } from './LiveStatusIndicator';
 
 interface LiveTopBarBannerProps {
   className?: string;

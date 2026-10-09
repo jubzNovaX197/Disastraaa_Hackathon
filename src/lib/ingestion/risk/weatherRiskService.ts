@@ -15,14 +15,14 @@
  * re-computing models on every single HTTP page load.
  */
 
-import type { NormalizedWeather } from '@/lib/weather/types';
-import type { RiskZone, FloodArea, PolygonRing, LngLat } from '@/data/types';
-import { calculateFloodRisk, explainFloodRisk } from '@/lib/risk/flood';
-import { calculateCycloneRisk, explainCycloneRisk } from '@/lib/risk/cyclone';
-import { calculateMultiHazardRisk, explainMultiHazardRisk } from '@/lib/risk/multiHazard';
+import type { FloodArea, LngLat, PolygonRing, RiskZone } from '@/data/types';
 import { executeQuery } from '@/lib/db';
-import { getCachedWeather, getAllCachedWeather } from '@/lib/weather/store';
 import { riverService } from '@/lib/hydrology/riverService';
+import { calculateCycloneRisk, explainCycloneRisk } from '@/lib/risk/cyclone';
+import { calculateFloodRisk, explainFloodRisk } from '@/lib/risk/flood';
+import { calculateMultiHazardRisk, explainMultiHazardRisk } from '@/lib/risk/multiHazard';
+import { getAllCachedWeather } from '@/lib/weather/store';
+import type { NormalizedWeather } from '@/lib/weather/types';
 
 // Cache for derived risk zones (15-minute TTL)
 interface CachedRiskResults {
@@ -159,13 +159,16 @@ export class WeatherRiskService {
       // Hydrology: Query riverService without fabricating water level from rainfall
       let riverLevelMetres = 0; // Default: 0 m above flood stage (normal flow)
       try {
-        const hydro = await riverService.getRiverStatusForDistrict(
-          wx.state || 'Odisha',
-          wx.district || 'Kalahandi',
-          lat,
-          lon,
-        );
-        if (hydro.gauges.length > 0) {
+        const hydro = await Promise.race([
+          riverService.getRiverStatusForDistrict(
+            wx.state || 'Odisha',
+            wx.district || 'Kalahandi',
+            lat,
+            lon,
+          ),
+          new Promise<null>((resolve) => setTimeout(() => resolve(null), 1200)),
+        ]);
+        if (hydro && hydro.gauges.length > 0) {
           const primary = hydro.gauges[0];
           if (primary.dangerLevelMslMeters && primary.waterLevelMslMeters) {
             // Relative to danger level (negative = below flood stage)
@@ -228,8 +231,8 @@ export class WeatherRiskService {
       // Create GIS polygon footprint (12 km radius)
       const buffer = createCircularPolygon([lon, lat], 12);
 
-      // If composite risk score is elevated (> 20), publish a RiskZone
-      if (multiResult.score >= 20) {
+      // Only publish a spatial RiskZone polygon if composite risk is genuinely elevated
+      if (multiResult.score >= 45 && multiResult.severity !== 'LOW') {
         const zone: RiskZone = {
           id: `rz-wx-${wx.id}`,
           name: `${wx.locationName} Weather Risk Basin`,

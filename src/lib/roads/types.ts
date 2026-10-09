@@ -6,8 +6,8 @@
  * Prepares clean architecture for future routing engines (OSRM, GraphHopper).
  */
 
-import type { Severity } from '@/types';
 import type { LngLat } from '@/data/types';
+import type { Severity } from '@/types';
 
 // ── Road Classification ──────────────────────────────────────────────────────
 

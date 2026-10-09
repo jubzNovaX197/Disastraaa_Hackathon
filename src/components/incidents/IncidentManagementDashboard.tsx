@@ -7,29 +7,26 @@
  * KPI row · filter/search bar · incident list · detail panel
  */
 
-import { useState, useCallback, useEffect } from 'react';
-import { Search, Filter, Plus, RefreshCw } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { IncidentKPIRow } from './IncidentKPIRow';
-import { IncidentList }   from './IncidentList';
-import { IncidentDetailPanel } from './IncidentDetailPanel';
 import { AuthorityAccessGate } from '@/components/auth/AuthorityAccessGate';
 import {
+  createIncident,
   getIncidents,
   getKPIs,
-  saveIncident,
-  createIncident,
-  INCIDENT_STATUS_CONFIG,
-  INCIDENT_SEVERITY_CONFIG,
   INCIDENT_TYPE_ICON,
+  saveIncident,
   type Incident,
-  type IncidentStatus,
   type IncidentSeverity,
-  type IncidentType,
+  type IncidentStatus,
+  type IncidentType
 } from '@/lib/incidents';
+import { cn } from '@/lib/utils';
 import type { Role } from '@/types/roles';
-import { ROLES } from '@/types/roles';
-import { rolePermissions } from '@/types/roles';
+import { rolePermissions, ROLES } from '@/types/roles';
+import { Filter, Plus, RefreshCw, Search } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import { IncidentDetailPanel } from './IncidentDetailPanel';
+import { IncidentKPIRow } from './IncidentKPIRow';
+import { IncidentList } from './IncidentList';
 
 const STATUSES:  { value: IncidentStatus | 'ALL'; label: string }[] = [
   { value: 'ALL',         label: 'All' },

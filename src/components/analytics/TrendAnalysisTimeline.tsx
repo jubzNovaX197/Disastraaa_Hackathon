@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
-import { Clock, Info, ShieldAlert, TrendingUp } from 'lucide-react';
+import { DataProvenance } from '@/components/demo/DataProvenance';
 import type { TrendAnalysisPoint } from '@/lib/analytics/types';
 import { cn } from '@/lib/utils';
+import { Clock } from 'lucide-react';
+import { useState } from 'react';
 
 interface TrendAnalysisTimelineProps {
   timeline: TrendAnalysisPoint[];
@@ -15,6 +16,7 @@ export function TrendAnalysisTimeline({ timeline }: TrendAnalysisTimelineProps) 
 
   return (
     <div className="p-4 rounded-xl bg-white dark:bg-surface-card border border-slate-200 dark:border-white/[0.07] shadow-sm space-y-4">
+      <DataProvenance model />
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-2 border-b border-slate-100 dark:border-white/[0.06]">
         <div>
           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-2">

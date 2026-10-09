@@ -4,8 +4,8 @@
  * ⚠️  PROTOTYPE / DEMO DECISION SUPPORT
  */
 
-import type { RoadStatus, RoadBlockageType, RoadType } from './types';
 import type { Severity } from '@/types';
+import type { RoadBlockageType, RoadStatus, RoadType } from './types';
 
 // ── Road Status Visual & Public Guidance Configuration ───────────────────────
 

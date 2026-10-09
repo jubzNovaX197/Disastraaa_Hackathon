@@ -1,6 +1,6 @@
-import type { Metadata } from 'next';
-import { resolveActiveRole } from '@/lib/auth/resolveRole';
 import { GovernanceDashboard } from '@/components/governance/GovernanceDashboard';
+import { resolveActiveRole } from '@/lib/auth/resolveRole';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Platform Governance & Security Center',

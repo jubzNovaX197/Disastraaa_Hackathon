@@ -13,32 +13,27 @@
  * - Manual refresh with duplicate-request debouncing
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-import {
-  Sparkles,
-  Bot,
-  RefreshCw,
-  AlertTriangle,
-  ShieldAlert,
-  Waves,
-  Wind,
-  CheckCircle2,
-  Clock,
-  HelpCircle,
-  ExternalLink,
-  ChevronDown,
-  ChevronUp,
-  Radio,
-  FileCheck2,
-  Info,
-} from 'lucide-react';
-import { Card, CardTitle, Badge } from '@/components/ui';
+import { DataProvenance } from '@/components/demo/DataProvenance';
+import { Card, CardTitle } from '@/components/ui';
 import type {
   DisasterIntelligenceSummary,
-  DecisionSupportRecommendation,
-  RecommendationPriority,
+  RecommendationPriority
 } from '@/lib/intelligence/types';
 import { cn } from '@/lib/utils';
+import {
+  AlertTriangle,
+  Bot,
+  CheckCircle2,
+  ChevronDown,
+  ChevronUp,
+  FileCheck2,
+  Info,
+  Radio,
+  RefreshCw,
+  ShieldAlert,
+  Sparkles
+} from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface DisasterIntelligenceSectionProps {
   selectedDistrict?: string;
@@ -143,6 +138,7 @@ export function DisasterIntelligenceSection({
 
   return (
     <Card className={cn('bg-surface-card/95 border-white/[0.08] shadow-xl overflow-hidden', className)}>
+      <DataProvenance />
       <div className="p-4 sm:p-5 space-y-4">
         {/* ── HEADER ── */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/[0.06] pb-4">

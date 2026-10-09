@@ -11,15 +11,15 @@
  *  - Extensible: accepts any HazardContribution entries.
  */
 
-import type { HazardType, Severity } from '@/types';
-import type { FloodRiskExplanation } from '@/lib/risk/flood';
 import type { CycloneRiskExplanation } from '@/lib/risk/cyclone';
-import { MULTI_HAZARD_WEIGHTS } from './weights';
+import type { FloodRiskExplanation } from '@/lib/risk/flood';
+import type { HazardType, Severity } from '@/types';
 import type {
+  DataQuality,
   HazardContribution,
   MultiHazardRiskResult,
-  DataQuality,
 } from './types';
+import { MULTI_HAZARD_WEIGHTS } from './weights';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 

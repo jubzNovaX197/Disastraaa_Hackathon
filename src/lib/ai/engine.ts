@@ -5,10 +5,10 @@
  * User Question → Intent Detection → Relevant Disaster Data → Structured Analysis → AI Explanation → Sources
  */
 
-import { detectAssistantIntent } from './intent';
 import { buildGroundedContext } from './context';
-import { GeminiProvider } from './providers/gemini-provider';
+import { detectAssistantIntent } from './intent';
 import { DeterministicProvider } from './providers/deterministic-provider';
+import { GeminiProvider } from './providers/gemini-provider';
 import type { AssistantQueryRequest, AssistantResponsePayload } from './types';
 
 export class AssistantEngine {

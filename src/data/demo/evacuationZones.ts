@@ -8,8 +8,9 @@
  * Reuses existing shelter, road, and alert identifiers from the platform dataset.
  */
 
-import type { EvacuationZone } from '@/lib/evacuation/types';
+import { DEMO_REFERENCE_EPOCH } from './clock';
 import { computeShelterPressure } from '@/lib/evacuation/engine';
+import type { EvacuationZone } from '@/lib/evacuation/types';
 
 export const demoEvacuationZones: EvacuationZone[] = [
   // ── 1. Puri Coastal Belt — Priority 1, EVACUATION ACTIVE ──────────────────
@@ -88,8 +89,8 @@ export const demoEvacuationZones: EvacuationZone[] = [
     relatedIncidentId: 'inc-cyclone-puri',
     resourceNote:      '8 ODRAF rescue teams, 14 emergency vehicles, 18 rescue boats deployed. 6 medical units on site.',
     source:            'SIMULATED',
-    createdAt:         new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-    updatedAt:         new Date(Date.now() - 12 * 60 * 1000).toISOString(),
+    createdAt:         new Date(DEMO_REFERENCE_EPOCH - 5 * 60 * 60 * 1000).toISOString(),
+    updatedAt:         new Date(DEMO_REFERENCE_EPOCH - 12 * 60 * 1000).toISOString(),
   },
 
   // ── 2. Mahanadi Delta — Priority 1, EVACUATION ACTIVE ────────────────────
@@ -168,8 +169,8 @@ export const demoEvacuationZones: EvacuationZone[] = [
     resourceNote:
       '12 NDRF rescue boats, 22 emergency vehicles, 10 medical teams. High-clearance convoy escort active on expressway.',
     source:    'SIMULATED',
-    createdAt: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 8 * 60 * 1000).toISOString(),
+    createdAt: new Date(DEMO_REFERENCE_EPOCH - 8 * 60 * 60 * 1000).toISOString(),
+    updatedAt: new Date(DEMO_REFERENCE_EPOCH - 8 * 60 * 1000).toISOString(),
   },
 
   // ── 3. Kendrapara — Priority 2, EVACUATION ADVISED ───────────────────────
@@ -234,8 +235,8 @@ export const demoEvacuationZones: EvacuationZone[] = [
     activeAlertIds: ['al-flood-kendrapara'],
     resourceNote:   '6 NDRF boats, 8 emergency vehicles, 4 medical teams. Boat corridor active for cut-off villages.',
     source:         'SIMULATED',
-    createdAt:      new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
-    updatedAt:      new Date(Date.now() - 25 * 60 * 1000).toISOString(),
+    createdAt:      new Date(DEMO_REFERENCE_EPOCH - 3 * 60 * 60 * 1000).toISOString(),
+    updatedAt:      new Date(DEMO_REFERENCE_EPOCH - 25 * 60 * 1000).toISOString(),
   },
 
   // ── 4. Visakhapatnam Hills — Priority 3, PREPARE ─────────────────────────
@@ -300,8 +301,8 @@ export const demoEvacuationZones: EvacuationZone[] = [
     activeAlertIds: ['al-landslide-ghats'],
     resourceNote:   '4 rescue teams, 6 emergency vehicles on standby. JCB units clearing debris on Araku road.',
     source:         'PREDICTED',
-    createdAt:      new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-    updatedAt:      new Date(Date.now() - 40 * 60 * 1000).toISOString(),
+    createdAt:      new Date(DEMO_REFERENCE_EPOCH - 2 * 60 * 60 * 1000).toISOString(),
+    updatedAt:      new Date(DEMO_REFERENCE_EPOCH - 40 * 60 * 1000).toISOString(),
   },
 
   // ── 5. Chilika South — Priority 4, MONITORING ────────────────────────────
@@ -355,7 +356,7 @@ export const demoEvacuationZones: EvacuationZone[] = [
     activeAlertIds: [],
     resourceNote:   'Monitoring teams on ground. No resource deployment yet.',
     source:         'PREDICTED',
-    createdAt:      new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
-    updatedAt:      new Date(Date.now() - 60 * 60 * 1000).toISOString(),
+    createdAt:      new Date(DEMO_REFERENCE_EPOCH - 1 * 60 * 60 * 1000).toISOString(),
+    updatedAt:      new Date(DEMO_REFERENCE_EPOCH - 60 * 60 * 1000).toISOString(),
   },
 ];

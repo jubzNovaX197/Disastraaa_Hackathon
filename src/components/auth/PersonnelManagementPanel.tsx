@@ -17,27 +17,27 @@
  * server-side.
  */
 
-import { useState, useEffect, type FormEvent } from 'react';
-import {
-  UserPlus,
-  ShieldCheck,
-  Mail,
-  Building,
-  MapPin,
-  Clock,
-  CheckCircle2,
-  AlertCircle,
-  Copy,
-  Check,
-  RefreshCw,
-  Loader2,
-  X,
-  Users,
-} from 'lucide-react';
-import { ROLES, type Role } from '@/types/roles';
-import { getInvitableRoles, getScopeConstraint, type ScopeConstraint } from '@/lib/auth/inviteMatrix';
 import type { AuthorityInvitation, RegistrableAuthorityType } from '@/lib/auth/authorityRegistry';
+import { getInvitableRoles, getScopeConstraint, type ScopeConstraint } from '@/lib/auth/inviteMatrix';
 import { cn } from '@/lib/utils';
+import { ROLES, type Role } from '@/types/roles';
+import {
+  AlertCircle,
+  Building,
+  Check,
+  CheckCircle2,
+  Clock,
+  Copy,
+  Loader2,
+  Mail,
+  MapPin,
+  RefreshCw,
+  ShieldCheck,
+  UserPlus,
+  Users,
+  X,
+} from 'lucide-react';
+import { useEffect, useState, type FormEvent } from 'react';
 
 interface CurrentUser {
   uid: string;

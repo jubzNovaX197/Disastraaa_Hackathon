@@ -9,8 +9,8 @@
  * Keyed by RiskZone id — same key space as demoFloodRiskInputs.
  */
 
-import { calculateFloodRisk, explainFloodRisk } from '@/lib/risk/flood';
 import type { FloodRiskExplanation } from '@/lib/risk/flood';
+import { calculateFloodRisk, explainFloodRisk } from '@/lib/risk/flood';
 import { demoFloodRiskInputs } from './floodRiskInputs';
 
 export const computedFloodRisks: Record<string, FloodRiskExplanation> =

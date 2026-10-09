@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { demoRoadSegments } from '@/data/demo';
 import { resolveServerEnvironment } from '@/lib/env';
+import type { BoundingBox } from '@/lib/geo/osm/types';
 import { getRoadProvider, getShelterProvider } from '@/lib/providers';
 import { osmRoadStore } from '@/lib/roads/osmStore';
 import { buildGraphFromRoadSegments } from '@/lib/routing';
-import { demoRoadSegments } from '@/data/demo';
 import { DEMO_NODES } from '@/lib/routing/graph';
-import type { BoundingBox } from '@/lib/geo/osm/types';
+import { NextRequest, NextResponse } from 'next/server';
 
 /**
  * GET /api/roads

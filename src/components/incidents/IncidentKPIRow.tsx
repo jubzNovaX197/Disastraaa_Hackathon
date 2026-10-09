@@ -1,7 +1,7 @@
 'use client';
 
-import { Activity, UserX, TrendingUp, CheckCircle2, Bell } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Activity, Bell, CheckCircle2, TrendingUp, UserX } from 'lucide-react';
 
 interface KPICardProps {
   label:    string;

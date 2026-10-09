@@ -17,14 +17,25 @@
  * mount. The user can skip it and registration still proceeds.
  */
 
-import { useEffect, useState, type FormEvent } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import {
-  Loader2, Mail, Lock, User, Phone, MapPin, Home as HomeIcon,
-  ArrowRight, AlertTriangle, Eye, EyeOff, KeyRound, MailCheck,
-  LocateFixed, CheckCircle2,
-} from 'lucide-react';
 import { cn } from '@/lib/utils';
+import {
+  AlertTriangle,
+  ArrowRight,
+  CheckCircle2,
+  Eye, EyeOff,
+  Home as HomeIcon,
+  KeyRound,
+  Loader2,
+  LocateFixed,
+  Lock,
+  Mail,
+  MailCheck,
+  MapPin,
+  Phone,
+  User,
+} from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState, type FormEvent } from 'react';
 
 const RESEND_COOLDOWN_SECONDS = 60;
 

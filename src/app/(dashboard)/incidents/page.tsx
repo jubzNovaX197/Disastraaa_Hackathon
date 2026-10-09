@@ -1,7 +1,7 @@
-import type { Metadata } from 'next';
+import { IncidentManagementDashboard } from '@/components/incidents/IncidentManagementDashboard';
 import { resolveActiveRole } from '@/lib/auth/resolveRole';
 import { resolveServerEnvironment } from '@/lib/env';
-import { IncidentManagementDashboard } from '@/components/incidents/IncidentManagementDashboard';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Incident Management | Disastraaa',

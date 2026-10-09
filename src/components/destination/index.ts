@@ -3,6 +3,6 @@
  */
 
 export * from './DestinationSafetyPanel';
+export * from './DestinationTimeline';
 export * from './TimeScenarioPicker';
 export * from './TravelRiskCard';
-export * from './DestinationTimeline';

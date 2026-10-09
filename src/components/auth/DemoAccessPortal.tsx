@@ -8,34 +8,32 @@
  * immediately navigate to their role-specific dashboard.
  */
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import {
-  ShieldAlert,
-  Globe2,
-  Building2,
-  MapPin,
-  Truck,
-  Eye,
-  CheckCircle2,
-  ArrowRight,
-  Shield,
-  User,
-  Sparkles,
-  Lock,
-  ExternalLink,
-  ChevronRight,
-} from 'lucide-react';
-import { ROLES, type Role } from '@/types/roles';
-import {
-  ROLE_COOKIE_NAME,
   DEMO_ROLES_CONFIG,
-  parseRoleFromCookie,
   getDemoUserContext,
+  parseRoleFromCookie,
+  ROLE_COOKIE_NAME,
   type DemoRoleDefinition,
 } from '@/lib/auth/roles';
 import { cn } from '@/lib/utils';
+import { ROLES, type Role } from '@/types/roles';
+import {
+  ArrowRight,
+  Building2,
+  CheckCircle2,
+  ChevronRight,
+  Eye,
+  Globe2,
+  MapPin,
+  Shield,
+  ShieldAlert,
+  Sparkles,
+  Truck,
+  User
+} from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 const ICON_MAP: Record<string, React.ElementType> = {
   ShieldAlert,
@@ -93,6 +91,9 @@ export function DemoAccessPortal({ initialRole }: DemoAccessPortalProps) {
       <div className="absolute bottom-10 left-1/3 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
       <div className="max-w-6xl mx-auto relative z-10 space-y-10">
+        <aside className="p-4 rounded-xl border border-amber-400/30 bg-amber-400/10 text-sm text-amber-200">
+          <strong>Fictional personas · Role simulation.</strong> All officer names, appointments, contact details and operational actions in this demo are invented. NDMA, OSDMA and Puri DEOC are real agency names used only to illustrate workflows; no affiliation or endorsement is implied. Selecting a persona is not authentication and grants no authority over real operations.
+        </aside>
         {/* Top Breadcrumb & Return to Map */}
         <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-b border-white/[0.06] pb-4">
           <div className="flex items-center gap-2 text-xs text-slate-400">

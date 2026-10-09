@@ -1,18 +1,17 @@
 'use client';
 
+import type { AnalyticsOverviewKpis } from '@/lib/analytics/types';
+import { cn, formatNumber } from '@/lib/utils';
 import {
-  Flame,
   AlertTriangle,
-  Users,
   Bell,
   CheckCircle2,
-  NavigationOff,
+  Flame,
   Home,
+  NavigationOff,
   PackageX,
+  Users,
 } from 'lucide-react';
-import type { AnalyticsOverviewKpis } from '@/lib/analytics/types';
-import { formatNumber } from '@/lib/utils';
-import { cn } from '@/lib/utils';
 
 interface AnalyticsOverviewKpiRowProps {
   kpis: AnalyticsOverviewKpis;

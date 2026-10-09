@@ -1,8 +1,8 @@
-import { NextResponse } from 'next/server';
-import { findUserByEmail } from '@/lib/auth/users';
+import { CITIZEN_OTP_TTL_MINUTES, createPendingCitizenAccount } from '@/lib/auth/citizenVerification';
 import { hashPassword } from '@/lib/auth/password';
-import { createPendingCitizenAccount, CITIZEN_OTP_TTL_MINUTES } from '@/lib/auth/citizenVerification';
+import { findUserByEmail } from '@/lib/auth/users';
 import { sendCitizenVerificationEmail } from '@/lib/email/sendVerificationEmail';
+import { NextResponse } from 'next/server';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 

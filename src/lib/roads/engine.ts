@@ -5,15 +5,15 @@
  * Correlates citizen reports, authority verifications, and hazard risk without external routing APIs.
  */
 
+import type { LngLat } from '@/data/types';
+import type { CitizenReportItem } from '@/lib/reports/types';
+import { getRoadRiskSeverity, ROAD_STATUS_CONFIG } from './rules';
 import type {
+  RoadAuthorityVerification,
   RoadSegment,
   RoadStatus,
   RoadTravelRisk,
-  RoadAuthorityVerification,
 } from './types';
-import { getRoadRiskSeverity, ROAD_STATUS_CONFIG } from './rules';
-import type { CitizenReportItem } from '@/lib/reports/types';
-import type { LngLat } from '@/data/types';
 
 // ── Great-Circle Distance (Haversine Formula) ────────────────────────────────
 
@@ -229,7 +229,7 @@ export function applyAuthorityRoadAction(
 ): RoadSegment {
   const reviewedAt = new Date().toISOString();
   let updatedStatus: RoadStatus = road.status;
-  let updatedVerification: RoadAuthorityVerification = {
+  const updatedVerification: RoadAuthorityVerification = {
     isVerified: true,
     reviewedBy: reviewer.name,
     reviewedAt,

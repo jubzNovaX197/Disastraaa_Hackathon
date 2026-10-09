@@ -8,7 +8,7 @@
  */
 
 import { executeQuery, getDbClient } from '@/lib/db';
-import type { IngestionJobRun, DatasetManifest, TelemetryDailyAggregate } from './types';
+import type { DatasetManifest, IngestionJobRun, TelemetryDailyAggregate } from './types';
 
 /**
  * Initializes Stage 6 tables non-destructively in Neon PostgreSQL.

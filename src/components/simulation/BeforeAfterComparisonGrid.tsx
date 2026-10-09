@@ -1,19 +1,17 @@
 'use client';
 
+import { DataProvenance } from '@/components/demo/DataProvenance';
+import type { SimulationResult } from '@/lib/simulation/types';
+import { formatNumber } from '@/lib/utils';
 import {
   Activity,
-  Users,
+  ArrowUpRight,
   Building2,
   Car,
   Home,
   Package,
-  TrendingUp,
-  ArrowUpRight,
-  ArrowDownRight,
+  Users
 } from 'lucide-react';
-import type { SimulationResult } from '@/lib/simulation/types';
-import { formatNumber } from '@/lib/utils';
-import { cn } from '@/lib/utils';
 
 interface BeforeAfterComparisonGridProps {
   result: SimulationResult;
@@ -87,6 +85,7 @@ export function BeforeAfterComparisonGrid({ result }: BeforeAfterComparisonGridP
 
   return (
     <div className="p-4 rounded-xl bg-white dark:bg-surface-card border border-slate-200 dark:border-white/[0.07] shadow-sm space-y-3">
+      <DataProvenance model source="Simulated" />
       <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-white/[0.06]">
         <div>
           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">

@@ -15,18 +15,17 @@
  * Components, so one implementation covers all three without extra
  * dependencies or runtime configuration.
  *
- * Prototype-grade secret management: AUTH_SECRET should be set via
- * environment variable in any real deployment. The fallback below is only
- * for local/demo use.
+ * AUTH_SECRET is required for account authentication in every environment.
+ * Missing or short keys fail closed; demo personas do not use this signer.
  */
 
 import type { Role } from '@/types/roles';
+import { isKnownRole } from './accessPolicy';
 
 export const SESSION_COOKIE_NAME = 'disastraaa-session';
 export const AUTH_MARKER_COOKIE_NAME = 'disastraaa-logged-in';
 export const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 7; // 7 days
 
-const AUTH_SECRET = process.env.AUTH_SECRET || 'disastraaa-dev-secret-change-in-production';
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 
@@ -61,9 +60,11 @@ function fromBase64Url(str: string): Uint8Array {
 }
 
 async function getKey(): Promise<CryptoKey> {
+  const secret = process.env.AUTH_SECRET || process.env.SESSION_SECRET || (process.env.NODE_ENV !== 'production' ? 'disastraaa-dev-auth-secret-key-32-chars-long-2026' : undefined);
+  if (!secret || secret.length < 32) throw new Error('AUTH_SECRET must contain at least 32 characters to enable account authentication.');
   return crypto.subtle.importKey(
     'raw',
-    encoder.encode(AUTH_SECRET),
+    encoder.encode(secret),
     { name: 'HMAC', hash: 'SHA-256' },
     false,
     ['sign', 'verify'],
@@ -109,6 +110,7 @@ export async function verifySessionToken(
     if (!valid) return null;
 
     const payload = JSON.parse(decoder.decode(fromBase64Url(payloadStr))) as SessionPayload;
+    if (!payload || !isKnownRole(payload.role) || typeof payload.uid !== 'string') return null;
     if (typeof payload.exp !== 'number' || payload.exp * 1000 < Date.now()) return null;
 
     return payload;

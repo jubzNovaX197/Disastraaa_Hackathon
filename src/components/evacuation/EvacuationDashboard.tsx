@@ -1,20 +1,33 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import {
-  Shield, Users, Home, Route, AlertTriangle,
-  ChevronRight, ChevronDown, CheckCircle2,
-  MapPin, Clock, Zap, TrendingUp, Building2,
-  ArrowRight, Bus, Stethoscope, Wifi, WifiOff,
-} from 'lucide-react';
-import { cn, severityConfig, formatNumber } from '@/lib/utils';
 import { Badge } from '@/components/ui/Badge';
+import type { EvacuationZone, RouteStatus, ShelterPressure } from '@/lib/evacuation';
 import {
-  summariseEvacuation,
-  sortZonesByPriority,
   remainingEvacuees,
+  sortZonesByPriority,
+  summariseEvacuation,
 } from '@/lib/evacuation';
-import type { EvacuationZone, ShelterPressure, RouteStatus } from '@/lib/evacuation';
+import { cn, formatNumber, severityConfig } from '@/lib/utils';
+import {
+  AlertTriangle,
+  ArrowRight,
+  Building2,
+  Bus,
+  CheckCircle2,
+  ChevronDown,
+  ChevronRight,
+  Clock,
+  Home,
+  MapPin,
+  Route,
+  Shield,
+  Stethoscope,
+  TrendingUp,
+  Users,
+  Wifi, WifiOff,
+  Zap,
+} from 'lucide-react';
+import { useMemo, useState } from 'react';
 
 // ── Sub-component helpers ─────────────────────────────────────────────────────
 

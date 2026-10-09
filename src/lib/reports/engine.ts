@@ -8,8 +8,14 @@
  * "Preliminary Automated Analysis" — clearly labeled as non-AI decision support.
  */
 
-import type { HazardType, Severity, ReportStatus } from '@/types';
-import type { DisasterDataset, LngLat, RiskZone, DemoAlert, Shelter, BlockedRoad } from '@/data/types';
+import type { BlockedRoad, DemoAlert, DisasterDataset, LngLat, RiskZone, Shelter } from '@/data/types';
+import type { HazardType, ReportStatus, Severity } from '@/types';
+import { assessPreliminaryEvidence } from './evidence';
+import {
+  canTransitionStatus,
+  REPORT_TO_HAZARD_MAP,
+  WORKFLOW_CONSTANTS,
+} from './rules';
 import type {
   CitizenReportItem,
   CreateReportInput,
@@ -19,12 +25,6 @@ import type {
   ReportEvidence,
   ReportType,
 } from './types';
-import { assessPreliminaryEvidence } from './evidence';
-import {
-  canTransitionStatus,
-  REPORT_TO_HAZARD_MAP,
-  WORKFLOW_CONSTANTS,
-} from './rules';
 
 // ── Geographic Helpers ────────────────────────────────────────────────────────
 

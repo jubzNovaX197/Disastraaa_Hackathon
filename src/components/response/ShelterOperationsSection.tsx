@@ -1,9 +1,10 @@
 'use client';
 
-import { Home, Users, AlertCircle, CheckCircle2, ShieldCheck, HeartPulse, Utensils } from 'lucide-react';
-import { Card, CardHeader, CardTitle, Badge } from '@/components/ui';
-import { formatNumber, cn } from '@/lib/utils';
+import { DataProvenance } from '@/components/demo/DataProvenance';
+import { Badge, Card, CardTitle } from '@/components/ui';
 import type { ShelterOperationsData } from '@/lib/response/types';
+import { cn, formatNumber } from '@/lib/utils';
+import { Home } from 'lucide-react';
 
 interface ShelterOperationsSectionProps {
   shelterData: ShelterOperationsData;
@@ -22,6 +23,7 @@ export function ShelterOperationsSection({ shelterData }: ShelterOperationsSecti
 
   return (
     <Card className="bg-surface-card/95 border-white/[0.08] shadow-lg">
+      <DataProvenance />
       <div className="p-4 border-b border-white/[0.06] flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-2">
           <span className="p-1.5 rounded-lg bg-purple-500/15 text-purple-400">

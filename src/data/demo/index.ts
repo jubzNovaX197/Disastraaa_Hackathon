@@ -7,15 +7,16 @@
  * without changing any map or UI component.
  */
 
-import { demoRiskZones }      from './riskZones';
-import { demoFloodAreas }     from './floodAreas';
-import { demoShelters }       from './shelters';
-import { demoAlerts }         from './alerts';
-import { demoInfrastructure } from './infrastructure';
-import { demoBlockedRoads }   from './blockedRoads';
-import { demoCitizenReports } from './citizenReports';
-import { demoRoadSegments }   from './roads';
+import { DEMO_REFERENCE_TIME } from './clock';
 import type { DisasterDataset } from '@/data/types';
+import { demoAlerts } from './alerts';
+import { demoBlockedRoads } from './blockedRoads';
+import { demoCitizenReports } from './citizenReports';
+import { demoFloodAreas } from './floodAreas';
+import { demoInfrastructure } from './infrastructure';
+import { demoRiskZones } from './riskZones';
+import { demoRoadSegments } from './roads';
+import { demoShelters } from './shelters';
 
 export const demoDataset: DisasterDataset = {
   riskZones:      demoRiskZones,
@@ -26,27 +27,21 @@ export const demoDataset: DisasterDataset = {
   blockedRoads:   demoBlockedRoads,
   citizenReports: demoCitizenReports,
   roads:          demoRoadSegments,
-  lastRefreshed:  new Date().toISOString(),
+  lastRefreshed:  DEMO_REFERENCE_TIME,
 };
 
 // Re-export individual collections for components that only need one type
 export {
-  demoRiskZones,
-  demoFloodAreas,
-  demoShelters,
-  demoAlerts,
-  demoInfrastructure,
-  demoBlockedRoads,
-  demoCitizenReports,
-  demoRoadSegments,
+  demoAlerts, demoBlockedRoads,
+  demoCitizenReports, demoFloodAreas, demoInfrastructure, demoRiskZones, demoRoadSegments, demoShelters
 };
 
-export type { DisasterDataset };
+  export type { DisasterDataset };
 
 // Cyclone-specific exports
-export { demoCycloneZones, demoCycloneTrack } from './cycloneZones';
-export { demoCycloneRiskInputs } from './cycloneRiskInputs';
-export { computedCycloneRisks } from './computedCycloneRisks';
+  export { computedCycloneRisks } from './computedCycloneRisks';
+  export { demoCycloneRiskInputs } from './cycloneRiskInputs';
+  export { demoCycloneTrack, demoCycloneZones } from './cycloneZones';
 
 // Flood risk computed results
 export { computedFloodRisks } from './computedFloodRisks';

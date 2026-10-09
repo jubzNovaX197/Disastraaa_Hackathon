@@ -1,10 +1,9 @@
 'use client';
 
-import { useState } from 'react';
-import { Clock, TrendingUp, Users, Home, Car, AlertTriangle } from 'lucide-react';
 import type { SimulatedTimelineStep } from '@/lib/simulation/types';
-import { formatNumber } from '@/lib/utils';
-import { cn } from '@/lib/utils';
+import { cn, formatNumber } from '@/lib/utils';
+import { Clock } from 'lucide-react';
+import { useState } from 'react';
 
 interface SimulationTimelineStepperProps {
   timeline: SimulatedTimelineStep[];

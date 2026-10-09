@@ -14,38 +14,42 @@
  * Dark + light mode via Tailwind tokens.
  */
 
-import { useState, useMemo, useCallback, useEffect } from 'react';
-import {
-  Compass,
-  FileText,
-  Globe,
-  Loader2,
-  MapPin,
-  Radio,
-  RefreshCw,
-  Shield,
-  ShieldAlert,
-  Sparkles,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { DEMO_NODES, calculateRoutes, buildGraphFromRoadSegments, type RoutingGraph } from '@/lib/routing';
-import type { RouteResult, RouteNode, RouteComparison } from '@/lib/routing/types';
-import type { RoadSegment } from '@/lib/roads/types';
+import { DataProvenance } from '@/components/demo/DataProvenance';
+import { DestinationSafetyPanel } from '@/components/destination/DestinationSafetyPanel';
+import { TimeScenarioPicker } from '@/components/destination/TimeScenarioPicker';
+import { TravelRiskCard } from '@/components/destination/TravelRiskCard';
+import { JourneyRiskPanel } from '@/components/journey';
 import type { LngLat } from '@/data/types';
 import { calculateDestinationSafety } from '@/lib/destination/engine';
+import { demoScenarioProvider } from '@/lib/destination/scenarios';
 import { calculateTravelRisk } from '@/lib/destination/travelEngine';
-import { DEMO_SCENARIOS, demoScenarioProvider } from '@/lib/destination/scenarios';
 import type {
   DestinationSafetyResult,
   DestinationSafetyStatus,
-  ScenarioSlotKey,
-  TravelRiskResult,
+  ScenarioSlotKey
 } from '@/lib/destination/types';
-import { TimeScenarioPicker } from '@/components/destination/TimeScenarioPicker';
-import { TravelRiskCard } from '@/components/destination/TravelRiskCard';
-import { DestinationSafetyPanel } from '@/components/destination/DestinationSafetyPanel';
 import { calculateJourneyRisk, type JourneyRiskResult } from '@/lib/risk/journey';
-import { JourneyRiskPanel } from '@/components/journey';
+import type { RoadSegment } from '@/lib/roads/types';
+import { DEMO_NODES, buildGraphFromRoadSegments, calculateRoutes, type RoutingGraph } from '@/lib/routing';
+import { DEMO_EDGES, NODE_BY_ID } from '@/lib/routing/graph';
+import type { RouteNode, RouteResult } from '@/lib/routing/types';
+import { cn } from '@/lib/utils';
+import {
+  ArrowUpDown,
+  Compass,
+  Globe,
+  Loader2,
+  Navigation,
+  RefreshCw,
+  Search,
+  Shield,
+  Sparkles,
+  X,
+} from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { haversineDistanceKm } from '@/lib/geo/osm/validation';
+import { useGeolocation, isValidCoordinates } from '@/hooks/useGeolocation';
+import { RoutePreviewMap } from './RoutePreviewMap';
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -288,6 +292,7 @@ function RouteDetailPanel({ result }: { result: RouteResult }) {
 // ── Main component ────────────────────────────────────────────────────────────
 
 export interface RoutePlannerProps {
+  autoCalculate?: boolean;
   /** Callback when a route is selected — passes map coordinates for display */
   onRouteSelected?: (coords: LngLat[], mode: RouteResult['mode']) => void;
   onRouteClear?: () => void;
@@ -320,12 +325,18 @@ export function RoutePlanner({
   initialOriginId = '',
   showFullDestinationPanel = true,
   environment: environmentProp,
+  autoCalculate = false,
 }: RoutePlannerProps) {
-  const { environment: contextEnv, switchEnvironment } = useLiveIntelligence();
+  const { environment: contextEnv, switchEnvironment, overrides } = useLiveIntelligence();
   const environment = environmentProp ?? contextEnv ?? 'REAL';
   const [originId, setOriginId] = useState<string>(initialOriginId);
   const [destinationId, setDestinationId] = useState<string>(initialDestinationId);
-  const [calculated, setCalculated] = useState(false);
+  const [originQuery, setOriginQuery] = useState<string>('');
+  const [destQuery, setDestQuery] = useState<string>('');
+  const [originCustomLabel, setOriginCustomLabel] = useState<string | null>(null);
+  const [isLocatingOrigin, setIsLocatingOrigin] = useState<boolean>(false);
+  const [locationNotice, setLocationNotice] = useState<string | null>(null);
+  const [calculated, setCalculated] = useState(autoCalculate);
   const [activeMode, setActiveMode] = useState<RouteResult['mode']>('SAFEST');
   const [activeSlotKey, setActiveSlotKey] = useState<ScenarioSlotKey>('NOW');
   const [customDate, setCustomDate] = useState<string>('');
@@ -333,28 +344,35 @@ export function RoutePlanner({
   const [activeTab, setActiveTab] = useState<'JOURNEY' | 'ROUTES' | 'DESTINATION' | 'TRANSIT_RISK'>('JOURNEY');
   const [error, setError] = useState<string>('');
 
+  const { requestLocation } = useGeolocation();
+
   // Real OSM Graph state
   const [realRoads, setRealRoads] = useState<RoadSegment[]>([]);
   const [realGraph, setRealGraph] = useState<RoutingGraph | null>(null);
   const [isLoadingReal, setIsLoadingReal] = useState<boolean>(false);
   const [realLoadError, setRealLoadError] = useState<string | null>(null);
 
-  // Fetch real OSM roads and build operational routing graph when in REAL mode
+  // Fetch real OSM roads AND shelters to build connected operational routing graph
   useEffect(() => {
     if (environment !== 'REAL') return;
     let isMounted = true;
     setIsLoadingReal(true);
-    fetch('/api/roads?env=REAL')
-      .then((res) => res.json())
-      .then((data) => {
+
+    Promise.all([
+      fetch('/api/roads?env=REAL').then((res) => res.json()),
+      fetch('/api/shelters?env=REAL').then((res) => res.json()).catch(() => ({ shelters: [] })),
+    ])
+      .then(([roadsData, sheltersData]) => {
         if (!isMounted) return;
-        if (data.success && Array.isArray(data.roads) && data.roads.length > 0) {
-          setRealRoads(data.roads);
-          const g = buildGraphFromRoadSegments(data.roads);
+        const roads = roadsData.success && Array.isArray(roadsData.roads) ? roadsData.roads : [];
+        const shelters = sheltersData.success && Array.isArray(sheltersData.shelters) ? sheltersData.shelters : [];
+        if (roads.length > 0) {
+          setRealRoads(roads);
+          const g = buildGraphFromRoadSegments(roads, shelters);
           setRealGraph(g);
           setRealLoadError(null);
         } else {
-          setRealLoadError(data.error || 'No operational road segments returned.');
+          setRealLoadError(roadsData.error || 'No operational road segments returned.');
         }
       })
       .catch((err) => {
@@ -396,13 +414,40 @@ export function RoutePlanner({
     if (environment === 'REAL') {
       return realGraph ?? undefined;
     }
-    return undefined; // DEMO graph fallback
+    const roads = new Map(overrides.roads.map(road => [road.id, road]));
+    return {
+      nodes: DEMO_NODES, nodeById: NODE_BY_ID,
+      edges: DEMO_EDGES.map(edge => {
+        const road = edge.roadSegmentId ? roads.get(edge.roadSegmentId) : undefined;
+        return road ? { ...edge, status: road.status, riskScore: road.travelRisk.score } : edge;
+      }),
+    };
+  }, [environment, realGraph, overrides.roads]);
+
+  // IDs belong to their graph; never carry demo IDs into live routing.
+  useEffect(() => {
+    setOriginId(environment === 'DEMO' ? initialOriginId : '');
+    setDestinationId(environment === 'DEMO' ? initialDestinationId : '');
+    setCalculated(environment === 'DEMO' && autoCalculate);
+  }, [environment, initialOriginId, initialDestinationId, autoCalculate]);
+
+  const nodeOptions = useMemo(() => {
+    if (environment === 'REAL') {
+      if (!realGraph || realGraph.nodes.length === 0) return [];
+      return realGraph.nodes;
+    }
+    return DEMO_NODES.filter((n) => n.type !== 'JUNCTION');
   }, [environment, realGraph]);
+
+  const originNode = useMemo(() => {
+    if (!originId) return null;
+    return effectiveGraph?.nodeById?.[originId] ?? nodeOptions.find((n) => n.id === originId) ?? null;
+  }, [originId, effectiveGraph, nodeOptions]);
 
   const destNode = useMemo(() => {
     if (!destinationId) return null;
-    return effectiveGraph?.nodeById?.[destinationId];
-  }, [destinationId, effectiveGraph]);
+    return effectiveGraph?.nodeById?.[destinationId] ?? nodeOptions.find((n) => n.id === destinationId) ?? null;
+  }, [destinationId, effectiveGraph, nodeOptions]);
 
   // 1. Calculate Destination Safety whenever destinationId or scenario changes
   const destinationSafety = useMemo(() => {
@@ -469,10 +514,68 @@ export function RoutePlanner({
     return activeTab;
   }, [activeTab, calculated, results, destinationSafety, travelRisk]);
 
+
+
+  const handleUseMyLocationForOrigin = useCallback(async () => {
+    setLocationNotice(null);
+    setIsLocatingOrigin(true);
+    try {
+      const coords = await requestLocation();
+      if (!coords || !isValidCoordinates(coords)) {
+        setLocationNotice('Device location unavailable or permission denied.');
+        return;
+      }
+
+      if (nodeOptions.length === 0) {
+        setLocationNotice('No road nodes currently loaded in network.');
+        return;
+      }
+
+      let closest: RouteNode | null = null;
+      let minDistance = Infinity;
+
+      for (const n of nodeOptions) {
+        const d = haversineDistanceKm(coords[1], coords[0], n.coordinates[1], n.coordinates[0]);
+        if (d < minDistance) {
+          minDistance = d;
+          closest = n;
+        }
+      }
+
+      if (closest) {
+        setOriginId(closest.id);
+        setOriginCustomLabel(`Current Location (snapped to ${closest.name})`);
+        setOriginQuery('');
+        setCalculated(false);
+        if (minDistance > 50) {
+          setLocationNotice(`Current device position is ~${Math.round(minDistance)}km from the closest monitored road corridor (${closest.name}).`);
+        } else {
+          setLocationNotice(`Device location snapped to nearest road corridor: ${closest.name} (±${minDistance.toFixed(1)}km).`);
+        }
+      }
+    } catch {
+      setLocationNotice('Unable to acquire device location.');
+    } finally {
+      setIsLocatingOrigin(false);
+    }
+  }, [requestLocation, nodeOptions]);
+
+  const handleSwapEndpoints = useCallback(() => {
+    if (!originId && !destinationId) return;
+    const prevOriginId = originId;
+    setOriginId(destinationId);
+    setOriginCustomLabel(destNode?.name ?? null);
+    setDestinationId(prevOriginId);
+    setOriginQuery('');
+    setDestQuery('');
+    setCalculated(false);
+    setError('');
+  }, [originId, destinationId, destNode]);
+
   const handleCalculate = useCallback(() => {
     setError('');
     if (!originId) {
-      setError('Please select an origin.');
+      setError('Please select an origin starting location.');
       return;
     }
     if (!destinationId) {
@@ -480,18 +583,28 @@ export function RoutePlanner({
       return;
     }
     if (originId === destinationId) {
-      setError('Origin and destination cannot be the same.');
+      setError('Origin and destination cannot be the same location.');
+      return;
+    }
+    const oNode = effectiveGraph?.nodeById?.[originId] ?? nodeOptions.find((n) => n.id === originId);
+    const dNode = effectiveGraph?.nodeById?.[destinationId] ?? nodeOptions.find((n) => n.id === destinationId);
+    if (!oNode || !dNode || !isValidCoordinates(oNode.coordinates) || !isValidCoordinates(dNode.coordinates)) {
+      setError('Invalid coordinates for selected endpoints.');
       return;
     }
     setCalculated(true);
     setActiveMode('SAFEST');
-    setActiveTab('JOURNEY');
-  }, [originId, destinationId]);
+    setActiveTab(environment === 'REAL' ? 'ROUTES' : 'JOURNEY');
+  }, [originId, destinationId, effectiveGraph, nodeOptions, environment]);
 
   const handleClear = useCallback(() => {
     setCalculated(false);
     setOriginId('');
     setDestinationId('');
+    setOriginQuery('');
+    setDestQuery('');
+    setOriginCustomLabel(null);
+    setLocationNotice(null);
     setError('');
     setActiveTab('JOURNEY');
     onRouteClear?.();
@@ -547,13 +660,7 @@ export function RoutePlanner({
     }
   }, [activeResult, destinationSafety, onRouteSelected, onRouteClear]);
 
-  const nodeOptions = useMemo(() => {
-    if (environment === 'REAL') {
-      if (!realGraph || realGraph.nodes.length === 0) return [];
-      return realGraph.nodes;
-    }
-    return DEMO_NODES.filter((n) => n.type !== 'JUNCTION');
-  }, [environment, realGraph]);
+
 
   // If in REAL mode but no real OSM network has loaded yet, display professional standby state
   if (environment === 'REAL' && (!realGraph || realGraph.nodes.length === 0)) {
@@ -602,6 +709,7 @@ export function RoutePlanner({
 
   return (
     <div className={cn('flex flex-col gap-4', className)}>
+      <DataProvenance model detail="Routes, transit risk and destination safety are advisory calculations" />
       {/* Operations disclaimer */}
       <div
         className={cn(
@@ -659,61 +767,160 @@ export function RoutePlanner({
         }}
       />
 
-      {/* Origin + Destination selects */}
-      <div className="grid grid-cols-1 gap-2.5">
-        <div>
-          <label className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
-            Origin Location
-          </label>
-          <select
-            value={originId}
-            onChange={(e) => {
-              setOriginId(e.target.value);
-              setCalculated(false);
-            }}
-            className={cn(
-              'w-full rounded-xl border text-sm px-3 py-2.5',
-              'bg-white dark:bg-surface-elevated border-slate-300 dark:border-white/15',
-              'text-slate-900 dark:text-slate-100 font-medium',
-              'focus:outline-none focus:ring-2 focus:ring-accent/50'
+      {/* Origin + Destination search & selection */}
+      <div className="grid grid-cols-1 gap-3">
+        {/* Origin Field */}
+        <div className="p-3.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50/60 dark:bg-surface-elevated/40 space-y-2">
+          <div className="flex items-center justify-between gap-2">
+            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              Starting Origin Location
+            </label>
+            {/* Convenient "Use My Location" action */}
+            <button
+              type="button"
+              onClick={handleUseMyLocationForOrigin}
+              disabled={isLocatingOrigin}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-accent text-slate-950 hover:bg-accent/90 shadow-xs transition-all active:scale-98 disabled:opacity-60"
+              title="Detect current device location and snap to nearest road node"
+            >
+              {isLocatingOrigin ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <Navigation className="w-3.5 h-3.5" />
+              )}
+              <span>{isLocatingOrigin ? 'Acquiring GPS...' : 'Use My Location'}</span>
+            </button>
+          </div>
+
+          <div className="space-y-1.5">
+            {nodeOptions.length > 8 && (
+              <div className="relative">
+                <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
+                <input
+                  type="text"
+                  value={originQuery}
+                  onChange={(e) => setOriginQuery(e.target.value)}
+                  placeholder="Filter origin place, junction, or shelter…"
+                  className="w-full pl-9 pr-3 py-1.5 rounded-lg bg-white dark:bg-surface-base border border-slate-300 dark:border-white/15 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-accent"
+                />
+              </div>
             )}
-          >
-            <option value="" className="bg-white dark:bg-surface-elevated text-slate-900 dark:text-slate-100">Select origin point…</option>
-            {nodeOptions.map((n) => (
-              <option key={n.id} value={n.id} disabled={n.id === destinationId} className="bg-white dark:bg-surface-elevated text-slate-900 dark:text-slate-100">
-                {NODE_ICON[n.type]} {n.name}
+            <select
+              value={originId}
+              onChange={(e) => {
+                setOriginId(e.target.value);
+                setOriginCustomLabel(null);
+                setCalculated(false);
+              }}
+              className={cn(
+                'w-full rounded-xl border text-xs px-3 py-2',
+                'bg-white dark:bg-surface-elevated border-slate-300 dark:border-white/15',
+                'text-slate-900 dark:text-slate-100 font-medium',
+                'focus:outline-none focus:ring-2 focus:ring-accent/50'
+              )}
+            >
+              <option value="" className="bg-white dark:bg-surface-elevated text-slate-900 dark:text-slate-100">
+                Select origin from {nodeOptions.length} points…
               </option>
-            ))}
-          </select>
+              {nodeOptions
+                .filter((n) => !originQuery || n.id === originId || n.name.toLowerCase().includes(originQuery.toLowerCase()) || n.type.toLowerCase().includes(originQuery.toLowerCase()))
+                .map((n) => (
+                  <option key={n.id} value={n.id} disabled={n.id === destinationId} className="bg-white dark:bg-surface-elevated text-slate-900 dark:text-slate-100">
+                    {NODE_ICON[n.type]} {n.name} ({n.type})
+                  </option>
+                ))}
+            </select>
+            {originNode && (
+              <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 font-mono px-1">
+                <span className="truncate">{originCustomLabel || originNode.name}</span>
+                <span className="flex-shrink-0">{originNode.coordinates[1].toFixed(4)}°N, {originNode.coordinates[0].toFixed(4)}°E</span>
+              </div>
+            )}
+          </div>
+
+          {locationNotice && (
+            <div className="text-[10px] text-blue-700 dark:text-blue-300 bg-blue-500/10 border border-blue-500/20 rounded p-1.5 flex items-center gap-1.5 animate-fade-in">
+              <span>📍</span>
+              <span>{locationNotice}</span>
+            </div>
+          )}
         </div>
 
-        <div>
-          <label className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
-            Destination Location
-          </label>
-          <select
-            value={destinationId}
-            onChange={(e) => {
-              setDestinationId(e.target.value);
-              setCalculated(false);
-              if (e.target.value) {
-                setActiveTab('DESTINATION');
-              }
-            }}
-            className={cn(
-              'w-full rounded-xl border text-sm px-3 py-2.5',
-              'bg-white dark:bg-surface-elevated border-slate-300 dark:border-white/15',
-              'text-slate-900 dark:text-slate-100 font-medium',
-              'focus:outline-none focus:ring-2 focus:ring-accent/50'
-            )}
+        {/* Swap Control */}
+        <div className="flex justify-center -my-1.5 relative z-10 pointer-events-auto">
+          <button
+            type="button"
+            onClick={handleSwapEndpoints}
+            disabled={!originId && !destinationId}
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-white dark:bg-surface-elevated hover:bg-slate-100 dark:hover:bg-surface-overlay text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-white/15 shadow-xs transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+            title="Swap Starting Origin and Destination"
+            aria-label="Swap starting origin and destination"
           >
-            <option value="" className="bg-white dark:bg-surface-elevated text-slate-900 dark:text-slate-100">Select destination…</option>
-            {nodeOptions.map((n) => (
-              <option key={n.id} value={n.id} disabled={n.id === originId} className="bg-white dark:bg-surface-elevated text-slate-900 dark:text-slate-100">
-                {NODE_ICON[n.type]} {n.name}
+            <ArrowUpDown className="w-3.5 h-3.5 text-accent" />
+            <span>Swap Locations</span>
+          </button>
+        </div>
+
+        {/* Destination Field */}
+        <div className="p-3.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50/60 dark:bg-surface-elevated/40 space-y-2">
+          <div className="flex items-center justify-between gap-2">
+            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              Destination Location
+            </label>
+            {destNode && (
+              <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 font-bold">
+                ✓ Destination Chosen
+              </span>
+            )}
+          </div>
+
+          <div className="space-y-1.5">
+            {nodeOptions.length > 8 && (
+              <div className="relative">
+                <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
+                <input
+                  type="text"
+                  value={destQuery}
+                  onChange={(e) => setDestQuery(e.target.value)}
+                  placeholder="Filter destination shelter, hospital, or locality…"
+                  className="w-full pl-9 pr-3 py-1.5 rounded-lg bg-white dark:bg-surface-base border border-slate-300 dark:border-white/15 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-accent"
+                />
+              </div>
+            )}
+            <select
+              value={destinationId}
+              onChange={(e) => {
+                setDestinationId(e.target.value);
+                setCalculated(false);
+                if (e.target.value) {
+                  setActiveTab('DESTINATION');
+                }
+              }}
+              className={cn(
+                'w-full rounded-xl border text-xs px-3 py-2',
+                'bg-white dark:bg-surface-elevated border-slate-300 dark:border-white/15',
+                'text-slate-900 dark:text-slate-100 font-medium',
+                'focus:outline-none focus:ring-2 focus:ring-accent/50'
+              )}
+            >
+              <option value="" className="bg-white dark:bg-surface-elevated text-slate-900 dark:text-slate-100">
+                Select destination from {nodeOptions.length} points…
               </option>
-            ))}
-          </select>
+              {nodeOptions
+                .filter((n) => !destQuery || n.id === destinationId || n.name.toLowerCase().includes(destQuery.toLowerCase()) || n.type.toLowerCase().includes(destQuery.toLowerCase()))
+                .map((n) => (
+                  <option key={n.id} value={n.id} disabled={n.id === originId} className="bg-white dark:bg-surface-elevated text-slate-900 dark:text-slate-100">
+                    {NODE_ICON[n.type]} {n.name} ({n.type})
+                  </option>
+                ))}
+            </select>
+            {destNode && (
+              <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 font-mono px-1">
+                <span className="truncate">{destNode.name}</span>
+                <span className="flex-shrink-0">{destNode.coordinates[1].toFixed(4)}°N, {destNode.coordinates[0].toFixed(4)}°E</span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -724,25 +931,29 @@ export function RoutePlanner({
         </div>
       )}
 
-      {/* Action buttons */}
-      <div className="flex gap-2">
+      {/* Action buttons: Find Safe Route & Reset */}
+      <div className="flex flex-col sm:flex-row gap-2.5 pt-1">
         <button
+          type="button"
           onClick={handleCalculate}
           disabled={!originId || !destinationId}
           className={cn(
-            'flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-sm',
-            'bg-accent text-slate-950 hover:bg-accent/90',
-            'disabled:opacity-40 disabled:cursor-not-allowed'
+            'flex-1 py-3 px-5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-md flex items-center justify-center gap-2',
+            'bg-accent text-slate-950 hover:bg-accent/90 active:scale-98',
+            'disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-accent'
           )}
         >
-          Calculate Route &amp; Travel Risk
+          <Compass className="w-4 h-4 text-slate-950" />
+          <span>Find Safe Route</span>
         </button>
-        {(calculated || destinationId) && (
+
+        {(calculated || originId || destinationId) && (
           <button
+            type="button"
             onClick={handleClear}
-            className="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
+            className="py-3 px-5 rounded-xl text-xs sm:text-sm font-semibold border border-slate-300 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
           >
-            Clear
+            Reset Route
           </button>
         )}
       </div>
@@ -865,6 +1076,31 @@ export function RoutePlanner({
             Route Options (Safest / Shortest / Alternative)
           </div>
 
+          {/* Interactive Map Visualization of the Selected Route */}
+          {activeResult?.found && activeResult.mapCoordinates.length > 1 && (
+            <RoutePreviewMap
+              coordinates={activeResult.mapCoordinates}
+              mode={activeResult.mode}
+              originName={originCustomLabel || originNode?.name}
+              destinationName={destNode?.name}
+            />
+          )}
+
+          {/* No-route-found honest alert */}
+          {!activeResult?.found && (
+            <div className="p-4 rounded-xl border border-amber-500/30 bg-amber-500/10 text-xs space-y-1.5 text-left">
+              <div className="font-bold text-amber-800 dark:text-amber-200 flex items-center gap-1.5">
+                <span>⚠️</span>
+                <span>Route Unavailable on Current Network</span>
+              </div>
+              <p className="text-slate-700 dark:text-slate-300 leading-relaxed text-[11px]">
+                {environment === 'REAL'
+                  ? `No connected road path exists between ${originCustomLabel || originNode?.name || 'origin'} and ${destNode?.name || 'destination'} within the ${realRoads.length} operational OpenStreetMap road corridors. The points may be geographically disconnected or obstructed by road closures.`
+                  : (activeResult?.notFoundReason || 'No viable route found.')}
+              </p>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 gap-3">
             {(['SAFEST', 'SHORTEST', 'ALTERNATIVE'] as const).map((mode) => {
               const r = results[mode.toLowerCase() as keyof typeof results] as RouteResult;
@@ -883,7 +1119,7 @@ export function RoutePlanner({
           </div>
 
           {/* Active Route Segment Breakdown */}
-          {activeResult && (
+          {activeResult?.found && (
             <div>
               <div className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
                 {MODE_CONFIG[activeMode].label} — Segment Detail
@@ -891,6 +1127,14 @@ export function RoutePlanner({
               <RouteDetailPanel result={activeResult} />
             </div>
           )}
+
+          {/* Real-Mode Disaster Safety & Road Data Limitations Disclosure */}
+          <div className="p-3 rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
+            <span className="font-bold">Corridor Data Freshness &amp; Safety Disclaimer: </span>
+            {environment === 'REAL'
+              ? 'Route calculated from genuine OpenStreetMap road network and real-time hazard status. Safest mode penalizes reported road closures, flooding, and severe weather risks according to current telemetry. Unmonitored rural stretches or unverified local roads may have unreported hazards; obey official police barriers and emergency directives.'
+              : 'Advisory transit path model based on simulated scenario conditions.'}
+          </div>
         </div>
       )}
 

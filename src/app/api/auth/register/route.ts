@@ -1,10 +1,10 @@
-import { NextResponse } from 'next/server';
-import { findUserByEmail } from '@/lib/auth/users';
-import { hashPassword } from '@/lib/auth/password';
 import { findAuthorityRecordById } from '@/lib/auth/authorityRegistry';
 import { createPendingAuthorityAccount, OTP_TTL_MINUTES } from '@/lib/auth/emailVerification';
+import { hashPassword } from '@/lib/auth/password';
+import { findUserByEmail } from '@/lib/auth/users';
 import { sendAuthorityVerificationEmail } from '@/lib/email/sendVerificationEmail';
 import { ROLES } from '@/types/roles';
+import { NextResponse } from 'next/server';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 

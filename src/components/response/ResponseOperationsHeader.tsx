@@ -1,12 +1,12 @@
 'use client';
 
-import { Shield, Radio, Search, SlidersHorizontal, RefreshCw, AlertCircle } from 'lucide-react';
-import { Badge } from '@/components/ui';
 import { AuthorityRoleSwitcher } from '@/components/auth/AuthorityRoleSwitcher';
 import { LiveStatusIndicator } from '@/components/realtime/LiveStatusIndicator';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
-import { type Role } from '@/types/roles';
+import { Badge } from '@/components/ui';
 import { getDemoUserContext } from '@/lib/auth/roles';
+import { type Role } from '@/types/roles';
+import { RefreshCw, Search, Shield } from 'lucide-react';
 
 interface ResponseOperationsHeaderProps {
   currentRole: Role;

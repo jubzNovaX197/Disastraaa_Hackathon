@@ -10,10 +10,10 @@
  * ⚠️  Shows PROTOTYPE / DEMO DATA indicator prominently.
  */
 
+import { DataProvenance } from '@/components/demo/DataProvenance';
+import type { CycloneFactorScores, CycloneRiskExplanation } from '@/lib/risk/cyclone';
+import { cn, formatNumber } from '@/lib/utils';
 import { useCallback } from 'react';
-import type { CycloneRiskExplanation, CycloneFactorScores } from '@/lib/risk/cyclone';
-import { cn } from '@/lib/utils';
-import { formatNumber } from '@/lib/utils';
 
 // ── Severity config ───────────────────────────────────────────────────────────
 
@@ -155,6 +155,7 @@ export function CycloneRiskPanel({
       role="dialog"
       aria-label={`Cyclone risk details for ${zoneName}`}
     >
+      <DataProvenance model />
       {/* Header */}
       <div className={cn('px-4 pt-4 pb-3', styles.bg)}>
         <div className="flex items-start justify-between gap-2">

@@ -7,9 +7,9 @@
 
 import type { Severity } from '@/types';
 import type {
-  MultiHazardRiskResult,
-  MultiHazardRiskExplanation,
   DataQuality,
+  MultiHazardRiskExplanation,
+  MultiHazardRiskResult,
 } from './types';
 
 // ── Label maps ────────────────────────────────────────────────────────────────

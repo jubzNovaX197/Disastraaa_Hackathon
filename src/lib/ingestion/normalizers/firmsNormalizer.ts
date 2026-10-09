@@ -4,10 +4,10 @@
  * Transforms raw satellite thermal hotspot telemetry into IngestedHazardEvent models.
  */
 
-import type { FirmsHotspotRaw } from '../clients/firmsClient';
-import type { IngestedHazardEvent } from '../types';
 import type { Severity } from '@/types';
+import type { FirmsHotspotRaw } from '../clients/firmsClient';
 import { evaluateFreshness } from '../freshness';
+import type { IngestedHazardEvent } from '../types';
 
 function deriveFirmsSeverity(hotspot: FirmsHotspotRaw): Severity {
   if (hotspot.frp >= 60 || hotspot.confidence === 'h') return 'CRITICAL';

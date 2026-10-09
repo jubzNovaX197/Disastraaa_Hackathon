@@ -1,6 +1,6 @@
-import type { OverpassElement } from './types';
 import fs from 'fs';
 import path from 'path';
+import type { OverpassElement } from './types';
 
 let _cachedSeed: OverpassElement[] | null = null;
 

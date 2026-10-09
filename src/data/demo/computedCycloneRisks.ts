@@ -9,8 +9,8 @@
  * Keyed by CycloneRiskZone id — same key space as demoCycloneRiskInputs.
  */
 
-import { calculateCycloneRisk, explainCycloneRisk } from '@/lib/risk/cyclone';
 import type { CycloneRiskExplanation } from '@/lib/risk/cyclone';
+import { calculateCycloneRisk, explainCycloneRisk } from '@/lib/risk/cyclone';
 import { demoCycloneRiskInputs } from './cycloneRiskInputs';
 
 export const computedCycloneRisks: Record<string, CycloneRiskExplanation> =

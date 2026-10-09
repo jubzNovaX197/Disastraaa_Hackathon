@@ -1,7 +1,7 @@
-import type { Metadata } from 'next';
-import { demoEvacuationZones } from '@/data/demo/evacuationZones';
 import { EvacuationDashboard } from '@/components/evacuation/EvacuationDashboard';
+import { demoEvacuationZones } from '@/data/demo/evacuationZones';
 import { resolveServerEnvironment } from '@/lib/env';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Evacuation Management',

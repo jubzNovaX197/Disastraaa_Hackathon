@@ -1,9 +1,10 @@
 'use client';
 
-import { MapPin, Layers, Maximize2 } from 'lucide-react';
+import { DataProvenance } from '@/components/demo/DataProvenance';
 import { DisasterMap } from '@/components/map/DisasterMap';
 import { demoDataset } from '@/data/demo';
 import type { RegionalAnalyticsRow } from '@/lib/analytics/types';
+import { Layers, MapPin } from 'lucide-react';
 
 interface AnalyticsMapSectionProps {
   selectedLocation: RegionalAnalyticsRow | null;
@@ -48,6 +49,7 @@ export function AnalyticsMapSection({
 
   return (
     <div className="p-4 rounded-xl bg-white dark:bg-surface-card border border-slate-200 dark:border-white/[0.07] shadow-sm space-y-3">
+      <DataProvenance model />
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-2 border-b border-slate-100 dark:border-white/[0.06]">
         <div>
           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-2">

@@ -61,6 +61,13 @@ export const SATELLITE_BASEMAP_STYLE: StyleSpecification = {
   },
   layers: [
     {
+      id: 'satellite-background',
+      type: 'background',
+      paint: {
+        'background-color': '#0b0f19',
+      },
+    },
+    {
       id: 'esri-imagery-layer',
       type: 'raster',
       source: 'esri-world-imagery',
@@ -144,7 +151,7 @@ export const mapConfig = {
   defaultZoom: 4.5,
 
   /** Zoom range */
-  minZoom: 3,
+  minZoom: 1.5,
   maxZoom: 18,
 
   /** Built-in control visibility */

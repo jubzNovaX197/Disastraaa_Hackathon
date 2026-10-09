@@ -4,6 +4,6 @@
  * ⚠️  PROTOTYPE / DEMO ONLY.
  */
 
-export { calculateImpact } from './engine';
 export { DEMO_ZONE_EXPOSURE, fallbackExposure } from './demoExposure';
-export type { ImpactInputs, ImpactResult, ImpactMetric, ZoneExposure } from './types';
+export { calculateImpact } from './engine';
+export type { ImpactInputs, ImpactMetric, ImpactResult, ZoneExposure } from './types';

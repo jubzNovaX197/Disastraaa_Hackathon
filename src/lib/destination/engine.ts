@@ -17,15 +17,14 @@
  * Statuses: SAFE (>=75) | CAUTION (50–74) | HIGH_RISK (25–49) | CRITICAL (<25)
  */
 
-import type { LngLat } from '@/data/types';
-import type { Severity } from '@/types';
-import { NODE_BY_ID, DEMO_NODES } from '@/lib/routing/graph';
 import { demoAlerts } from '@/data/demo/alerts';
-import { demoShelters } from '@/data/demo/shelters';
-import { demoRoadSegments } from '@/data/demo/roads';
 import { demoHistoricalEvents } from '@/data/demo/historicalEvents';
+import { demoRoadSegments } from '@/data/demo/roads';
+import { demoShelters } from '@/data/demo/shelters';
+import type { LngLat } from '@/data/types';
 import type { HistoricalDisasterEvent } from '@/lib/historical/types';
-import { computedMultiHazardRisks } from '@/data/demo/computedMultiHazardRisks';
+import { DEMO_NODES, NODE_BY_ID } from '@/lib/routing/graph';
+import type { Severity } from '@/types';
 import { DEMO_SCENARIOS, demoScenarioProvider } from './scenarios';
 import type {
   DestinationRiskFactor,

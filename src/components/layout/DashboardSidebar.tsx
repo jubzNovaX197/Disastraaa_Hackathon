@@ -1,40 +1,40 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import {
-  LayoutDashboard,
-  Map,
-  Bell,
-  FileText,
-  Home,
-  Package,
-  Activity,
-  Calendar,
-  Clock,
-  Truck,
-  Settings,
-  BarChart2,
-  Sliders,
-  Bot,
-  Shield,
-  ShieldAlert,
-  ChevronLeft,
-  ChevronRight,
-  AlertTriangle,
-  User,
-  RefreshCw,
-  LogOut,
-  ShieldCheck,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { Logo } from '@/components/brand/Logo';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { brand } from '@/config/brand';
 import { getDashboardNavGroupsForRole } from '@/config/nav';
-import { ThemeToggle } from '@/components/theme/ThemeToggle';
+import { getDemoUserContext, parseRoleFromCookie, ROLE_COOKIE_NAME } from '@/lib/auth/roles';
+import { cn } from '@/lib/utils';
 import { ROLES, type Role } from '@/types/roles';
-import { parseRoleFromCookie, getDemoUserContext, ROLE_COOKIE_NAME } from '@/lib/auth/roles';
+import {
+  Activity,
+  AlertTriangle,
+  BarChart2,
+  Bell,
+  Bot,
+  Calendar,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  FileText,
+  Home,
+  LayoutDashboard,
+  LogOut,
+  Map,
+  Package,
+  RefreshCw,
+  Settings,
+  Shield,
+  ShieldAlert,
+  ShieldCheck,
+  Sliders,
+  Truck,
+  User,
+} from 'lucide-react';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 // Icon registry — avoids dynamic require; extend when adding nav items
 const iconMap: Record<string, React.ElementType> = {

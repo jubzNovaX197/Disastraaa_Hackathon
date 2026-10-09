@@ -7,8 +7,7 @@
  * - Global Disaster Alert and Coordination System (GDACS)
  */
 
-import type { DemoAlert, LngLat } from '@/data/types';
-import type { Severity, HazardType } from '@/types';
+import type { DemoAlert } from '@/data/types';
 import type { FreshnessStatus } from '@/lib/ingestion/types';
 
 export type AlertFeedStatus = 'CONNECTED' | 'RESTRICTED_WAF' | 'UNAVAILABLE' | 'STANDBY';

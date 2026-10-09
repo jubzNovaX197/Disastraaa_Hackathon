@@ -1,6 +1,6 @@
-import type { Metadata } from 'next';
-import { resolveActiveRole } from '@/lib/auth/resolveRole';
 import { CommandCenterDashboard } from '@/components/commandCenter/CommandCenterDashboard';
+import { resolveActiveRole } from '@/lib/auth/resolveRole';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Emergency Operations Command Center',

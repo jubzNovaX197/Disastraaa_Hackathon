@@ -1,5 +1,5 @@
-import type { Metadata } from 'next';
 import { IntelligenceAssistantDashboard } from '@/components/assistant';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Intelligence Assistant | Disastraaa',
