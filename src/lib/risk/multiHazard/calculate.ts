@@ -127,12 +127,16 @@ export function calculateMultiHazardRisk(
   const avgConfidence =
     contributions.reduce((s, c) => s + c.confidence, 0) / contributions.length;
 
+  const rawPop = typeof inputs.affectedPopulation === 'number' && !isNaN(inputs.affectedPopulation)
+    ? Math.max(0, inputs.affectedPopulation)
+    : 0;
+
   return {
     score,
     severity,
     dominantHazard,
     contributions,
-    affectedPopulation: inputs.affectedPopulation,
+    affectedPopulation: rawPop,
     dataQuality:        dataQuality(avgConfidence, contributions.length),
     calculatedAt:       new Date().toISOString(),
   };
