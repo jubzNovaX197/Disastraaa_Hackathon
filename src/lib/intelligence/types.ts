@@ -217,6 +217,20 @@ export interface DisasterIntelligenceSnapshot {
   impact: SnapshotImpactEstimation;
   limitations: SnapshotLimitations;
   deterministicRecommendations: DecisionSupportRecommendation[];
+  mlPrediction?: SnapshotMlPrediction;
+}
+
+export interface SnapshotMlPrediction {
+  modelId: string;
+  modelVersion: string;
+  algorithm: string;
+  forecastHorizonHours: number;
+  exceedanceProbability: number | null;
+  predictedClass: string;
+  confidenceLevel: string;
+  inputQualityStatus: string;
+  deterministicAgreement: boolean | null;
+  statusNote: string;
 }
 
 export interface DisasterIntelligenceSummary {

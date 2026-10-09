@@ -47,7 +47,9 @@ import type {
   SnapshotLimitations,
   DecisionSupportRecommendation,
   SnapshotAlert,
+  SnapshotMlPrediction,
 } from './types';
+import { predictRiverExceedance } from '@/lib/ml/predictionService';
 import type { AppEnvironment } from '@/lib/env';
 
 export interface AssembleSnapshotOptions {
@@ -115,6 +117,44 @@ export class DisasterIntelligenceSnapshotService {
       limitations,
     );
 
+    // 10. Optional ML Flood Threshold Exceedance Prediction (Experimental Decision Support)
+    let mlPrediction: SnapshotMlPrediction | undefined = undefined;
+    if (location.district.toLowerCase().includes('kalahandi') || hydrology.riverGauges.length > 0) {
+      try {
+        const gauge = hydrology.riverGauges[0];
+        const realWaterLevel = gauge?.waterLevelMetres;
+        const isHistorical = gauge?.status === 'HISTORICAL_OBSERVATION' || gauge?.status === 'STALE';
+
+        const mlRes = await predictRiverExceedance({
+          stationCode: gauge?.stationCode || (location.district.toLowerCase().includes('kalahandi') ? '022-MDBURLA' : undefined),
+          district: location.district,
+          timestamp: generatedAt,
+          rain24hMm: weather.current.precipitationMm,
+          rain48hMm: weather.current.precipitationMm !== undefined ? weather.current.precipitationMm * 1.5 : undefined,
+          rain72hMm: weather.current.precipitationMm !== undefined ? weather.current.precipitationMm * 2.0 : undefined,
+          catchmentSoilMoisturePct: 65,
+          upstreamDischargeCumec: hydrology.modelledDischarge?.dischargeM3s,
+          gaugeStagePriorM: realWaterLevel,
+          isHistoricalObservation: isHistorical,
+        });
+
+        mlPrediction = {
+          modelId: mlRes.modelId,
+          modelVersion: mlRes.modelVersion,
+          algorithm: mlRes.algorithm,
+          forecastHorizonHours: mlRes.forecastHorizonHours,
+          exceedanceProbability: mlRes.exceedanceProbability,
+          predictedClass: mlRes.predictedClass,
+          confidenceLevel: mlRes.confidenceLevel,
+          inputQualityStatus: mlRes.inputQualityStatus,
+          deterministicAgreement: mlRes.deterministicAgreement,
+          statusNote: mlRes.warnings.length > 0 ? mlRes.warnings[0] : mlRes.disclaimer,
+        };
+      } catch {
+        // Non-blocking fallback
+      }
+    }
+
     return {
       snapshotId: `snap-${location.district.toLowerCase()}-${Date.now()}`,
       generatedAt,
@@ -146,6 +186,7 @@ export class DisasterIntelligenceSnapshotService {
       impact,
       limitations,
       deterministicRecommendations,
+      mlPrediction,
     };
   }
 

@@ -222,12 +222,12 @@ export async function saveWeatherTelemetry(weather: NormalizedWeather): Promise<
           weather.surfacePressureHpa,
           weather.weatherCode,
           weather.condition,
-          weather.source,
+          weather.source || 'Open-Meteo',
           weather.observedAt,
-          weather.retrievedAt,
-          weather.freshnessStatus,
+          weather.retrievedAt || new Date().toISOString(),
+          weather.freshnessStatus || (weather as any).freshness || 'LIVE',
           JSON.stringify(weather.hourlyForecast ?? []),
-          weather.environment,
+          weather.environment || 'REAL',
         ],
       );
 

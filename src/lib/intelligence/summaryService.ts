@@ -43,12 +43,12 @@ export class DisasterIntelligenceSummaryService {
    */
   async generateSummary(
     snapshot: DisasterIntelligenceSnapshot,
-    options: { forceRefresh?: boolean } = {},
+    options: { forceRefresh?: boolean; forceRuleBased?: boolean } = {},
   ): Promise<DisasterIntelligenceSummary> {
     const cacheKey = `${snapshot.location.district.toLowerCase()}_${snapshot.environment}`;
     const now = Date.now();
 
-    if (!options.forceRefresh) {
+    if (!options.forceRefresh && !options.forceRuleBased) {
       const cached = _summaryCache.get(cacheKey);
       if (cached && now < cached.expiresAt) {
         return cached.summary;
@@ -57,8 +57,8 @@ export class DisasterIntelligenceSummaryService {
 
     const apiKey = this.getApiKey();
 
-    if (!apiKey) {
-      // Deterministic rule-based summary when no LLM key configured
+    if (!apiKey || options.forceRuleBased) {
+      // Deterministic rule-based summary when no LLM key configured or explicitly requested
       const ruleBased = this.generateRuleBasedSummary(snapshot, 'Deterministic Rule-Based Intelligence Engine (Server Native)');
       _summaryCache.set(cacheKey, { summary: ruleBased, expiresAt: now + SUMMARY_CACHE_TTL_MS });
       return ruleBased;
@@ -365,8 +365,23 @@ Respond with strictly valid JSON only. Do not add markdown backticks around the 
       supportingEvidence.push('Authoritative warnings: 0 broadcast warnings active via IMD CAP (Monitoring baseline).');
     }
 
+    if (snapshot.mlPrediction) {
+      const ml = snapshot.mlPrediction;
+      const probaText = ml.exceedanceProbability !== null
+        ? `${(ml.exceedanceProbability * 100).toFixed(1)}% probability`
+        : 'UNAVAILABLE due to degraded/missing sensor telemetry';
+      supportingEvidence.push(
+        `Experimental ML early warning: Model ${ml.modelId} (${ml.algorithm}) evaluates danger threshold exceedance as ${probaText} within ${ml.forecastHorizonHours}h (Input Quality: ${ml.inputQualityStatus}, Decision Support Only).`,
+      );
+    }
+
     // 3. Key Uncertainties
     const keyUncertainties: string[] = [];
+    if (snapshot.mlPrediction && snapshot.mlPrediction.inputQualityStatus !== 'OPTIMAL') {
+      keyUncertainties.push(
+        `ML early-warning model indicates ${snapshot.mlPrediction.inputQualityStatus} input telemetry; confidence is restricted.`,
+      );
+    }
     if (limits.missingCriticalInputs.length > 0) {
       keyUncertainties.push(`Missing critical inputs: ${limits.missingCriticalInputs.join(', ')}.`);
     }
@@ -393,6 +408,12 @@ Respond with strictly valid JSON only. Do not add markdown backticks around the 
       'OpenStreetMap Overpass Network',
       'Deterministic Multi-Hazard Engine (v1.0)',
     ];
+
+    if (snapshot.mlPrediction) {
+      sourceReferences.push(
+        `Experimental ML Early Warning (${snapshot.mlPrediction.modelId} v${snapshot.mlPrediction.modelVersion})`,
+      );
+    }
 
     return {
       summaryId: `rulesum-${loc.district.toLowerCase()}-${Date.now()}`,
