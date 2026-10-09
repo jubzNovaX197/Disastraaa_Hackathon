@@ -108,6 +108,21 @@ export const CANONICAL_ODISHA_LOCATIONS: Array<CanonicalLocation & { population:
   },
 ];
 
+/**
+ * Finds a canonical demonstration location by district, ID, or substring.
+ */
+export function findCanonicalLocation(query: string) {
+  if (!query) return undefined;
+  const q = query.toLowerCase().trim();
+  return CANONICAL_ODISHA_LOCATIONS.find(
+    (loc) =>
+      loc.district.toLowerCase().includes(q) ||
+      loc.id.toLowerCase().includes(q) ||
+      (loc.locality && loc.locality.toLowerCase().includes(q)) ||
+      q.includes(loc.district.toLowerCase().replace(' district', '')),
+  );
+}
+
 // Registry of dynamically ingested real operational locations
 let _realLocationsRegistry: CanonicalLocation[] = [];
 
