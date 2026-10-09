@@ -46,7 +46,7 @@ export function CommandCenterKpiRow({ kpis }: CommandCenterKpiRowProps) {
                 </span>
               </div>
               <Badge severity={peakSeverity} dot className="text-[10px]">
-                {peakScore === 0 ? 'Normal 0/100' : `Peak ${peakScore}/100`}
+                {peakScore === 0 ? 'Standby 0/100' : `Peak ${peakScore}/100`}
               </Badge>
             </div>
 
@@ -74,7 +74,7 @@ export function CommandCenterKpiRow({ kpis }: CommandCenterKpiRowProps) {
                   {peakScore}
                 </span>
                 <p className="text-[9px] text-slate-400 uppercase font-semibold">
-                  {peakScore === 0 ? 'ALL CLEAR' : risk.highestCurrentRisk.dominantHazard}
+                  {peakScore === 0 ? 'STANDBY' : risk.highestCurrentRisk.dominantHazard}
                 </p>
               </div>
             </div>
@@ -217,7 +217,7 @@ export function CommandCenterKpiRow({ kpis }: CommandCenterKpiRowProps) {
                 </p>
               </div>
               <Badge severity={response.activeAlertsCount > 0 ? 'MODERATE' : 'LOW'} className="text-[10px]">
-                {response.activeAlertsCount > 0 ? 'CAP Broadcast' : 'All Clear'}
+                {response.activeAlertsCount > 0 ? 'CAP Broadcast' : '0 Active (Monitoring)'}
               </Badge>
             </div>
 
@@ -234,18 +234,22 @@ export function CommandCenterKpiRow({ kpis }: CommandCenterKpiRowProps) {
                 <p className="text-[9px] text-slate-500">roads</p>
               </div>
               <div className="p-1.5 rounded-lg bg-purple-500/10 border border-purple-500/20">
-                <p className="text-[10px] text-purple-300">Shelter Press.</p>
+                <p className="text-[10px] text-purple-300">Shelters</p>
                 <p className="text-sm font-bold text-purple-400">
-                  {response.sheltersUnderPressureCount}
+                  {response.sheltersUnderPressureCount > 0 ? `${response.sheltersUnderPressureCount} alert` : 'Registered'}
                 </p>
-                <p className="text-[9px] text-slate-500">units</p>
+                <p className="text-[9px] text-slate-500">
+                  {response.sheltersUnderPressureCount > 0 ? 'pressure' : 'occupancy unmon.'}
+                </p>
               </div>
               <div className="p-1.5 rounded-lg bg-red-500/10 border border-red-500/20">
-                <p className="text-[10px] text-red-300">Shortages</p>
-                <p className="text-sm font-bold text-critical">
-                  {response.resourceShortagesCount}
+                <p className="text-[10px] text-red-300">Logistics</p>
+                <p className={cn('text-sm font-bold', response.resourceShortagesCount > 0 ? 'text-critical' : 'text-slate-400')}>
+                  {response.resourceShortagesCount > 0 ? response.resourceShortagesCount : 'Standby'}
                 </p>
-                <p className="text-[9px] text-slate-500">deficits</p>
+                <p className="text-[9px] text-slate-500">
+                  {response.resourceShortagesCount > 0 ? 'deficits' : 'telemetry unconf.'}
+                </p>
               </div>
             </div>
           </div>

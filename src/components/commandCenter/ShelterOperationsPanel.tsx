@@ -44,7 +44,7 @@ export function ShelterOperationsPanel({ shelterOperations }: ShelterOperationsP
           {totalCapacityGap > 0
             ? `Gap: -${formatNumber(totalCapacityGap)}`
             : totalShelters > 0
-            ? 'Sufficient Overall'
+            ? (items.some((s) => s.occupancy > 0) ? 'Sufficient Overall' : 'Registered Capacity (Occupancy Unmonitored)')
             : 'Standby / Unactivated'}
         </Badge>
       </div>
@@ -56,16 +56,22 @@ export function ShelterOperationsPanel({ shelterOperations }: ShelterOperationsP
           <p className="text-sm font-bold text-slate-200">{totalShelters}</p>
         </div>
         <div className="p-2 rounded-lg bg-green-500/10 border border-green-500/20">
-          <p className="text-green-300 text-[10px]">Available Shelters</p>
-          <p className="text-sm font-bold text-green-400">{availableShelters}</p>
+          <p className="text-green-300 text-[10px]">Registered Capacity</p>
+          <p className="text-sm font-bold text-green-400">
+            {formatNumber(items.reduce((acc, s) => acc + s.capacity, 0))}
+          </p>
         </div>
-        <div className="p-2 rounded-lg bg-orange-500/10 border border-orange-500/20">
-          <p className="text-orange-300 text-[10px]">High Utilization</p>
-          <p className="text-sm font-bold text-orange-400">{highUtilizationShelters}</p>
+        <div className="p-2 rounded-lg bg-white/5 border border-white/[0.04]">
+          <p className="text-slate-400 text-[10px]">Live Occupancy</p>
+          <p className="text-sm font-bold text-slate-300">
+            {items.some((s) => s.occupancy > 0) ? formatNumber(items.reduce((acc, s) => acc + s.occupancy, 0)) : 'Unmonitored'}
+          </p>
         </div>
         <div className="p-2 rounded-lg bg-blue-500/10 border border-blue-500/20">
           <p className="text-blue-300 text-[10px]">Projected Demand</p>
-          <p className="text-sm font-bold text-blue-400">{formatNumber(totalProjectedDemand)}</p>
+          <p className="text-sm font-bold text-blue-400">
+            {totalProjectedDemand > 0 ? formatNumber(totalProjectedDemand) : 'Standby'}
+          </p>
         </div>
         <div className="p-2 rounded-lg bg-red-500/10 border border-red-500/20">
           <p className="text-red-300 text-[10px]">Capacity Gap</p>
@@ -74,8 +80,10 @@ export function ShelterOperationsPanel({ shelterOperations }: ShelterOperationsP
           </p>
         </div>
         <div className="p-2 rounded-lg bg-purple-500/10 border border-purple-500/20">
-          <p className="text-purple-300 text-[10px]">Projected Surplus</p>
-          <p className="text-sm font-bold text-purple-400">{formatNumber(totalProjectedSurplus)}</p>
+          <p className="text-purple-300 text-[10px]">Available Surplus</p>
+          <p className="text-sm font-bold text-purple-400">
+            {formatNumber(totalProjectedSurplus > 0 ? totalProjectedSurplus : items.reduce((acc, s) => acc + s.capacity, 0))}
+          </p>
         </div>
       </div>
 
@@ -112,10 +120,10 @@ export function ShelterOperationsPanel({ shelterOperations }: ShelterOperationsP
                   {formatNumber(shelter.capacity)}
                 </td>
                 <td className="py-2.5 px-3 text-right font-mono text-slate-300">
-                  {formatNumber(shelter.occupancy)} ({shelter.utilizationPct}%)
+                  {shelter.occupancy > 0 ? `${formatNumber(shelter.occupancy)} (${shelter.utilizationPct}%)` : 'Unmonitored'}
                 </td>
                 <td className="py-2.5 px-3 text-right font-mono text-amber-300">
-                  {formatNumber(shelter.projectedDemand)}
+                  {shelter.projectedDemand > 0 ? formatNumber(shelter.projectedDemand) : 'Standby'}
                 </td>
                 <td className="py-2.5 px-3 text-right font-mono">
                   {shelter.gapOrSurplus < 0 ? (
