@@ -207,14 +207,17 @@ export function aggregateCommandCenterData(overrides?: CommandCenterDataOverride
             Math.hypot(s.coordinates[0] - region.coordinates[0], s.coordinates[1] - region.coordinates[1]) < 0.6),
       );
       const totalShelterCapacity = localShelters.reduce((sum, s) => sum + (s.capacity || 0), 0);
-      const totalShelterOccupancy = localShelters.reduce((sum, s) => sum + (s.occupancy || 0), 0);
-      const shelterGap = Math.max(0, totalShelterOccupancy - totalShelterCapacity);
-      const shelterSurplus = Math.max(0, totalShelterCapacity - totalShelterOccupancy);
+      const hasVerifiedOccupancy = localShelters.some((s) => typeof s.occupancy === 'number' && s.occupancy > 0);
+      const totalShelterOccupancy = hasVerifiedOccupancy ? localShelters.reduce((sum, s) => sum + (s.occupancy || 0), 0) : 0;
+      const shelterGap = hasVerifiedOccupancy ? Math.max(0, totalShelterOccupancy - totalShelterCapacity) : 0;
+      const shelterSurplus = hasVerifiedOccupancy ? Math.max(0, totalShelterCapacity - totalShelterOccupancy) : totalShelterCapacity;
       const shelterPressureLabel =
         totalShelterCapacity > 0
-          ? shelterGap > 0
-            ? `SHORTAGE (-${formatNumber(shelterGap)})`
-            : `AVAILABLE (+${formatNumber(shelterSurplus)})`
+          ? hasVerifiedOccupancy
+            ? shelterGap > 0
+              ? `SHORTAGE (-${formatNumber(shelterGap)})`
+              : `AVAILABLE (+${formatNumber(shelterSurplus)})`
+            : `AVAILABLE (+${formatNumber(totalShelterCapacity)} registered spaces, Occupancy Unmonitored)`
           : 'SUFFICIENT';
 
       // Correlate roads
@@ -244,13 +247,21 @@ export function aggregateCommandCenterData(overrides?: CommandCenterDataOverride
       const regionalPopulation = region.population || 50000;
 
       if (matchingWeather) {
-        const precip24h = Math.max(0, matchingWeather.precipitationMm * 24);
-        const riverSurgeProxy = Math.max(-1.0, (matchingWeather.precipitationMm - 4) * 0.2);
+        let precip24h = Math.max(0, matchingWeather.precipitationMm * 24);
+        if (Array.isArray(matchingWeather.hourlyForecast) && matchingWeather.hourlyForecast.length >= 24) {
+          const sum24 = matchingWeather.hourlyForecast.slice(0, 24).reduce((acc, h) => acc + (h.precipitationMm || 0), 0);
+          if (sum24 > 0) precip24h = Math.round(sum24 * 10) / 10;
+        }
+
+        // River gauge: In real mode, use neutral 0 m (normal channel) without fabricating river surge from rainfall
+        const isKalahandi = region.district.toLowerCase().includes('kalahandi') || region.displayName.toLowerCase().includes('kalahandi');
+        const regionalElevation = isKalahandi ? 250 : 18;
+
         const floodRes = calculateFloodRisk(
           {
             rainfallIntensityMmPerDay: precip24h,
-            riverLevelMetres: riverSurgeProxy,
-            elevationMetres: 18,
+            riverLevelMetres: 0,
+            elevationMetres: regionalElevation,
             distanceFromRiverKm: 3.0,
             exposedPopulation: regionalPopulation,
             historicalFloodFrequency: 1.5,
@@ -260,7 +271,12 @@ export function aggregateCommandCenterData(overrides?: CommandCenterDataOverride
         );
         floodScore = floodRes.score;
 
-        const pressureDropSurge = Math.max(0, (1013 - matchingWeather.surfacePressureHpa) * 0.04);
+        // Coastal storm surge check: only coastal districts can have storm surge
+        const isCoastal = ['puri', 'jagatsinghpur', 'kendrapara', 'ganjam', 'bhadrak', 'balasore'].some(
+          (c) => region.district.toLowerCase().includes(c) || region.displayName.toLowerCase().includes(c),
+        );
+        const pressureDropSurge = isCoastal ? Math.max(0, (1013 - matchingWeather.surfacePressureHpa) * 0.04) : 0;
+
         const cycloneRes = calculateCycloneRisk(
           {
             windSpeedKmh: matchingWeather.windSpeedKmh,
@@ -268,7 +284,7 @@ export function aggregateCommandCenterData(overrides?: CommandCenterDataOverride
             stormSurgeMetres: pressureDropSurge,
             distanceFromTrackKm: 45,
             exposedPopulation: regionalPopulation,
-            elevationMetres: 18,
+            elevationMetres: regionalElevation,
             historicalCycloneFrequency: 1.2,
             infrastructureVulnerabilityIndex: 0.35,
           },

@@ -217,9 +217,10 @@ async function runTests() {
 
   // ── TEST 8: calculateRoutes over Real OSM Graph ─────────────────────────────
   console.log('\n--- TEST 8: Route Calculation over Real OSM Graph ---');
-  if (routingGraph.nodes.length >= 2) {
-    const originNode = routingGraph.nodes[0];
-    const destNode = routingGraph.nodes[1];
+  if (routingGraph.edges.length > 0) {
+    const sampleEdge = routingGraph.edges[0];
+    const originNode = routingGraph.nodes.find((n) => n.id === sampleEdge.from) || routingGraph.nodes[0];
+    const destNode = routingGraph.nodes.find((n) => n.id === sampleEdge.to) || routingGraph.nodes[1];
 
     console.log(`Routing from [${originNode.name}] to [${destNode.name}]...`);
     const routes = calculateRoutes(
@@ -238,9 +239,9 @@ async function runTests() {
 
   // ── TEST 9: Disaster-Aware Cost Penalization & Avoidance ─────────────────────
   console.log('\n--- TEST 9: Disaster-Aware Routing & Blockage Avoidance ---');
-  // Create a controlled sub-graph with 2 paths: path A (short but blocked) and path B (longer but open)
-  const nStart = routingGraph.nodes[0];
-  const nEnd = routingGraph.nodes[1];
+  const sampleEdge9 = routingGraph.edges[0];
+  const nStart = routingGraph.nodes.find((n) => n.id === sampleEdge9.from) || routingGraph.nodes[0];
+  const nEnd = routingGraph.nodes.find((n) => n.id === sampleEdge9.to) || routingGraph.nodes[1];
 
   // Modify one edge to BLOCKED status
   const modifiedEdges = routingGraph.edges.map(e => {

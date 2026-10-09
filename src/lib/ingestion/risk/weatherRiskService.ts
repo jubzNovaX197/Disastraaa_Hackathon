@@ -22,6 +22,7 @@ import { calculateCycloneRisk, explainCycloneRisk } from '@/lib/risk/cyclone';
 import { calculateMultiHazardRisk, explainMultiHazardRisk } from '@/lib/risk/multiHazard';
 import { executeQuery } from '@/lib/db';
 import { getCachedWeather, getAllCachedWeather } from '@/lib/weather/store';
+import { riverService } from '@/lib/hydrology/riverService';
 
 // Cache for derived risk zones (15-minute TTL)
 interface CachedRiskResults {
@@ -146,14 +147,40 @@ export class WeatherRiskService {
       const [lon, lat] = wx.coordinates;
 
       // ── 1. Flood Risk Normalization ───────────────────────────
-      // Convert hourly/instantaneous precipitation into 24h intensity proxy
-      const precip24h = Math.max(0, wx.precipitationMm * 24);
-      const riverSurgeProxy = Math.max(-1.0, (wx.precipitationMm - 4) * 0.2);
+      // Use 24h accumulation if hourly forecast available; otherwise extrapolate instantaneous rate
+      let precip24h = Math.max(0, wx.precipitationMm * 24);
+      if (Array.isArray(wx.hourlyForecast) && wx.hourlyForecast.length >= 24) {
+        const sum24 = wx.hourlyForecast.slice(0, 24).reduce((acc, h) => acc + (h.precipitationMm || 0), 0);
+        if (sum24 > 0) {
+          precip24h = Math.round(sum24 * 10) / 10;
+        }
+      }
+
+      // Hydrology: Query riverService without fabricating water level from rainfall
+      let riverLevelMetres = 0; // Default: 0 m above flood stage (normal flow)
+      try {
+        const hydro = await riverService.getRiverStatusForDistrict(
+          wx.state || 'Odisha',
+          wx.district || 'Kalahandi',
+          lat,
+          lon,
+        );
+        if (hydro.gauges.length > 0) {
+          const primary = hydro.gauges[0];
+          if (primary.dangerLevelMslMeters && primary.waterLevelMslMeters) {
+            // Relative to danger level (negative = below flood stage)
+            riverLevelMetres = Math.round((primary.waterLevelMslMeters - primary.dangerLevelMslMeters) * 100) / 100;
+          }
+        }
+      } catch {
+        // Fallback to neutral 0 m when hydrology feed is offline
+        riverLevelMetres = 0;
+      }
 
       const floodResult = calculateFloodRisk(
         {
           rainfallIntensityMmPerDay: precip24h,
-          riverLevelMetres: riverSurgeProxy,
+          riverLevelMetres,
           elevationMetres: 18,
           distanceFromRiverKm: 3.0,
           exposedPopulation: 35000,
@@ -166,7 +193,13 @@ export class WeatherRiskService {
 
       // ── 2. Cyclone Risk Normalization ─────────────────────────
       const windKmh = wx.windSpeedKmh;
-      const pressureDropSurge = Math.max(0, (1013 - wx.surfacePressureHpa) * 0.04);
+      // Storm surge only applies to coastal districts; inland districts (like Kalahandi) are 0 m
+      const isCoastal = ['puri', 'jagatsinghpur', 'kendrapara', 'ganjam', 'bhadrak', 'balasore'].some(
+        (c) =>
+          (wx.district && wx.district.toLowerCase().includes(c)) ||
+          (wx.locationName && wx.locationName.toLowerCase().includes(c)),
+      );
+      const pressureDropSurge = isCoastal ? Math.max(0, (1013 - wx.surfacePressureHpa) * 0.04) : 0;
 
       const cycloneResult = calculateCycloneRisk(
         {

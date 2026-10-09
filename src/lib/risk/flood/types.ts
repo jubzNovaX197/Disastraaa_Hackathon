@@ -41,15 +41,23 @@ export interface FloodFactorScores {
 export type FloodSeverity = 'LOW' | 'MODERATE' | 'HIGH' | 'CRITICAL';
 
 export interface FloodRiskResult {
-  /** 0–100 composite risk score */
+  /** 0–100 composite risk score (deterministic index, NOT uncalibrated probability) */
   score: number;
   severity: FloodSeverity;
   /** Normalised 0–100 contribution of each factor */
   factors: FloodFactorScores;
-  /** Estimated affected population */
+  /** Estimated affected population (provisional scenario proxy) */
   affectedPopulation: number;
   /** 0–1 — data completeness / model confidence */
   confidence: number;
+  /** Data quality status based on input completeness & freshness */
+  qualityStatus?: 'HIGH' | 'DEGRADED' | 'INSUFFICIENT';
+  /** Provenance mode: measured physical telemetry vs scenario model */
+  evaluationMode?: 'MEASURED_OBSERVATION' | 'SCENARIO_ESTIMATE';
+  /** Deterministic model identifier */
+  modelId?: string;
+  /** Input validation or data limitation notes */
+  notes?: string[];
   /** ISO-8601 timestamp of calculation */
   calculatedAt: string;
   /** True = uses real-time inputs; false = demo/simulated */

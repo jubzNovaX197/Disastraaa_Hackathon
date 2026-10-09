@@ -29,6 +29,11 @@ function linearNorm(v: number, inMin: number, inMax: number): number {
   return clamp(((v - inMin) / (inMax - inMin)) * 100, 0, 100);
 }
 
+/** Validates if a value is a valid, finite number */
+function isValidNum(v: unknown): v is number {
+  return typeof v === 'number' && !isNaN(v) && isFinite(v);
+}
+
 /**
  * Normalise raw inputs to 0–100 factor scores.
  * Higher score = more risk contribution.
@@ -37,32 +42,37 @@ function linearNorm(v: number, inMin: number, inMax: number): number {
  * transparent and auditable without a statistics background.
  */
 function normaliseFactors(inputs: FloodRiskInputs): FloodFactorScores {
-  // Rainfall: 0 mm/day → 0 risk; 300+ mm/day → 100 risk
-  const rainfall = linearNorm(inputs.rainfallIntensityMmPerDay, 0, 300);
+  // Rainfall: 0 mm/day → 0 risk; 300+ mm/day → 100 risk. Default 0 if invalid
+  const rawRain = isValidNum(inputs.rainfallIntensityMmPerDay) ? Math.max(0, inputs.rainfallIntensityMmPerDay) : 0;
+  const rainfall = linearNorm(rawRain, 0, 300);
 
-  // River level: 0 m above flood stage → 0; 5+ m → 100
-  const riverLevel = linearNorm(inputs.riverLevelMetres, 0, 5);
+  // River level: 0 m above flood stage → 0; 5+ m → 100. Negative = below flood stage → 0
+  const rawRiver = isValidNum(inputs.riverLevelMetres) ? Math.max(0, inputs.riverLevelMetres) : 0;
+  const riverLevel = linearNorm(rawRiver, 0, 5);
 
   // Elevation: inverse — higher ground = lower risk
   // 0 m MSL = 100 risk; 50+ m MSL = 0 risk
-  const elevation = clamp(100 - linearNorm(inputs.elevationMetres, 0, 50), 0, 100);
+  const rawElev = isValidNum(inputs.elevationMetres) ? inputs.elevationMetres : 25;
+  const elevation = clamp(100 - linearNorm(rawElev, 0, 50), 0, 100);
 
   // Distance from river: inverse — closer = higher risk
   // 0 km = 100; 10+ km = 0
-  const distanceFromRiver = clamp(100 - linearNorm(inputs.distanceFromRiverKm, 0, 10), 0, 100);
+  const rawDist = isValidNum(inputs.distanceFromRiverKm) ? Math.max(0, inputs.distanceFromRiverKm) : 5;
+  const distanceFromRiver = clamp(100 - linearNorm(rawDist, 0, 10), 0, 100);
 
   // Population exposure proxy: 0 → 0; 1 000 000+ → 100
-  const population = linearNorm(inputs.exposedPopulation, 0, 1_000_000);
+  const rawPop = isValidNum(inputs.exposedPopulation) ? Math.max(0, inputs.exposedPopulation) : 0;
+  const population = linearNorm(rawPop, 0, 1_000_000);
 
   // Historical frequency: 0 events/decade → 0; 10+ → 100
-  const historicalFrequency = linearNorm(inputs.historicalFloodFrequency, 0, 10);
+  const rawHist = isValidNum(inputs.historicalFloodFrequency) ? Math.max(0, inputs.historicalFloodFrequency) : 0;
+  const historicalFrequency = linearNorm(rawHist, 0, 10);
 
   // Infrastructure vulnerability: already 0–1, scale to 0–100
-  const infrastructureVulnerability = clamp(
-    inputs.infrastructureVulnerabilityIndex * 100,
-    0,
-    100,
-  );
+  const rawVuln = isValidNum(inputs.infrastructureVulnerabilityIndex)
+    ? clamp(inputs.infrastructureVulnerabilityIndex, 0, 1)
+    : 0.3;
+  const infrastructureVulnerability = clamp(rawVuln * 100, 0, 100);
 
   return {
     rainfall,
@@ -92,25 +102,50 @@ function toSeverity(score: number): FloodSeverity {
 
 /**
  * Estimate affected population: linear proxy from composite score.
- * Not a real epidemiological model.
+ * Provisional scenario estimate — not a physical epidemiological model.
  */
 function estimateAffectedPopulation(population: number, score: number): number {
-  return Math.round(population * clamp(score / 100, 0, 1));
+  const pop = isValidNum(population) ? Math.max(0, population) : 0;
+  return Math.round(pop * clamp(score / 100, 0, 1));
 }
 
-/** Confidence: data-completeness heuristic (all inputs >= 0 = full confidence) */
-function calcConfidence(inputs: FloodRiskInputs): number {
-  const fields: number[] = [
-    inputs.rainfallIntensityMmPerDay,
-    inputs.riverLevelMetres,
-    inputs.elevationMetres,
-    inputs.distanceFromRiverKm,
-    inputs.exposedPopulation,
-    inputs.historicalFloodFrequency,
-    inputs.infrastructureVulnerabilityIndex,
+/**
+ * Confidence calculation: checks valid domain for each input.
+ * Note: Negative riverLevelMetres is a valid physical measurement (below flood stage).
+ */
+function evaluateInputIntegrity(inputs: FloodRiskInputs): {
+  confidence: number;
+  qualityStatus: 'HIGH' | 'DEGRADED' | 'INSUFFICIENT';
+  notes: string[];
+} {
+  const notes: string[] = [];
+  const checks = [
+    { name: 'rainfall', valid: isValidNum(inputs.rainfallIntensityMmPerDay) && inputs.rainfallIntensityMmPerDay >= 0, critical: true },
+    { name: 'riverLevel', valid: isValidNum(inputs.riverLevelMetres), critical: false }, // negative is valid
+    { name: 'elevation', valid: isValidNum(inputs.elevationMetres), critical: false },
+    { name: 'distanceFromRiver', valid: isValidNum(inputs.distanceFromRiverKm) && inputs.distanceFromRiverKm >= 0, critical: false },
+    { name: 'population', valid: isValidNum(inputs.exposedPopulation) && inputs.exposedPopulation >= 0, critical: false },
+    { name: 'historicalFrequency', valid: isValidNum(inputs.historicalFloodFrequency) && inputs.historicalFloodFrequency >= 0, critical: false },
+    { name: 'infrastructureVulnerability', valid: isValidNum(inputs.infrastructureVulnerabilityIndex) && inputs.infrastructureVulnerabilityIndex >= 0 && inputs.infrastructureVulnerabilityIndex <= 1, critical: false },
   ];
-  const populated = fields.filter((f) => f >= 0).length;
-  return Math.round((populated / fields.length) * 100) / 100;
+
+  const validCount = checks.filter((c) => c.valid).length;
+  let rawConf = Math.round((validCount / checks.length) * 100) / 100;
+
+  const failedCritical = checks.filter((c) => !c.valid && c.critical);
+  if (failedCritical.length > 0) {
+    notes.push(`Missing critical inputs: ${failedCritical.map((c) => c.name).join(', ')}.`);
+    rawConf = Math.min(rawConf, 0.35);
+  }
+
+  let qualityStatus: 'HIGH' | 'DEGRADED' | 'INSUFFICIENT' = 'HIGH';
+  if (failedCritical.length > 0 || rawConf < 0.4) {
+    qualityStatus = 'INSUFFICIENT';
+  } else if (rawConf < 0.8) {
+    qualityStatus = 'DEGRADED';
+  }
+
+  return { confidence: rawConf, qualityStatus, notes };
 }
 
 // ── Public API ────────────────────────────────────────────────────────────────
@@ -126,11 +161,11 @@ export function calculateFloodRisk(
   inputs: FloodRiskInputs,
   isLive = false,
 ): FloodRiskResult {
+  const { confidence, qualityStatus, notes } = evaluateInputIntegrity(inputs);
   const factors            = normaliseFactors(inputs);
   const score              = weightedScore(factors);
   const severity           = toSeverity(score);
   const affectedPopulation = estimateAffectedPopulation(inputs.exposedPopulation, score);
-  const confidence         = calcConfidence(inputs);
 
   return {
     score,
@@ -138,6 +173,10 @@ export function calculateFloodRisk(
     factors,
     affectedPopulation,
     confidence,
+    qualityStatus,
+    evaluationMode: isLive ? 'MEASURED_OBSERVATION' : 'SCENARIO_ESTIMATE',
+    modelId: 'disastraaa-flood-det-v1',
+    notes: notes.length > 0 ? notes : undefined,
     calculatedAt: new Date().toISOString(),
     isLive,
   };
