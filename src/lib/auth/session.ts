@@ -59,9 +59,35 @@ function fromBase64Url(str: string): Uint8Array {
   return bytes;
 }
 
+export function resolveAuthSecret(): string | undefined {
+  const candidates = [
+    process.env.AUTH_SECRET,
+    process.env.SESSION_SECRET,
+    process.env.NEXTAUTH_SECRET,
+    process.env.JWT_SECRET,
+  ];
+
+  for (const candidate of candidates) {
+    if (typeof candidate === 'string') {
+      const trimmed = candidate.trim().replace(/^["']|["']$/g, '').trim();
+      if (trimmed.length >= 32) {
+        return trimmed;
+      }
+    }
+  }
+
+  if (process.env.NODE_ENV !== 'production') {
+    return 'disastraaa-dev-auth-secret-key-32-chars-long-2026';
+  }
+
+  return undefined;
+}
+
 async function getKey(): Promise<CryptoKey> {
-  const secret = process.env.AUTH_SECRET || process.env.SESSION_SECRET || (process.env.NODE_ENV !== 'production' ? 'disastraaa-dev-auth-secret-key-32-chars-long-2026' : undefined);
-  if (!secret || secret.length < 32) throw new Error('AUTH_SECRET must contain at least 32 characters to enable account authentication.');
+  const secret = resolveAuthSecret();
+  if (!secret) {
+    throw new Error('AUTH_SECRET must contain at least 32 characters to enable account authentication in production (checked AUTH_SECRET, SESSION_SECRET, NEXTAUTH_SECRET, JWT_SECRET).');
+  }
   return crypto.subtle.importKey(
     'raw',
     encoder.encode(secret),

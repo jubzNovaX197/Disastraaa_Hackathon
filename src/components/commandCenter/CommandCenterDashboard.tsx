@@ -34,7 +34,7 @@ import { OperationsFiltersBar } from './OperationsFiltersBar';
 import { PriorityLocationsTable } from './PriorityLocationsTable';
 import { ResourceOperationsPanel } from './ResourceOperationsPanel';
 import { ShelterOperationsPanel } from './ShelterOperationsPanel';
-import { SituationSummaryPanel } from './SituationSummaryPanel';
+
 import { SituationTimelineTrend } from './SituationTimelineTrend';
 
 // Operational default map layers (Citizen reports & road disruptions visible for command response)
@@ -196,8 +196,7 @@ export function CommandCenterDashboard({
       {/* ── 2. Key Operational Metrics (KPIs) ── */}
       <CommandCenterKpiRow kpis={baseData.kpis} />
 
-      {/* ── 3. Operational Situation Brief (Dynamic Narrative) ── */}
-      <SituationSummaryPanel narrative={baseData.narrative} />
+
 
       {/* ── 3.1 AI Disaster Intelligence & Decision Support ── */}
       <DisasterIntelligenceSection />

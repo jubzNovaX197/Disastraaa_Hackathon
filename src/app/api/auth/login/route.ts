@@ -85,7 +85,14 @@ export async function POST(req: Request) {
     });
 
     return res;
-  } catch {
+  } catch (err: unknown) {
+    const errorName = err instanceof Error ? err.name : 'UnknownError';
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    const errorStack = err instanceof Error && err.stack ? err.stack : undefined;
+    console.error(
+      `[AUTH-LOGIN] Internal error creating session token for account "${user.email}": ${errorName}: ${errorMessage}`,
+      errorStack ? `\nStack trace: ${errorStack}` : '',
+    );
     return NextResponse.json(
       { success: false, error: 'Login failed. Please try again.' },
       { status: 500 },

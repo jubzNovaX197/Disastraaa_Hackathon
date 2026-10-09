@@ -191,8 +191,8 @@ export function MapPageClient({ initialDataset, environment }: MapPageClientProp
 
   return (
     <div className="relative w-full h-full">
-      {/* Environment Mode Switcher (Real Mode vs Simulation) — Centered horizontally at top */}
-      <div className="absolute top-2.5 sm:top-3 left-1/2 -translate-x-1/2 z-30 pointer-events-auto flex items-center bg-slate-900/90 dark:bg-surface-elevated/95 backdrop-blur-md p-1 rounded-full border border-white/10 shadow-xl max-w-[calc(100%-1rem)]">
+      {/* Environment Mode Switcher (Real Mode vs Simulation) — Centered horizontally at top on desktop, integrated into mobile top bar on mobile */}
+      <div className="hidden md:flex absolute top-2.5 sm:top-3 left-1/2 -translate-x-1/2 z-30 pointer-events-auto items-center bg-slate-900/90 dark:bg-surface-elevated/95 backdrop-blur-md p-1 rounded-full border border-white/10 shadow-xl max-w-[calc(100%-1rem)]">
         <button
           type="button"
           onClick={() => handleToggleEnvironment('REAL')}
