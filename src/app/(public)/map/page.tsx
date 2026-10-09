@@ -1,11 +1,10 @@
-import type { Metadata } from 'next';
-import { brand } from '@/config/brand';
 import { resolveServerEnvironment } from '@/lib/env';
 import { getDatasetProvider } from '@/lib/providers';
+import type { Metadata } from 'next';
 import { MapPageClient } from './MapPageClient';
 
 export const metadata: Metadata = {
-  title: `Live Map | ${brand.name}`,
+  title: 'Disaster Map',
   description: 'Interactive disaster intelligence map — risk zones, flood areas, shelters, alerts and infrastructure.',
 };
 

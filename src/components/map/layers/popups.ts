@@ -78,11 +78,11 @@ function amenity(icon: string, label: string, active: boolean): string {
   ">${icon} ${label}</span>`;
 }
 
-function demoTag(): string {
+function demoTag(props: Record<string, unknown>): string {
   return `<div style="
     font-size:10px;color:#475569;margin-top:8px;
     padding-top:8px;border-top:1px solid rgba(255,255,255,0.06);
-  ">⚠️ SIMULATED DATA — Not real government data</div>`;
+  ">${props.dataProvenance === 'Live API / cached observations' ? 'Live API / cached observations — check source age and availability' : 'Simulated — fictional operational data'}</div>`;
 }
 
 // ── Risk Zone popup ───────────────────────────────────────────────────────────
@@ -98,7 +98,7 @@ export function riskZonePopupHTML(props: Record<string, unknown>): string {
       ${row('Risk Score', `${props.riskScore}/100`)}
       ${row('Affected Population', formatNumber(Number(props.affectedPopulation)))}
       ${props.description ? `<div style="margin-top:8px;font-size:12px;color:#94A3B8;line-height:1.5;">${props.description}</div>` : ''}
-      ${demoTag()}
+      ${demoTag(props)}
     </div>`;
 }
 
@@ -119,7 +119,7 @@ export function floodAreaPopupHTML(props: Record<string, unknown>): string {
       ${props.areaKm2 != null ? row('Inundated Area', `${props.areaKm2} km²`) : ''}
       ${row('Last Updated', updated)}
       ${props.description ? `<div style="margin-top:8px;font-size:12px;color:#94A3B8;line-height:1.5;">${props.description}</div>` : ''}
-      ${demoTag()}
+      ${demoTag(props)}
     </div>`;
 }
 
@@ -150,7 +150,7 @@ export function shelterPopupHTML(props: Record<string, unknown>): string {
         ${amenity('⚡', 'Power', Boolean(props.hasPower))}
       </div>
       ${props.contactPhone ? row('Phone', String(props.contactPhone)) : ''}
-      ${demoTag()}
+      ${demoTag(props)}
     </div>`;
 }
 
@@ -188,7 +188,7 @@ export function alertPopupHTML(props: Record<string, unknown>): string {
       ${instruction ? `<div style="font-size:11px;color:#93C5FD;background:#1E3A8A25;border:1px solid #3B82F633;padding:6px 8px;border-radius:6px;margin:6px 0;"><strong>Directives:</strong> ${instruction}</div>` : ''}
       ${row('Issued', issued)}
       ${sourceAgency ? row('Authority', sourceAgency) : ''}
-      ${isReal ? '' : demoTag()}
+      ${demoTag(props)}
     </div>`;
 }
 
@@ -205,7 +205,7 @@ export function infrastructurePopupHTML(props: Record<string, unknown>): string 
       ${row('Status', operational ? '🟢 Operational' : '🔴 Non-operational')}
       ${props.capacity ? row('Capacity', String(props.capacity)) : ''}
       ${props.contactPhone ? row('Phone', String(props.contactPhone)) : ''}
-      ${demoTag()}
+      ${demoTag(props)}
     </div>`;
 }
 
@@ -226,7 +226,7 @@ export function blockedRoadPopupHTML(props: Record<string, unknown>): string {
       <div style="font-size:12px;color:#CBD5E1;line-height:1.5;margin-bottom:6px;">${props.reason}</div>
       ${row('Since', since)}
       ${props.alternateRoute ? `<div style="margin-top:6px;font-size:12px;"><span style="color:#64748B">Alternate:</span> <span style="color:#22D3EE;">${props.alternateRoute}</span></div>` : ''}
-      ${demoTag()}
+      ${demoTag(props)}
     </div>`;
 }
 
@@ -272,7 +272,7 @@ export function citizenReportPopupHTML(props: Record<string, unknown>): string {
       ` : ''}
       ${row('Reported', created)}
       ${row('Confirmations', String(props.confirmCount ?? 0))}
-      ${demoTag()}
+      ${demoTag(props)}
     </div>`;
 }
 

@@ -4,8 +4,8 @@
  */
 
 import { Badge } from '@/components/ui';
-import { timeAgo } from '@/lib/utils';
 import type { DemoAlert } from '@/data/types';
+import { timeAgo } from '@/lib/utils';
 
 const HAZARD_ICON: Record<string, string> = {
   FLOOD:       '🌊',

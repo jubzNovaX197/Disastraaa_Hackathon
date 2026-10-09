@@ -6,23 +6,23 @@
  * Future: replace store with a real DB / server actions without changing the UI.
  */
 
+import type { Role } from '@/types/roles';
 import type {
-  Incident,
-  IncidentStatus,
-  IncidentSeverity,
-  OperationalPriority,
-  TimelineEvent,
+  ActionStatus,
+  AddActionInput,
+  AssignTeamInput,
   AuditRecord,
   CreateIncidentInput,
-  UpdateStatusInput,
-  AssignTeamInput,
-  AddActionInput,
   EscalateInput,
+  Incident,
   IncidentAction,
-  ActionStatus,
+  IncidentSeverity,
+  IncidentStatus,
+  OperationalPriority,
+  TimelineEvent,
+  UpdateStatusInput,
 } from './types';
-import { VALID_TRANSITIONS, INCIDENT_STATUSES, type IncidentType } from './types';
-import type { Role } from '@/types/roles';
+import { INCIDENT_STATUSES, VALID_TRANSITIONS, type IncidentType } from './types';
 
 // ── Report → Incident Mappers ────────────────────────────────────────────────
 

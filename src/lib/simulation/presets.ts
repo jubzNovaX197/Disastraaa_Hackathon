@@ -4,7 +4,7 @@
  * Pre-calibrated operational scenarios for rapid situational testing.
  */
 
-import type { ScenarioPreset, ScenarioConfiguration } from './types';
+import type { ScenarioConfiguration, ScenarioPreset } from './types';
 
 export const DEFAULT_ADVANCED_CONDITIONS = {
   rainfallMm24h: 0,

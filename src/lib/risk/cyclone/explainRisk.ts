@@ -6,9 +6,9 @@
  */
 
 import type {
-  CycloneRiskResult,
-  CycloneRiskExplanation,
   CycloneFactorScores,
+  CycloneRiskExplanation,
+  CycloneRiskResult,
   CycloneSeverity,
 } from './types';
 

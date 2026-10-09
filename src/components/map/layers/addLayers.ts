@@ -8,22 +8,22 @@
  */
 
 
-import type { Map as MLMap, GeoJSONSource, ExpressionSpecification } from 'maplibre-gl';
+import { mapLayerIds } from '@/config/map';
 import type {
   FeatureCollection,
-  Polygon,
-  Point,
-  LineString,
   GeoJsonProperties,
+  LineString,
+  Point,
+  Polygon,
 } from 'geojson';
-import { mapLayerIds } from '@/config/map';
+import type { ExpressionSpecification, GeoJSONSource, Map as MLMap } from 'maplibre-gl';
 import {
+  blockedRoadColorExpr,
+  infraColorExpr,
+  reportStatusColorExpr,
   severityColorExpr,
   severityOpacityExpr,
   shelterStatusColorExpr,
-  infraColorExpr,
-  blockedRoadColorExpr,
-  reportStatusColorExpr,
 } from './styles';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

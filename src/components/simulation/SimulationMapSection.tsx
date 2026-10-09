@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
-import { Layers, Eye, ShieldAlert, Sparkles, MapPin } from 'lucide-react';
+import { DataProvenance } from '@/components/demo/DataProvenance';
 import { DisasterMap } from '@/components/map/DisasterMap';
 import { demoDataset } from '@/data/demo';
 import type { SimulationResult } from '@/lib/simulation/types';
 import { cn } from '@/lib/utils';
+import { Eye, Layers, ShieldAlert, Sparkles } from 'lucide-react';
+import { useState } from 'react';
 
 interface SimulationMapSectionProps {
   result: SimulationResult;
@@ -40,6 +41,7 @@ export function SimulationMapSection({ result }: SimulationMapSectionProps) {
 
   return (
     <div className="p-4 rounded-xl bg-white dark:bg-surface-card border border-slate-200 dark:border-white/[0.07] shadow-sm space-y-3">
+      <DataProvenance model source="Simulated" />
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-2 border-b border-slate-100 dark:border-white/[0.06]">
         <div>
           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-2">

@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server';
-import { SESSION_COOKIE_NAME, AUTH_MARKER_COOKIE_NAME } from '@/lib/auth/session';
 import { ROLE_COOKIE_NAME } from '@/lib/auth/roles';
+import { AUTH_MARKER_COOKIE_NAME, SESSION_COOKIE_NAME } from '@/lib/auth/session';
+import { NextResponse } from 'next/server';
 
 /**
  * POST /api/auth/logout

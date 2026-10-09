@@ -16,7 +16,16 @@
  * 7. Authority Verification Status & Workflow Actions (Verify, Mark Open, Partial, Closed, Escalate)
  */
 
-import { useState, useEffect } from 'react';
+import { DataProvenance } from '@/components/demo/DataProvenance';
+import type { CitizenReportItem } from '@/lib/reports/types';
+import {
+  ROAD_BLOCKAGE_CONFIG,
+  ROAD_STATUS_CONFIG,
+  ROAD_TYPE_CONFIG,
+  applyAuthorityRoadAction,
+  type RoadSegment,
+} from '@/lib/roads';
+import { cn, severityConfig, timeAgo } from '@/lib/utils';
 import {
   AlertTriangle,
   ArrowRight,
@@ -25,24 +34,13 @@ import {
   Compass,
   FileText,
   Hospital,
-  Info,
   MapPin,
   Navigation,
   Shield,
-  ShieldAlert,
-  Sparkles,
   X,
-  XCircle,
+  XCircle
 } from 'lucide-react';
-import { cn, severityConfig, timeAgo } from '@/lib/utils';
-import {
-  ROAD_STATUS_CONFIG,
-  ROAD_BLOCKAGE_CONFIG,
-  ROAD_TYPE_CONFIG,
-  applyAuthorityRoadAction,
-  type RoadSegment,
-} from '@/lib/roads';
-import type { CitizenReportItem } from '@/lib/reports/types';
+import { useEffect, useState } from 'react';
 
 interface RoadDetailPanelProps {
   road: RoadSegment;
@@ -113,6 +111,7 @@ export function RoadDetailPanel({
       role="region"
       aria-label={`Road Travel Safety: ${road.name}`}
     >
+      <DataProvenance />
       {/* ── Header ── */}
       <div className={cn('p-4 border-b border-slate-200 dark:border-white/10 transition-colors', statusCfg.bg)}>
         <div className="flex items-start justify-between gap-2">

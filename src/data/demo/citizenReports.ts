@@ -6,8 +6,8 @@
  * Task 11 — Citizen Evidence Intelligence with structured metadata & preliminary assessment.
  */
 
-import type { CitizenReportItem } from '@/lib/reports/types';
 import { assessPreliminaryEvidence } from '@/lib/reports/evidence';
+import type { CitizenReportItem } from '@/lib/reports/types';
 
 const rawDemoCitizenReports: CitizenReportItem[] = [
   // 1. Verified flood report with photo evidence (Cuttack North)

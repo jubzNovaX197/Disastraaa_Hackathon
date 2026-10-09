@@ -14,15 +14,16 @@
  *  - Desktop : side panel   (parent positions it)
  */
 
-import { useCallback } from 'react';
+import { DataProvenance } from '@/components/demo/DataProvenance';
 import type {
-  MultiHazardRiskExplanation,
-  HazardContribution,
   DataQuality,
+  HazardContribution,
+  MultiHazardRiskExplanation,
 } from '@/lib/risk/multiHazard';
 import { DATA_QUALITY_LABEL } from '@/lib/risk/multiHazard';
 import { cn, formatNumber } from '@/lib/utils';
 import type { Severity } from '@/types';
+import { useCallback } from 'react';
 
 // ── Severity styling ──────────────────────────────────────────────────────────
 
@@ -166,6 +167,7 @@ export function MultiHazardPanel({
       role="dialog"
       aria-label={`Multi-hazard risk details for ${locationName}`}
     >
+      <DataProvenance model />
       {/* ── Header ── */}
       <div className={cn('px-4 pt-4 pb-3', s.bg)}>
         <div className="flex items-start justify-between gap-2">

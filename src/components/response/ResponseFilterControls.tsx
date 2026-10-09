@@ -1,11 +1,9 @@
 'use client';
 
-import { Filter, RotateCcw } from 'lucide-react';
-import type { ResourceCategory } from '@/lib/planning/resources/types';
 import type {
-  ResponseFilters,
-  ResourceAvailabilityStatus,
+  ResponseFilters
 } from '@/lib/response/types';
+import { Filter, RotateCcw } from 'lucide-react';
 
 interface ResponseFilterControlsProps {
   filters: ResponseFilters;

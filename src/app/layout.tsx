@@ -1,9 +1,9 @@
+import { brand } from '@/config/brand';
+import { LiveIntelligenceProvider } from '@/context/LiveIntelligenceContext';
+import { ThemeProvider } from '@/context/ThemeContext';
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { brand } from '@/config/brand';
-import { ThemeProvider } from '@/context/ThemeContext';
-import { LiveIntelligenceProvider } from '@/context/LiveIntelligenceContext';
 
 const inter = Inter({
   subsets: ['latin'],

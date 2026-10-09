@@ -10,7 +10,7 @@
  * 4. Status transitions
  */
 
-import type { HazardType, Severity, ReportStatus } from '@/types';
+import type { HazardType, ReportStatus, Severity } from '@/types';
 import type {
   BlockageType,
   PreliminaryConfidence,

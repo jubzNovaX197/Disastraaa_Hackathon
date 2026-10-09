@@ -7,10 +7,10 @@
  */
 
 import { demoCitizenReports } from '@/data/demo/citizenReports';
-import type { CitizenReportItem, ReportType } from './types';
-import type { AppEnvironment } from '@/lib/env';
 import { executeQuery } from '@/lib/db';
+import type { AppEnvironment } from '@/lib/env';
 import { parseLocationFromText, registerRealOperationalLocation } from '@/lib/geo/regions';
+import type { CitizenReportItem, ReportType } from './types';
 
 // Global singletons across server runtime — strictly separated
 let _realReportsStore: CitizenReportItem[] = [];

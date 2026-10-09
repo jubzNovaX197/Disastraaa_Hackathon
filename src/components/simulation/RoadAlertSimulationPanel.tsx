@@ -1,8 +1,9 @@
 'use client';
 
-import { Car, Bell, AlertTriangle, ShieldCheck, XCircle } from 'lucide-react';
+import { DataProvenance } from '@/components/demo/DataProvenance';
 import type { SimulationResult } from '@/lib/simulation/types';
 import { cn } from '@/lib/utils';
+import { Bell, Car } from 'lucide-react';
 
 interface RoadAlertSimulationPanelProps {
   result: SimulationResult;
@@ -21,6 +22,7 @@ export function RoadAlertSimulationPanel({ result }: RoadAlertSimulationPanelPro
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      <DataProvenance model source="Simulated" />
       {/* 1. Road Access Impact Simulation (7 cols) */}
       <div className="lg:col-span-7 p-4 rounded-xl bg-white dark:bg-surface-card border border-slate-200 dark:border-white/[0.07] shadow-sm space-y-3.5">
         <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-white/[0.06]">

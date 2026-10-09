@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
-import { ShieldAlert, Navigation, MapPin, AlertTriangle, Eye, CheckCircle2, X } from 'lucide-react';
-import { Card, CardHeader, CardTitle, Badge } from '@/components/ui';
+import { DataProvenance } from '@/components/demo/DataProvenance';
+import { Badge, Card, CardTitle } from '@/components/ui';
 import type { RoadOperationsSummary } from '@/lib/commandCenter/types';
 import type { RoadSegment } from '@/lib/roads/types';
 import { cn } from '@/lib/utils';
+import { Eye, ShieldAlert, X } from 'lucide-react';
+import { useState } from 'react';
 
 interface BlockedRoadsOperationsPanelProps {
   roadOperations: RoadOperationsSummary;
@@ -26,6 +27,7 @@ export function BlockedRoadsOperationsPanel({ roadOperations }: BlockedRoadsOper
 
   return (
     <Card className="bg-surface-card/95 border-white/[0.08] shadow-lg">
+      <DataProvenance />
       <div className="p-4 border-b border-white/[0.06] flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-2">
           <span className="p-1.5 rounded-lg bg-orange-500/15 text-orange-400">

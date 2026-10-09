@@ -1,10 +1,10 @@
-import { NextResponse } from 'next/server';
-import { verifyPendingAuthorityAccount, type VerifyFailureReason } from '@/lib/auth/emailVerification';
-import { createVerifiedAuthorityUser, findUserByEmail, toSafeUser } from '@/lib/auth/users';
-import { createSessionToken, SESSION_COOKIE_NAME, AUTH_MARKER_COOKIE_NAME, SESSION_MAX_AGE_SECONDS } from '@/lib/auth/session';
-import { ROLE_COOKIE_NAME } from '@/lib/auth/roles';
-import { markInvitationAccepted } from '@/lib/auth/authorityRegistry';
 import { recordAuditEvent } from '@/lib/audit/log';
+import { markInvitationAccepted } from '@/lib/auth/authorityRegistry';
+import { verifyPendingAuthorityAccount, type VerifyFailureReason } from '@/lib/auth/emailVerification';
+import { ROLE_COOKIE_NAME } from '@/lib/auth/roles';
+import { AUTH_MARKER_COOKIE_NAME, createSessionToken, SESSION_COOKIE_NAME, SESSION_MAX_AGE_SECONDS } from '@/lib/auth/session';
+import { createVerifiedAuthorityUser, findUserByEmail, toSafeUser } from '@/lib/auth/users';
+import { NextResponse } from 'next/server';
 
 const FAILURE_MESSAGES: Record<VerifyFailureReason, string> = {
   NOT_FOUND: 'This verification session has expired or was already used. Please register again.',

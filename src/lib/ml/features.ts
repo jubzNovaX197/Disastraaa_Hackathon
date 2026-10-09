@@ -8,7 +8,7 @@
  * - Hydrological input bounds validation
  */
 
-import type { FloodFeatureRecord, ScalerParams, FloodPredictionInput } from './types';
+import type { FloodFeatureRecord, FloodPredictionInput, ScalerParams } from './types';
 
 export const FEATURE_NAMES = [
   'rain24hMm',

@@ -7,8 +7,8 @@
  */
 
 import { executeQuery } from '@/lib/db';
+import { parseLocationFromText, registerRealOperationalLocation } from '@/lib/geo/regions';
 import type { NormalizedWeather } from './types';
-import { registerRealOperationalLocation, parseLocationFromText } from '@/lib/geo/regions';
 
 // In-memory cache for ultra-fast repeated queries (60-minute TTL)
 const _weatherCache = new Map<string, { weather: NormalizedWeather; expiresAt: number }>();

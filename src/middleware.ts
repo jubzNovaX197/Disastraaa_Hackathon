@@ -1,6 +1,7 @@
-import { NextResponse, type NextRequest } from 'next/server';
-import { SESSION_COOKIE_NAME, verifySessionToken } from '@/lib/auth/session';
+import { canAccessDashboard, isKnownRole } from '@/lib/auth/accessPolicy';
 import { ROLE_COOKIE_NAME } from '@/lib/auth/roles';
+import { SESSION_COOKIE_NAME, verifySessionToken } from '@/lib/auth/session';
+import { NextResponse, type NextRequest } from 'next/server';
 
 /**
  * Server-side protection for operational/dashboard routes.
@@ -57,19 +58,24 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // Demo Access: unchanged — any active demo persona passes through exactly
-  // as it does today, with per-page role gating still applying downstream.
-  if (req.cookies.get(ROLE_COOKIE_NAME)?.value) {
-    return NextResponse.next();
-  }
-
   // Real session: verify signature + expiry.
   const sessionToken = req.cookies.get(SESSION_COOKIE_NAME)?.value;
   if (sessionToken) {
     const payload = await verifySessionToken(sessionToken);
     if (payload) {
-      return NextResponse.next();
+      return canAccessDashboard(payload.role, pathname)
+        ? NextResponse.next()
+        : new NextResponse('Forbidden: your account role cannot access this page.', { status: 403 });
     }
+    return NextResponse.redirect(new URL('/login', req.url));
+  }
+
+  // Unsigned persona cookies grant simulated dashboard access only.
+  const demoRole = req.cookies.get(ROLE_COOKIE_NAME)?.value;
+  if (req.cookies.get('disastraaa-env')?.value !== 'REAL' && demoRole && isKnownRole(demoRole)) {
+    return canAccessDashboard(demoRole, pathname)
+      ? NextResponse.next()
+      : new NextResponse('Forbidden: this simulated role cannot access this page.', { status: 403 });
   }
 
   const loginUrl = new URL('/login', req.url);

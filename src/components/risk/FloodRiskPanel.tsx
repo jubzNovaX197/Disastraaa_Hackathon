@@ -10,10 +10,10 @@
  * ⚠️  Shows PROTOTYPE / DEMO DATA indicator prominently.
  */
 
+import { DataProvenance } from '@/components/demo/DataProvenance';
+import type { FloodFactorScores, FloodRiskExplanation } from '@/lib/risk/flood';
+import { cn, formatNumber } from '@/lib/utils';
 import { useCallback } from 'react';
-import type { FloodRiskExplanation, FloodFactorScores } from '@/lib/risk/flood';
-import { cn } from '@/lib/utils';
-import { formatNumber } from '@/lib/utils';
 
 // ── Severity config ───────────────────────────────────────────────────────────
 
@@ -153,6 +153,7 @@ export function FloodRiskPanel({
       role="dialog"
       aria-label={`Flood risk details for ${zoneName}`}
     >
+      <DataProvenance model />
       {/* Header */}
       <div className={cn('px-4 pt-4 pb-3', styles.bg)}>
         <div className="flex items-start justify-between gap-2">

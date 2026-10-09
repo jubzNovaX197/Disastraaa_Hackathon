@@ -1,7 +1,7 @@
+import { DemoAccessPortal } from '@/components/auth/DemoAccessPortal';
+import { ROLE_COOKIE_NAME, parseRoleFromCookie } from '@/lib/auth/roles';
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
-import { ROLE_COOKIE_NAME, parseRoleFromCookie } from '@/lib/auth/roles';
-import { DemoAccessPortal } from '@/components/auth/DemoAccessPortal';
 
 export const metadata: Metadata = {
   title: 'Demo Access · Role-Based Evaluation Portal',

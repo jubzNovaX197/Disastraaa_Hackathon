@@ -9,9 +9,10 @@
  * Fully responsive, accessible, dark/light mode polished.
  */
 
-import { Radio, RefreshCw, Pause, Play, AlertCircle, WifiOff } from 'lucide-react';
 import { useLiveIntelligence } from '@/context/LiveIntelligenceContext';
+import { getFeedLabel } from '@/lib/realtime/feedStatus';
 import { cn } from '@/lib/utils';
+import { Pause, Play, RefreshCw, WifiOff } from 'lucide-react';
 
 interface LiveStatusIndicatorProps {
   className?: string;
@@ -21,6 +22,9 @@ interface LiveStatusIndicatorProps {
 export function LiveStatusIndicator({ className, compact = false }: LiveStatusIndicatorProps) {
   const {
     status,
+    environment,
+    overrides,
+    lastSuccessfulSync,
     sourceName,
     secondsSinceSync,
     isPaused,
@@ -113,12 +117,12 @@ export function LiveStatusIndicator({ className, compact = false }: LiveStatusIn
           {/* Text Labels */}
           {!compact && (
             <span className="text-[11px] font-bold tracking-wider font-mono">
-              {statusConfig.label}
+              {getFeedLabel(environment, status, overrides.alerts.filter(alert => alert.isActive).length)}
             </span>
           )}
 
           <span className="text-[10px] opacity-80 font-mono hidden sm:inline">
-            · {statusConfig.freshness}
+            · Last updated: {lastSuccessfulSync ? new Date(lastSuccessfulSync).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour12: false }) + ' IST' : 'Awaiting feed'}
           </span>
 
           {/* Unread updates pill */}

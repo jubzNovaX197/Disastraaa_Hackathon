@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Shield, Radio, AlertTriangle } from 'lucide-react';
-import { Badge } from '@/components/ui';
 import { LiveStatusIndicator } from '@/components/realtime/LiveStatusIndicator';
-import { ROLES, type Role } from '@/types/roles';
+import { Badge } from '@/components/ui';
 import { getDemoUserContext } from '@/lib/auth/roles';
 import type { AppEnvironment } from '@/lib/env';
 import { cn } from '@/lib/utils';
+import { ROLES, type Role } from '@/types/roles';
+import { AlertTriangle, Radio, Shield } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface SafeUser {
   uid: string;

@@ -1,17 +1,17 @@
 'use client';
 
-import { MapPin, Clock, Users } from 'lucide-react';
-import { cn, timeAgo, formatNumber } from '@/lib/utils';
 import {
-  INCIDENT_STATUS_CONFIG,
   INCIDENT_SEVERITY_CONFIG,
+  INCIDENT_STATUS_CONFIG,
   INCIDENT_TYPE_ICON,
   TEAM_LABEL,
   type Incident,
-  type IncidentStatus,
   type IncidentSeverity,
+  type IncidentStatus,
   type IncidentType,
 } from '@/lib/incidents';
+import { cn, formatNumber, timeAgo } from '@/lib/utils';
+import { Clock, MapPin, Users } from 'lucide-react';
 
 interface IncidentListProps {
   incidents:        Incident[];

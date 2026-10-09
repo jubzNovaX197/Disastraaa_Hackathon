@@ -12,16 +12,14 @@
  * 8. Side-by-side comparison with the deterministic flood risk score
  */
 
-import { loadModelArtifact } from './registry';
+import { calculateFloodRisk } from '@/lib/risk/flood/calculateFloodRisk';
 import {
-  scaleFeatureVector,
-  validateFeatureRanges,
-  FEATURE_NAMES,
   KESINGA_DANGER_STAGE_M,
-  KESINGA_WARNING_STAGE_M,
+  scaleFeatureVector,
+  validateFeatureRanges
 } from './features';
 import { sigmoid } from './models';
-import { calculateFloodRisk } from '@/lib/risk/flood/calculateFloodRisk';
+import { loadModelArtifact } from './registry';
 import type { FloodPredictionInput, FloodPredictionOutput, ModelArtifact } from './types';
 
 let _cachedArtifact: ModelArtifact | null = null;

@@ -6,9 +6,9 @@
  */
 
 import type {
-  FloodRiskResult,
-  FloodRiskExplanation,
   FloodFactorScores,
+  FloodRiskExplanation,
+  FloodRiskResult,
   FloodSeverity,
 } from './types';
 

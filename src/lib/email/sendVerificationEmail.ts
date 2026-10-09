@@ -17,8 +17,8 @@
  *                      EMAIL_FROM to an address on that domain.
  */
 
-import { Resend } from 'resend';
 import { brand } from '@/config/brand';
+import { Resend } from 'resend';
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const EMAIL_FROM = process.env.EMAIL_FROM || 'Disastraaa <onboarding@resend.dev>';

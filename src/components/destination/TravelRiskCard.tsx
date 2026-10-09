@@ -9,10 +9,11 @@
  * and Destination Safety Risk, along with factual route option comparisons.
  */
 
-import { AlertTriangle, Compass, Info, Navigation, Shield, ShieldAlert, Sparkles } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import type { TravelRiskResult, DestinationSafetyStatus } from '@/lib/destination/types';
+import { DataProvenance } from '@/components/demo/DataProvenance';
+import type { DestinationSafetyStatus, TravelRiskResult } from '@/lib/destination/types';
 import type { RouteResult } from '@/lib/routing/types';
+import { cn } from '@/lib/utils';
+import { Compass, Info } from 'lucide-react';
 
 interface TravelRiskCardProps {
   travelRisk: TravelRiskResult;
@@ -66,6 +67,7 @@ export function TravelRiskCard({
         className
       )}
     >
+      <DataProvenance model />
       {/* Header bar */}
       <div className="px-5 py-4 border-b border-slate-200 dark:border-white/10 bg-slate-50/90 dark:bg-surface-elevated/80 flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-2">

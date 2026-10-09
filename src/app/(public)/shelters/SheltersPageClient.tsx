@@ -1,22 +1,21 @@
 'use client';
 
-import { useState, useMemo } from 'react';
 import type { Shelter } from '@/data/types';
 import type { AppEnvironment } from '@/lib/env';
-import {
-  Home,
-  Search,
-  Activity,
-  Sparkles,
-  ShieldCheck,
-  Zap,
-  Utensils,
-  HeartPulse,
-  Phone,
-  MapPin,
-  CheckCircle2,
-} from 'lucide-react';
 import { cn } from '@/lib/utils';
+import {
+  Activity,
+  CheckCircle2,
+  HeartPulse,
+  Home,
+  MapPin,
+  Phone,
+  Search,
+  Sparkles,
+  Utensils,
+  Zap
+} from 'lucide-react';
+import { useMemo, useState } from 'react';
 
 interface SheltersPageClientProps {
   initialShelters: Shelter[];

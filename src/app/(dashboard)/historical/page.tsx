@@ -1,8 +1,8 @@
-import type { Metadata } from 'next';
+import { HistoricalAnalysisPanel } from '@/components/historical/HistoricalAnalysisPanel';
 import { brand } from '@/config/brand';
 import { demoHistoricalEvents } from '@/data/demo/historicalEvents';
-import { summariseEvents, sortByRecent } from '@/lib/historical/engine';
-import { HistoricalAnalysisPanel } from '@/components/historical/HistoricalAnalysisPanel';
+import { sortByRecent, summariseEvents } from '@/lib/historical/engine';
+import type { Metadata } from 'next';
 import { HistoricalDashboardStats } from './HistoricalDashboardStats';
 
 import { resolveServerEnvironment } from '@/lib/env';

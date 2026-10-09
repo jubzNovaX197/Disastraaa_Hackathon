@@ -5,7 +5,7 @@
  * Reuses existing risk/impact data — does NOT create a new risk engine.
  */
 
-import type { EvacuationZone, EvacuationSummary, ShelterPressure } from './types';
+import type { EvacuationSummary, EvacuationZone, ShelterPressure } from './types';
 import { EVACUATION_STATUS } from './types';
 
 // ── Shelter pressure helper ───────────────────────────────────────────────────

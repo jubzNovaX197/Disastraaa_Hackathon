@@ -1,9 +1,9 @@
 'use client';
 
-import { Users, Building2, Car, HeartPulse, GraduationCap, Home, ShieldAlert, CheckCircle2 } from 'lucide-react';
+import { DataProvenance } from '@/components/demo/DataProvenance';
 import type { ImpactAnalyticsData, ImpactAnalyticsMetric } from '@/lib/analytics/types';
 import { formatNumber } from '@/lib/utils';
-import { cn } from '@/lib/utils';
+import { Building2, Car, CheckCircle2, GraduationCap, HeartPulse, Home, ShieldAlert, Users } from 'lucide-react';
 
 interface ImpactAnalyticsPanelProps {
   impact: ImpactAnalyticsData;
@@ -25,6 +25,7 @@ export function ImpactAnalyticsPanel({ impact }: ImpactAnalyticsPanelProps) {
 
   return (
     <div className="p-4 rounded-xl bg-white dark:bg-surface-card border border-slate-200 dark:border-white/[0.07] shadow-sm space-y-4">
+      <DataProvenance model />
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-2">

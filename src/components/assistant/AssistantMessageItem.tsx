@@ -4,23 +4,20 @@
  * AI Disaster Intelligence Assistant — Message Bubble & Structured Cards
  */
 
-import { useState } from 'react';
-import {
-  Bot,
-  User,
-  ShieldCheck,
-  CheckCircle2,
-  AlertCircle,
-  Copy,
-  Check,
-  Database,
-  Clock,
-  Layers,
-  Sparkles,
-  MapPin,
-} from 'lucide-react';
 import type { AssistantMessage, DataQualityBadge } from '@/lib/ai/types';
 import { cn } from '@/lib/utils';
+import {
+  Bot,
+  Check,
+  Clock,
+  Copy,
+  Database,
+  MapPin,
+  ShieldCheck,
+  Sparkles,
+  User
+} from 'lucide-react';
+import { useState } from 'react';
 
 interface AssistantMessageItemProps {
   message: AssistantMessage;

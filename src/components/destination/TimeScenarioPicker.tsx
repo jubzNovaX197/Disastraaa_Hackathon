@@ -9,11 +9,10 @@
  * custom dates/times to inspect time-varying travel risk and safety conditions.
  */
 
-import { useState } from 'react';
-import { Calendar, Clock, Sparkles } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { DEMO_SCENARIOS } from '@/lib/destination/scenarios';
 import type { ScenarioSlotKey, TimeRiskScenario } from '@/lib/destination/types';
+import { cn } from '@/lib/utils';
+import { Calendar, Clock, Sparkles } from 'lucide-react';
+import { useState } from 'react';
 
 interface TimeScenarioPickerProps {
   activeScenario: TimeRiskScenario;

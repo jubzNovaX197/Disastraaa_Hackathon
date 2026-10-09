@@ -1,19 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { DataProvenance } from '@/components/demo/DataProvenance';
+import { Badge, Card, CardTitle } from '@/components/ui';
+import type { ResourceReadinessItem } from '@/lib/response/types';
+import { cn, formatNumber } from '@/lib/utils';
 import {
-  Package,
+  ArrowRight,
+  Building,
   ChevronDown,
   ChevronUp,
-  MapPin,
-  Building,
-  AlertTriangle,
-  ArrowRight,
-  ShieldAlert,
+  Package
 } from 'lucide-react';
-import { Card, CardHeader, CardTitle, Badge } from '@/components/ui';
-import { formatNumber, cn } from '@/lib/utils';
-import type { ResourceReadinessItem, ResourceZoneAllocation } from '@/lib/response/types';
+import { useState } from 'react';
 
 interface ResourceReadinessGridProps {
   resources: ResourceReadinessItem[];
@@ -38,6 +36,7 @@ export function ResourceReadinessGrid({
 
   return (
     <Card className="bg-surface-card/95 border-white/[0.08] shadow-lg">
+      <DataProvenance />
       <div className="p-4 border-b border-white/[0.06] flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-2">
           <span className="p-1.5 rounded-lg bg-blue-500/15 text-blue-400">

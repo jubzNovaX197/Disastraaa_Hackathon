@@ -5,8 +5,8 @@
  * ⚠️  PROTOTYPE weights — not official disaster-management standards.
  */
 
-import type { RouteEdge } from './types';
 import type { Severity } from '@/types';
+import type { RouteEdge } from './types';
 
 // ── Base speeds by road type (km/h) ──────────────────────────────────────────
 

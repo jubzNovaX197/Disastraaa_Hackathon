@@ -13,8 +13,8 @@
 import { cwcWrisClient } from './cwcWrisClient';
 import { glofasClient } from './glofasClient';
 import type {
-  RiverGaugeObservation,
   RiverDischargeObservation,
+  RiverGaugeObservation,
   RiverIntelligenceSummary,
 } from './types';
 

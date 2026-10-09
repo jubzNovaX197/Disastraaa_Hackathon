@@ -1,6 +1,6 @@
+import type { Severity } from '@/types';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import type { Severity } from '@/types';
 
 /** Safely merge Tailwind class names, resolving conflicts */
 export function cn(...inputs: ClassValue[]): string {

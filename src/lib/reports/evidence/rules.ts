@@ -7,10 +7,10 @@
  */
 
 import type {
-  EvidenceFlag,
-  EvidenceQualityIndicator,
   ContextConsistency,
   EvidenceConfidence,
+  EvidenceFlag,
+  EvidenceQualityIndicator,
 } from './types';
 
 // ── Validation Limits ────────────────────────────────────────────────────────

@@ -23,24 +23,24 @@
  * field, dropdown, or hidden input. Role comes entirely from the server.
  */
 
-import { useEffect, useState, type FormEvent } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
+import { cn } from '@/lib/utils';
 import {
-  Loader2,
-  Mail,
-  Lock,
-  User,
-  ShieldCheck,
-  ArrowRight,
   AlertTriangle,
+  ArrowRight,
   Eye,
   EyeOff,
   KeyRound,
+  Loader2,
+  Lock,
+  Mail,
   MailCheck,
+  ShieldCheck,
   Sparkles,
+  User,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState, type FormEvent } from 'react';
 
 interface AccountAuthFormProps {
   mode: 'login' | 'register';
@@ -128,7 +128,7 @@ export function AccountAuthForm({ mode }: AccountAuthFormProps) {
         if (r === 'SUPER_ADMIN') targetUrl = '/governance';
         else if (r === 'NATIONAL_AUTHORITY') targetUrl = '/analytics';
         else if (r === 'FIELD_OPERATOR') targetUrl = '/operations';
-        else if (r === 'REGISTERED_USER') targetUrl = '/map';
+        else if (r === 'REGISTERED_USER' || r === 'CITIZEN') targetUrl = '/map';
         else targetUrl = '/dashboard';
       }
 

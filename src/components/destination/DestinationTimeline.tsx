@@ -7,9 +7,10 @@
  *     Values are deterministically modeled from scenario disaster inputs.
  */
 
-import { TrendingDown, TrendingUp, Sparkles, Clock } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { DataProvenance } from '@/components/demo/DataProvenance';
 import type { DestinationSafetyResult, DestinationSafetyStatus } from '@/lib/destination/types';
+import { cn } from '@/lib/utils';
+import { Clock } from 'lucide-react';
 
 interface DestinationTimelineProps {
   timeline: DestinationSafetyResult['timeline'];
@@ -63,6 +64,7 @@ export function DestinationTimeline({
         className
       )}
     >
+      <DataProvenance model />
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-200">
           <Clock className="w-3.5 h-3.5 text-accent" />

@@ -7,58 +7,48 @@
  */
 
 import type { AppEnvironment } from '@/lib/env';
-import type {
-  DisasterDataProvider,
-  AlertProvider,
-  HazardProvider,
-  RoadProvider,
-  ShelterProvider,
-  ReportProvider,
-  IncidentProvider,
-} from './types';
 import {
-  demoDataProvider,
   demoAlertProvider,
+  demoDataProvider,
   demoHazardProvider,
+  demoIncidentProvider,
+  demoReportProvider,
   demoRoadProvider,
   demoShelterProvider,
-  demoReportProvider,
-  demoIncidentProvider,
 } from './demo/demoProvider';
 import { demoWeatherProvider } from './demo/demoWeatherProvider';
 import {
-  realDataProvider,
   realAlertProvider,
+  realDataProvider,
   realHazardProvider,
+  realIncidentProvider,
+  realReportProvider,
   realRoadProvider,
   realShelterProvider,
-  realReportProvider,
-  realIncidentProvider,
 } from './real/realProvider';
 import { realWeatherProvider } from './real/realWeatherProvider';
-import type { WeatherProvider } from './types';
+import type {
+  AlertProvider,
+  DisasterDataProvider,
+  HazardProvider,
+  IncidentProvider,
+  ReportProvider,
+  RoadProvider,
+  ShelterProvider,
+  WeatherProvider,
+} from './types';
 
-export * from './types';
 export {
-  demoDataProvider,
-  demoAlertProvider,
-  demoHazardProvider,
-  demoRoadProvider,
-  demoShelterProvider,
-  demoReportProvider,
-  demoIncidentProvider,
+  demoAlertProvider, demoDataProvider, demoHazardProvider, demoIncidentProvider, demoReportProvider, demoRoadProvider,
+  demoShelterProvider
 } from './demo/demoProvider';
-export {
-  realDataProvider,
-  realAlertProvider,
-  realHazardProvider,
-  realRoadProvider,
-  realShelterProvider,
-  realReportProvider,
-  realIncidentProvider,
-} from './real/realProvider';
 export { demoWeatherProvider } from './demo/demoWeatherProvider';
+export {
+  realAlertProvider, realDataProvider, realHazardProvider, realIncidentProvider, realReportProvider, realRoadProvider,
+  realShelterProvider
+} from './real/realProvider';
 export { realWeatherProvider } from './real/realWeatherProvider';
+export * from './types';
 
 export function getDatasetProvider(env: AppEnvironment): DisasterDataProvider {
   return env === 'DEMO' ? demoDataProvider : realDataProvider;

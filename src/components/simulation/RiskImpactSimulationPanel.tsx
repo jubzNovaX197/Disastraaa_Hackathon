@@ -1,22 +1,21 @@
 'use client';
 
+import { DataProvenance } from '@/components/demo/DataProvenance';
+import type { SimulationResult } from '@/lib/simulation/types';
+import { cn, formatNumber } from '@/lib/utils';
 import {
   Activity,
-  Waves,
-  Wind,
-  Layers,
   ArrowRight,
   Building2,
-  Users,
   Car,
-  HeartPulse,
   GraduationCap,
+  HeartPulse,
   Home,
-  CheckCircle2,
+  Layers,
+  Users,
+  Waves,
+  Wind
 } from 'lucide-react';
-import type { SimulationResult } from '@/lib/simulation/types';
-import { formatNumber } from '@/lib/utils';
-import { cn } from '@/lib/utils';
 
 interface RiskImpactSimulationPanelProps {
   result: SimulationResult;
@@ -61,6 +60,7 @@ export function RiskImpactSimulationPanel({ result }: RiskImpactSimulationPanelP
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <DataProvenance model source="Simulated" />
       {/* 1. Risk Response & Causal Drivers */}
       <div className="p-4 rounded-xl bg-white dark:bg-surface-card border border-slate-200 dark:border-white/[0.07] shadow-sm space-y-3.5">
         <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-white/[0.06]">

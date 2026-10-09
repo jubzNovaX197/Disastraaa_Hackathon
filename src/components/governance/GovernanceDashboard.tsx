@@ -7,37 +7,32 @@
  * Dedicated workspace for SUPER_ADMIN (Level 5 Clearance).
  */
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { PersonnelManagementPanel } from '@/components/auth/PersonnelManagementPanel';
+import { Badge, Card, CardTitle } from '@/components/ui';
 import {
-  ShieldAlert,
-  ShieldCheck,
-  Lock,
-  KeyRound,
-  Users,
-  FileCheck2,
-  Activity,
-  AlertTriangle,
-  Server,
-  RefreshCw,
-  Eye,
-  CheckCircle2,
-  ExternalLink,
-  ChevronRight,
-  Database,
-  Terminal,
-} from 'lucide-react';
+  DEMO_ROLES_CONFIG,
+  ROLE_COOKIE_NAME,
+  getDemoUserContext,
+  isAuthorizedForGovernance,
+} from '@/lib/auth/roles';
+import { cn } from '@/lib/utils';
 import { ROLES, type Role } from '@/types/roles';
 import {
-  ROLE_COOKIE_NAME,
-  isAuthorizedForGovernance,
-  getDemoUserContext,
-  DEMO_ROLES_CONFIG,
-} from '@/lib/auth/roles';
-import { Card, CardHeader, CardTitle, Badge } from '@/components/ui';
-import { cn } from '@/lib/utils';
-import { PersonnelManagementPanel } from '@/components/auth/PersonnelManagementPanel';
+  Activity,
+  CheckCircle2,
+  ChevronRight,
+  Database,
+  FileCheck2,
+  KeyRound,
+  Lock,
+  RefreshCw,
+  Server,
+  ShieldAlert,
+  Users
+} from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 interface GovernanceDashboardProps {
   initialRole?: Role;

@@ -1,9 +1,10 @@
 'use client';
 
-import { Package, AlertCircle, CheckCircle2, TrendingDown } from 'lucide-react';
-import { Card, CardHeader, CardTitle, Badge } from '@/components/ui';
-import { formatNumber, cn } from '@/lib/utils';
+import { DataProvenance } from '@/components/demo/DataProvenance';
+import { Badge, Card, CardTitle } from '@/components/ui';
 import type { ResourceOperationsSummary } from '@/lib/commandCenter/types';
+import { cn, formatNumber } from '@/lib/utils';
+import { Package } from 'lucide-react';
 
 interface ResourceOperationsPanelProps {
   resourceOperations: ResourceOperationsSummary;
@@ -14,6 +15,7 @@ export function ResourceOperationsPanel({ resourceOperations }: ResourceOperatio
 
   return (
     <Card className="bg-surface-card/95 border-white/[0.08] shadow-lg">
+      <DataProvenance />
       <div className="p-4 border-b border-white/[0.06] flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-2">
           <span className="p-1.5 rounded-lg bg-blue-500/15 text-blue-400">

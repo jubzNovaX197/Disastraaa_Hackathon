@@ -15,21 +15,19 @@
  * - Graceful empty/unavailable state
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import {
-  CloudRain,
-  Wind,
-  Compass,
-  Gauge,
-  Droplets,
-  RefreshCw,
-  ChevronDown,
-  Info,
-  Thermometer,
-} from 'lucide-react';
+import type { AppEnvironment } from '@/lib/env';
 import { cn } from '@/lib/utils';
 import type { NormalizedWeather, WeatherFreshnessStatus } from '@/lib/weather/types';
-import type { AppEnvironment } from '@/lib/env';
+import {
+  ChevronDown,
+  CloudRain,
+  Droplets,
+  Gauge,
+  Info,
+  RefreshCw,
+  Wind
+} from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface LiveWeatherWidgetProps {
   environment?: AppEnvironment;
@@ -125,6 +123,7 @@ export function LiveWeatherWidget({
 
   return (
     <div className={cn('pointer-events-auto select-none', className)}>
+      <span className="block text-[9px] text-slate-500 dark:text-slate-300">{environment === 'DEMO' ? 'Simulated' : 'Live API · Open-Meteo'}</span>
       {/* Minimized Pill */}
       <button
         type="button"

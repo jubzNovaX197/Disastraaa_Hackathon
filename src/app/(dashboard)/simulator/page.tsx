@@ -1,6 +1,6 @@
-import type { Metadata } from 'next';
-import { resolveActiveRole } from '@/lib/auth/resolveRole';
 import { ResponseSimulatorDashboard } from '@/components/simulation/ResponseSimulatorDashboard';
+import { resolveActiveRole } from '@/lib/auth/resolveRole';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Response Simulator',

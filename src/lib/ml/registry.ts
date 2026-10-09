@@ -8,13 +8,13 @@
  * - Storage in `.storage/models/` and Neon metadata records
  */
 
-import fs from 'fs';
-import path from 'path';
-import crypto from 'crypto';
-import type { ModelArtifact } from './types';
-import { objectStorage } from '@/lib/storage';
 import { saveDatasetManifest } from '@/lib/platform/db';
 import type { DatasetManifest } from '@/lib/platform/types';
+import { objectStorage } from '@/lib/storage';
+import crypto from 'crypto';
+import fs from 'fs';
+import path from 'path';
+import type { ModelArtifact } from './types';
 
 const MODELS_DIR = path.resolve(process.cwd(), '.storage', 'models');
 

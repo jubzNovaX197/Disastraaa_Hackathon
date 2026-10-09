@@ -7,7 +7,7 @@
  * Integrates with existing RBAC, alerts, reports, roads, shelters and resources.
  */
 
-import type { HazardType, Severity } from '@/types';
+import type { HazardType } from '@/types';
 import type { Role } from '@/types/roles';
 
 // ── Incident Types ────────────────────────────────────────────────────────────
@@ -70,6 +70,7 @@ export type IncidentSource =
   | 'SYSTEM_GENERATED';
 
 export type DataLabel =
+  | 'SIMULATION'
   | 'VERIFIED'
   | 'PREDICTED'
   | 'CITIZEN_REPORT'

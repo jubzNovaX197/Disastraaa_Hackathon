@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
-import Link from 'next/link';
-import { User, ShieldCheck, Sparkles, LogIn } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { CitizenRegisterForm } from './CitizenRegisterForm';
+import { LogIn, ShieldCheck, Sparkles, User } from 'lucide-react';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { AccountAuthForm } from './AccountAuthForm';
+import { CitizenRegisterForm } from './CitizenRegisterForm';
 
 export type RegisterAccountType = 'citizen' | 'authority';
 

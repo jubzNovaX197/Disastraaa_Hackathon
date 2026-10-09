@@ -5,32 +5,31 @@
  * All records are marked sourceType = 'SIMULATION'.
  */
 
+import { demoDataset, demoRoadSegments } from '@/data/demo';
+import { demoCitizenReports } from '@/data/demo/citizenReports';
+import { demoCycloneTrack, demoCycloneZones } from '@/data/demo/cycloneZones';
 import type {
-  DisasterDataProvider,
-  AlertProvider,
-  HazardProvider,
-  RoadProvider,
-  ShelterProvider,
-  ReportProvider,
-  IncidentProvider,
-  DataProvenance,
-} from '../types';
-import type {
-  DisasterDataset,
-  RiskZone,
-  FloodArea,
-  Shelter,
-  DemoAlert,
   BlockedRoad,
   CycloneTrack,
+  DemoAlert,
+  DisasterDataset,
+  FloodArea,
+  RiskZone,
+  Shelter,
 } from '@/data/types';
-import type { RoadSegment } from '@/lib/roads/types';
-import type { CitizenReportItem } from '@/lib/reports/types';
 import type { Incident } from '@/lib/incidents/types';
-import { demoDataset } from '@/data/demo';
-import { demoCycloneZones, demoCycloneTrack } from '@/data/demo/cycloneZones';
-import { demoCitizenReports } from '@/data/demo/citizenReports';
-import { demoRoadSegments } from '@/data/demo';
+import type { CitizenReportItem } from '@/lib/reports/types';
+import type { RoadSegment } from '@/lib/roads/types';
+import type {
+  AlertProvider,
+  DataProvenance,
+  DisasterDataProvider,
+  HazardProvider,
+  IncidentProvider,
+  ReportProvider,
+  RoadProvider,
+  ShelterProvider,
+} from '../types';
 
 export class DemoAlertProvider implements AlertProvider {
   async getAlerts(): Promise<DemoAlert[]> {

@@ -10,8 +10,8 @@
  */
 
 import { executeQuery } from '@/lib/db';
+import { parseLocationFromText, registerRealOperationalLocation } from '@/lib/geo/regions';
 import type { IngestedHazardEvent } from '../types';
-import { registerRealOperationalLocation, parseLocationFromText } from '@/lib/geo/regions';
 
 // In-memory cache for fast repeated reads without slamming PostgreSQL
 let _cachedHazards: IngestedHazardEvent[] = [];

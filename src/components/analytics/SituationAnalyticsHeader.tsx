@@ -1,9 +1,9 @@
 'use client';
 
-import { Activity, Shield, RefreshCw } from 'lucide-react';
 import { LiveStatusIndicator } from '@/components/realtime/LiveStatusIndicator';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import type { Role } from '@/types/roles';
+import { Activity, Shield } from 'lucide-react';
 
 interface SituationAnalyticsHeaderProps {
   role: Role;

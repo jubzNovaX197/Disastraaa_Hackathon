@@ -13,6 +13,11 @@
 
 # ── Local env files (never commit) ───────────────────────────
 .env*.local
+.env
+.env.*
+!.env.example
+/test-results/
+/playwright-report/
 
 # ── Debug logs ────────────────────────────────────────────────
 npm-debug.log*

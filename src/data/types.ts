@@ -8,8 +8,8 @@
  * All geographic coordinates are [longitude, latitude] (GeoJSON order).
  */
 
-import type { Severity, HazardType, ReportStatus } from '@/types';
 import type { RoadSegment } from '@/lib/roads/types';
+import type { HazardType, ReportStatus, Severity } from '@/types';
 
 // ── Shared ────────────────────────────────────────────────────────────────────
 

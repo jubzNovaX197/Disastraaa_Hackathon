@@ -13,10 +13,10 @@
  * ⚠️  ALL distances, names and statuses are PROTOTYPE demo data.
  */
 
-import type { RouteNode, RouteEdge } from './types';
-import type { RoadSegment } from '@/lib/roads/types';
 import type { Shelter } from '@/data/types';
 import { haversineDistanceKm } from '@/lib/geo/osm/validation';
+import type { RoadSegment } from '@/lib/roads/types';
+import type { RouteEdge, RouteNode } from './types';
 
 // ── Nodes ─────────────────────────────────────────────────────────────────────
 

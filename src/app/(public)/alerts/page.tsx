@@ -1,10 +1,10 @@
-import type { Metadata } from 'next';
+import { AlertsView } from '@/components/alerts';
 import { Footer } from '@/components/layout/Footer';
+import { alertStore } from '@/lib/alerts/alertStore';
+import type { FeedStatusRecord } from '@/lib/alerts/types';
 import { resolveServerEnvironment } from '@/lib/env';
 import { demoAlertProvider } from '@/lib/providers';
-import { alertStore } from '@/lib/alerts/alertStore';
-import { AlertsView } from '@/components/alerts';
-import type { FeedStatusRecord } from '@/lib/alerts/types';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Disaster Warnings & Early Warning Broadcasts',

@@ -1,9 +1,10 @@
 'use client';
 
-import { Users, FileCheck2, ShieldCheck, Clock, MapPin, AlertCircle, Image as ImageIcon } from 'lucide-react';
-import { Card, CardHeader, CardTitle, Badge } from '@/components/ui';
+import { DataProvenance } from '@/components/demo/DataProvenance';
+import { Badge, Card, CardTitle } from '@/components/ui';
 import type { CitizenReportsIntelligence } from '@/lib/commandCenter/types';
 import { cn } from '@/lib/utils';
+import { Clock, Image as ImageIcon, MapPin, Users } from 'lucide-react';
 
 interface CitizenReportsOperationsPanelProps {
   intelligence: CitizenReportsIntelligence;
@@ -23,6 +24,7 @@ export function CitizenReportsOperationsPanel({ intelligence }: CitizenReportsOp
 
   return (
     <Card className="bg-surface-card/95 border-white/[0.08] shadow-lg">
+      <DataProvenance />
       <div className="p-4 border-b border-white/[0.06] flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-2">
           <span className="p-1.5 rounded-lg bg-cyan-500/15 text-cyan-400">

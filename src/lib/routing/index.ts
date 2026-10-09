@@ -1,21 +1,16 @@
 export type {
-  RouteNode,
-  RouteEdge,
-  RouteMode,
-  RouteRequest,
+  RouteComparison, RouteEdge,
+  RouteMode, RouteNode, RouteRequest,
   RouteResult,
-  RouteSegment,
-  RouteComparison,
+  RouteSegment
 } from './types';
 
-export {
-  DEMO_NODES,
-  NODE_BY_ID,
-  DEMO_EDGES,
-  buildAdjacency,
-  buildGraphFromRoadSegments,
-  type RoutingGraph,
-} from './graph';
 export { calculateRoutes } from './engine';
+export {
+  DEMO_EDGES, DEMO_NODES,
+  NODE_BY_ID, buildAdjacency,
+  buildGraphFromRoadSegments,
+  type RoutingGraph
+} from './graph';
 export { BASE_SPEED_KMH, SAFETY_WEIGHTS } from './scoring';
 

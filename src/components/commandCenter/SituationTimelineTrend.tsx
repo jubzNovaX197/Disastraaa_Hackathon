@@ -1,9 +1,9 @@
 'use client';
 
-import { Clock, TrendingUp, AlertTriangle } from 'lucide-react';
-import { Card, CardHeader, CardTitle, Badge } from '@/components/ui';
+import { Badge, Card, CardTitle } from '@/components/ui';
 import type { SituationTimelinePoint } from '@/lib/commandCenter/types';
 import { cn } from '@/lib/utils';
+import { AlertTriangle, Clock } from 'lucide-react';
 
 interface SituationTimelineTrendProps {
   timeline: SituationTimelinePoint[];

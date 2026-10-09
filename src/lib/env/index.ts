@@ -3,11 +3,11 @@
  *
  * Single source of truth for REAL vs DEMO environment detection.
  *
- * REAL  — the default production/live operational environment.
+ * REAL  — explicitly selected live operational environment.
  *         Uses real data providers. May have empty/limited data until
  *         external APIs are integrated. Never shows fake data as real.
  *
- * DEMO  — a controlled simulation environment accessed via /demo.
+ * DEMO  — the default visitor experience and /demo environment.
  *         Uses scenario data providers. Clearly labelled as simulation.
  *
  * Rules:
@@ -15,7 +15,7 @@
  *  - /demo path is always DEMO.
  *  - Real sessions (disastraaa-session cookie) always default to REAL.
  *  - Demo role sessions (disastraaa-user-role without real session) default to DEMO.
- *  - Default for any visitor opening / or /map is ALWAYS REAL.
+ *  - Visitors default to the labelled DEMO; explicit REAL choice is preserved.
  *  - Intelligence engines are environment-agnostic — only data providers differ.
  *  - Never mix REAL and DEMO data in the same render.
  */
@@ -39,13 +39,14 @@ export function getEnvironmentFromPath(pathname: string): AppEnvironment {
  * Parse environment from a standard cookie header string.
  */
 export function parseEnvironmentFromCookie(cookieHeader?: string | null): AppEnvironment {
-  if (!cookieHeader) return 'REAL';
+  if (!cookieHeader) return 'DEMO';
   const match = cookieHeader.match(new RegExp(`(?:^|; )${ENV_COOKIE_NAME}=([^;]*)`));
-  const raw = match ? decodeURIComponent(match[1]).toUpperCase() : null;
+  let raw: string | null = null;
+  try { raw = match ? decodeURIComponent(match[1]).toUpperCase() : null; } catch { return 'DEMO'; }
   if (raw === 'DEMO' || raw === 'REAL') {
     return raw as AppEnvironment;
   }
-  return 'REAL';
+  return 'DEMO';
 }
 
 /**
@@ -57,8 +58,8 @@ export async function resolveServerEnvironment(): Promise<AppEnvironment> {
     const cookieStore = await cookies();
 
     // 1. Real authenticated session ALWAYS resolves to REAL — cannot be overridden
-    const { SESSION_COOKIE_NAME } = await import('@/lib/auth/session');
-    if (cookieStore.get(SESSION_COOKIE_NAME)?.value) {
+    const { SESSION_COOKIE_NAME, verifySessionToken } = await import('@/lib/auth/session');
+    if (await verifySessionToken(cookieStore.get(SESSION_COOKIE_NAME)?.value)) {
       return 'REAL';
     }
 
@@ -74,10 +75,10 @@ export async function resolveServerEnvironment(): Promise<AppEnvironment> {
       return 'DEMO';
     }
 
-    // 4. Default for any visitor is REAL
-    return 'REAL';
+    // 4. A cold visitor gets a useful, explicitly labelled simulation.
+    return 'DEMO';
   } catch {
-    return 'REAL';
+    return 'DEMO';
   }
 }
 

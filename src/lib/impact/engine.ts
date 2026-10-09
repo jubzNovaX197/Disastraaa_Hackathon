@@ -8,7 +8,7 @@
  * Replace this module with GIS overlays / ML without touching the UI.
  */
 
-import type { ImpactInputs, ImpactResult, ImpactMetric } from './types';
+import type { ImpactInputs, ImpactMetric, ImpactResult } from './types';
 
 // ── Severity-based impact fractions ──────────────────────────────────────────
 // These represent approximate "fraction of the zone that may be affected"

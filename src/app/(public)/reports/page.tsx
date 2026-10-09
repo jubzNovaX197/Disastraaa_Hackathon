@@ -1,6 +1,6 @@
-import type { Metadata } from 'next';
 import { Footer } from '@/components/layout/Footer';
 import { PublicReportList } from '@/components/reports';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Citizen Reports · Disastraaa',

@@ -16,20 +16,24 @@
  * - Supporting environmental and infrastructure metrics
  */
 
-import { useState } from 'react';
+import { DataProvenance } from '@/components/demo/DataProvenance';
+import { DEMO_SCENARIOS } from '@/lib/destination/scenarios';
+import type {
+  DestinationSafetyResult,
+  DestinationSafetyStatus,
+  ScenarioSlotKey,
+  TimeRiskScenario,
+} from '@/lib/destination/types';
+import { cn } from '@/lib/utils';
 import {
   AlertTriangle,
   CheckCircle2,
   Clock,
   Compass,
   FileText,
-  Flame,
-  HelpCircle,
-  History,
   Home,
   Info,
   MapPin,
-  Navigation,
   Radio,
   Shield,
   ShieldAlert,
@@ -39,18 +43,11 @@ import {
   TrendingUp,
   Waves,
   Wind,
-  XCircle,
+  XCircle
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import type {
-  DestinationSafetyResult,
-  DestinationSafetyStatus,
-  ScenarioSlotKey,
-  TimeRiskScenario,
-} from '@/lib/destination/types';
-import { DEMO_SCENARIOS } from '@/lib/destination/scenarios';
-import { TimeScenarioPicker } from './TimeScenarioPicker';
+import { useState } from 'react';
 import { DestinationTimeline } from './DestinationTimeline';
+import { TimeScenarioPicker } from './TimeScenarioPicker';
 
 interface DestinationSafetyPanelProps {
   safetyResult: DestinationSafetyResult | null;
@@ -126,6 +123,7 @@ export function DestinationSafetyPanel({
           className
         )}
       >
+      <DataProvenance model />
         <MapPin className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto" />
         <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">
           No Destination Selected
@@ -147,6 +145,7 @@ export function DestinationSafetyPanel({
         className
       )}
     >
+      <DataProvenance model />
       {/* ── Top Header & Professional Notice ─────────────────────────── */}
       <div className="px-5 py-4 border-b border-slate-200 dark:border-white/10 bg-slate-50/90 dark:bg-surface-elevated/80 flex flex-wrap items-center justify-between gap-3">
         <div>

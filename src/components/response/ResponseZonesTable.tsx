@@ -1,25 +1,18 @@
 'use client';
 
-import { useState } from 'react';
-import {
-  MapPin,
-  ShieldAlert,
-  Users,
-  Building2,
-  Navigation,
-  Home,
-  Package,
-  Eye,
-  Sliders,
-  CheckCircle2,
-} from 'lucide-react';
-import { Card, CardHeader, CardTitle, Badge } from '@/components/ui';
-import { formatNumber, cn } from '@/lib/utils';
+import { DataProvenance } from '@/components/demo/DataProvenance';
+import { Badge, Card, CardTitle } from '@/components/ui';
 import {
   OPERATIONAL_STATUSES,
-  type ResponseZoneItem,
   type OperationalStatus,
+  type ResponseZoneItem,
 } from '@/lib/response/types';
+import { cn, formatNumber } from '@/lib/utils';
+import {
+  Eye,
+  MapPin,
+  ShieldAlert
+} from 'lucide-react';
 
 interface ResponseZonesTableProps {
   zones: ResponseZoneItem[];
@@ -36,6 +29,7 @@ export function ResponseZonesTable({
 }: ResponseZonesTableProps) {
   return (
     <Card className="bg-surface-card/95 border-white/[0.08] shadow-lg overflow-hidden">
+      <DataProvenance />
       <div className="p-4 border-b border-white/[0.06] flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-2">
           <span className="p-1.5 rounded-lg bg-red-500/15 text-critical">

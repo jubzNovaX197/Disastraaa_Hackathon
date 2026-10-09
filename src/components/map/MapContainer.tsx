@@ -17,10 +17,10 @@
 
 import 'maplibre-gl/dist/maplibre-gl.css';
 
-import { useEffect, useRef } from 'react';
-import type { Map as MLMap, StyleSpecification } from 'maplibre-gl';
 import { mapConfig } from '@/config/map';
 import { cn } from '@/lib/utils';
+import type { Map as MLMap, StyleSpecification } from 'maplibre-gl';
+import { useEffect, useRef } from 'react';
 import type { MapContainerProps } from './types';
 
 export function MapContainer({
@@ -34,6 +34,8 @@ export function MapContainer({
 }: MapContainerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef       = useRef<MLMap | null>(null);
+  const readyCallbackRef = useRef(onMapReady);
+  useEffect(() => { readyCallbackRef.current = onMapReady; }, [onMapReady]);
   const targetStyleRef = useRef(style ?? mapConfig.defaultStyle);
   const currentAppliedStyleRef = useRef<string | StyleSpecification | null>(null);
 
@@ -93,7 +95,7 @@ export function MapContainer({
       map.on('load', () => {
         if (!canceled) {
           map.resize();
-          onMapReady?.(map);
+          readyCallbackRef.current?.(map);
         }
       });
 

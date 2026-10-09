@@ -1,9 +1,8 @@
 'use client';
 
-import { Waves, Wind, Layers, AlertCircle, Building2, Car, HeartPulse, GraduationCap } from 'lucide-react';
 import type { HazardAnalyticsComparison as ComparisonType, HazardMetricProfile } from '@/lib/analytics/types';
-import { formatNumber } from '@/lib/utils';
-import { cn } from '@/lib/utils';
+import { cn, formatNumber } from '@/lib/utils';
+import { AlertCircle, Building2, Car, GraduationCap, HeartPulse, Layers, Waves, Wind } from 'lucide-react';
 
 interface HazardAnalyticsComparisonProps {
   comparison: ComparisonType;

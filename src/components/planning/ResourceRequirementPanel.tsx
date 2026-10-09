@@ -24,13 +24,14 @@
  * Dark + light mode via design system tokens.
  */
 
-import { useState } from 'react';
+import { DataProvenance } from '@/components/demo/DataProvenance';
 import type {
   ResourcePlanningResult,
   ResourceRequirementItem,
   ResourceStatus,
 } from '@/lib/planning/resources/types';
 import { cn } from '@/lib/utils';
+import { useState } from 'react';
 
 // ── Status Configurations ─────────────────────────────────────────────────────
 
@@ -225,6 +226,7 @@ export function ResourceRequirementPanel({
       role="region"
       aria-label={`Resource Requirement Planning for ${planning.zoneName}`}
     >
+      <DataProvenance model />
       {/* ── Header ── */}
       <div className={cn('px-4 pt-3.5 pb-3 transition-colors', overallCfg.bg)}>
         <div className="flex items-start justify-between gap-2">

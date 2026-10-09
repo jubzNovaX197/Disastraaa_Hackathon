@@ -1,8 +1,8 @@
 'use client';
 
-import { Search, Filter, RotateCcw } from 'lucide-react';
-import type { HazardType, Severity } from '@/types';
 import type { AnalyticsFilterState } from '@/lib/analytics/types';
+import type { HazardType, Severity } from '@/types';
+import { RotateCcw, Search } from 'lucide-react';
 
 interface AnalyticsFilterBarProps {
   filters: AnalyticsFilterState;

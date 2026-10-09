@@ -8,8 +8,8 @@
  * Reuses existing shelter, road, and alert identifiers from the platform dataset.
  */
 
-import type { EvacuationZone } from '@/lib/evacuation/types';
 import { computeShelterPressure } from '@/lib/evacuation/engine';
+import type { EvacuationZone } from '@/lib/evacuation/types';
 
 export const demoEvacuationZones: EvacuationZone[] = [
   // ── 1. Puri Coastal Belt — Priority 1, EVACUATION ACTIVE ──────────────────

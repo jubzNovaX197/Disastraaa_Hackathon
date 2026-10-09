@@ -10,92 +10,94 @@
  *  4. Other layers                                    → MapLibre popup
  */
 
-import { useCallback, useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
-import type { Map as MLMap } from 'maplibre-gl';
-import { MapContainer } from './MapContainer';
-import { LayerControl, type LayerToggle } from './LayerControl';
-import { BasemapSelector } from './BasemapSelector';
-import { LiveWeatherWidget } from './LiveWeatherWidget';
-import { MapLegend } from './MapLegend';
-import { FloodRiskPanel } from '@/components/risk/FloodRiskPanel';
-import { CycloneRiskPanel } from '@/components/risk/CycloneRiskPanel';
-import { MultiHazardPanel } from '@/components/risk/MultiHazardPanel';
+import { DataProvenance } from '@/components/demo/DataProvenance';
 import { ImpactPredictionPanel } from '@/components/impact/ImpactPredictionPanel';
-import { ShelterRequirementPanel } from '@/components/planning/ShelterRequirementPanel';
-import { buildShelterPlanningForZone, type ShelterPlanningResult } from '@/lib/planning/shelter';
 import { ResourceRequirementPanel } from '@/components/planning/ResourceRequirementPanel';
-import { buildResourcePlanningForZone, type ResourcePlanningResult } from '@/lib/planning/resources';
-import { ReportDetailPanel } from '@/components/reports/ReportDetailPanel';
+import { ShelterRequirementPanel } from '@/components/planning/ShelterRequirementPanel';
 import { CitizenReportForm } from '@/components/reports/CitizenReportForm';
+import { ReportDetailPanel } from '@/components/reports/ReportDetailPanel';
+import { CycloneRiskPanel } from '@/components/risk/CycloneRiskPanel';
+import { FloodRiskPanel } from '@/components/risk/FloodRiskPanel';
+import { MultiHazardPanel } from '@/components/risk/MultiHazardPanel';
 import { RoadDetailPanel } from '@/components/roads/RoadDetailPanel';
 import { RouteMapOverlay } from '@/components/routing/RouteMapOverlay';
-import { createCitizenReport, type CitizenReportItem } from '@/lib/reports';
-import { demoCitizenReports } from '@/data/demo/citizenReports';
-import {
-  addOrUpdateRouteLayers,
-  removeRouteLayers,
-  addOrUpdateDestinationSafetyLayers,
-  removeDestinationSafetyLayers,
-} from './layers/addLayers';
-import type { RouteResult } from '@/lib/routing/types';
-import type { DestinationSafetyStatus } from '@/lib/destination/types';
-import { demoRoadSegments } from '@/data/demo';
-import type { RoadSegment } from '@/lib/roads/types';
-import { mapLayerIds, getBasemapStyle, type BasemapStyleId } from '@/config/map';
+import { getBasemapStyle, mapLayerIds, type BasemapStyleId } from '@/config/map';
+import { useLiveIntelligence } from '@/context/LiveIntelligenceContext';
 import { useTheme } from '@/context/ThemeContext';
-import {
-  riskZonesToGeoJSON,
-  floodAreasToGeoJSON,
-  sheltersToGeoJSON,
-  alertsToGeoJSON,
-  infrastructureToGeoJSON,
-  blockedRoadsToGeoJSON,
-  roadSegmentsToGeoJSON,
-  citizenReportsToGeoJSON,
-  cycloneZonesToGeoJSON,
-  cycloneTrackToGeoJSON,
-  cycloneLandfallToGeoJSON,
-  historicalEventsToGeoJSON,
-} from '@/data/geojson';
-import {
-  addRiskZoneLayers,
-  addFloodAreaLayers,
-  addShelterLayers,
-  addAlertLayers,
-  addInfrastructureLayers,
-  addBlockedRoadLayers,
-  addCitizenReportLayers,
-  addCycloneZoneLayers,
-  addCycloneTrackLayers,
-  addHistoricalEventLayers,
-  addOrUpdateJourneyCorridorLayers,
-  removeJourneyCorridorLayers,
-} from './layers/addLayers';
-import {
-  floodAreaPopupHTML,
-  shelterPopupHTML,
-  alertPopupHTML,
-  infrastructurePopupHTML,
-  blockedRoadPopupHTML,
-  citizenReportPopupHTML,
-  historicalEventPopupHTML,
-} from './layers/popups';
-import type { DisasterDataset } from '@/data/types';
-import type { FloodRiskExplanation } from '@/lib/risk/flood';
-import type { CycloneRiskExplanation } from '@/lib/risk/cyclone';
-import type { MultiHazardRiskExplanation } from '@/lib/risk/multiHazard';
-import type { ImpactResult } from '@/lib/impact';
-import { calculateImpact, DEMO_ZONE_EXPOSURE, fallbackExposure } from '@/lib/impact';
-import { computedFloodRisks }        from '@/data/demo/computedFloodRisks';
-import { computedCycloneRisks }      from '@/data/demo/computedCycloneRisks';
+import { demoRoadSegments } from '@/data/demo';
+import { demoCitizenReports } from '@/data/demo/citizenReports';
+import { computedCycloneRisks } from '@/data/demo/computedCycloneRisks';
+import { computedFloodRisks } from '@/data/demo/computedFloodRisks';
 import {
   computedMultiHazardRisks,
   ZONE_TO_MULTI_HAZARD_ID,
 } from '@/data/demo/computedMultiHazardRisks';
-import { demoCycloneZones, demoCycloneTrack } from '@/data/demo/cycloneZones';
+import { demoCycloneTrack, demoCycloneZones } from '@/data/demo/cycloneZones';
 import { demoHistoricalEvents } from '@/data/demo/historicalEvents';
+import {
+  alertsToGeoJSON,
+  citizenReportsToGeoJSON,
+  cycloneLandfallToGeoJSON,
+  cycloneTrackToGeoJSON,
+  cycloneZonesToGeoJSON,
+  floodAreasToGeoJSON,
+  historicalEventsToGeoJSON,
+  infrastructureToGeoJSON,
+  riskZonesToGeoJSON,
+  roadSegmentsToGeoJSON,
+  sheltersToGeoJSON
+} from '@/data/geojson';
+import type { DisasterDataset } from '@/data/types';
+import type { DestinationSafetyStatus } from '@/lib/destination/types';
+import type { ImpactResult } from '@/lib/impact';
+import { calculateImpact, DEMO_ZONE_EXPOSURE, fallbackExposure } from '@/lib/impact';
+import { buildResourcePlanningForZone, type ResourcePlanningResult } from '@/lib/planning/resources';
+import { buildShelterPlanningForZone, type ShelterPlanningResult } from '@/lib/planning/shelter';
+import { getFeedLabel } from '@/lib/realtime/feedStatus';
+import { type CitizenReportItem } from '@/lib/reports';
+import type { CycloneRiskExplanation } from '@/lib/risk/cyclone';
+import type { FloodRiskExplanation } from '@/lib/risk/flood';
+import type { MultiHazardRiskExplanation } from '@/lib/risk/multiHazard';
+import type { RoadSegment } from '@/lib/roads/types';
+import type { RouteResult } from '@/lib/routing/types';
 import { cn } from '@/lib/utils';
+import { Crosshair, Loader2 } from 'lucide-react';
+import type { Map as MLMap } from 'maplibre-gl';
+import Link from 'next/link';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useGeolocation } from '@/hooks/useGeolocation';
+import { BasemapSelector } from './BasemapSelector';
+import { LayerControl, type LayerToggle } from './LayerControl';
+import {
+  addAlertLayers,
+  addBlockedRoadLayers,
+  addCitizenReportLayers,
+  addCycloneTrackLayers,
+  addCycloneZoneLayers,
+  addFloodAreaLayers,
+  addHistoricalEventLayers,
+  addInfrastructureLayers,
+  addOrUpdateDestinationSafetyLayers,
+  addOrUpdateJourneyCorridorLayers,
+  addOrUpdateRouteLayers,
+  addRiskZoneLayers,
+  addShelterLayers,
+  removeDestinationSafetyLayers,
+  removeJourneyCorridorLayers,
+  removeRouteLayers,
+} from './layers/addLayers';
+import {
+  alertPopupHTML,
+  blockedRoadPopupHTML,
+  citizenReportPopupHTML,
+  floodAreaPopupHTML,
+  historicalEventPopupHTML,
+  infrastructurePopupHTML,
+  shelterPopupHTML,
+} from './layers/popups';
+import { LiveWeatherWidget } from './LiveWeatherWidget';
+import { MapContainer } from './MapContainer';
+import { MapLegend } from './MapLegend';
 
 // ── Layer definitions ─────────────────────────────────────────────────────────
 
@@ -183,6 +185,7 @@ interface DisasterMapProps {
 }
 
 export function DisasterMap({ dataset, className, center, zoom, initialLayers, environment }: DisasterMapProps) {
+  const { status: feedStatus, lastSuccessfulSync } = useLiveIntelligence();
   const envMode = environment ?? dataset.environment ?? 'REAL';
   const isDemo = envMode === 'DEMO';
   const { theme } = useTheme();
@@ -213,6 +216,102 @@ export function DisasterMap({ dataset, className, center, zoom, initialLayers, e
   const clickHandlerRef               = useRef<((e: any) => void) | null>(null);
   const mouseMoveHandlerRef           = useRef<((e: any) => void) | null>(null);
 
+  // ── Geolocation & Current Location Marker state ──────────────────────────
+  const userMarkerRef                 = useRef<import('maplibre-gl').Marker | null>(null);
+  const userHasPannedRef              = useRef(false);
+  const [geoNotice, setGeoNotice]     = useState<string | null>(null);
+
+  const {
+    status: geoStatus,
+    coordinates: userCoords,
+    errorMessage: geoError,
+    requestLocation,
+  } = useGeolocation({ autoRequest: true, sessionKey: 'disastraaa_main_map_session' });
+
+  const updateUserMarker = useCallback(async (coords: [number, number]) => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    if (userMarkerRef.current) {
+      userMarkerRef.current.setLngLat(coords);
+      return;
+    }
+
+    try {
+      const { Marker, Popup } = await import('maplibre-gl');
+      if (!mapRef.current) return;
+
+      const el = document.createElement('div');
+      el.className = 'disaster-user-marker';
+      el.setAttribute('role', 'img');
+      el.setAttribute('aria-label', 'Your Current Location');
+      el.innerHTML = `
+        <div style="position:relative;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+          <div style="position:absolute;width:32px;height:32px;border-radius:50%;background:rgba(37,99,235,0.35);animation:ping 1.8s cubic-bezier(0,0,0.2,1) infinite;"></div>
+          <div style="width:16px;height:16px;border-radius:50%;background:#2563EB;border:2.5px solid #FFFFFF;box-shadow:0 0 10px rgba(37,99,235,0.85);z-index:2;display:flex;align-items:center;justify-content:center;">
+            <div style="width:5px;height:5px;border-radius:50%;background:#FFFFFF;"></div>
+          </div>
+        </div>
+      `;
+
+      const popup = new Popup({ offset: 16, closeButton: false }).setHTML(`
+        <div style="font-family:system-ui,-apple-system,sans-serif;padding:3px 6px;font-size:11px;font-weight:600;color:#1E3A8A;">
+          📍 Your Current Location
+        </div>
+      `);
+
+      const marker = new Marker({ element: el })
+        .setLngLat(coords)
+        .setPopup(popup)
+        .addTo(map);
+
+      userMarkerRef.current = marker;
+    } catch {
+      // Ignore dynamic import / marker creation errors
+    }
+  }, []);
+
+  // Update marker and center map on initial auto-locate without repeating on pan
+  useEffect(() => {
+    if (!userCoords || !mapRef.current) return;
+    updateUserMarker(userCoords);
+
+    if (!userHasPannedRef.current) {
+      mapRef.current.flyTo({
+        center: userCoords,
+        zoom: 13.5,
+        speed: 1.2,
+      });
+    }
+  }, [userCoords, updateUserMarker]);
+
+  // Clean up user marker on unmount
+  useEffect(() => {
+    return () => {
+      if (userMarkerRef.current) {
+        userMarkerRef.current.remove();
+        userMarkerRef.current = null;
+      }
+    };
+  }, []);
+
+  const handleManualLocate = useCallback(async () => {
+    setGeoNotice(null);
+    userHasPannedRef.current = false;
+    const coords = await requestLocation();
+    if (coords && mapRef.current) {
+      mapRef.current.flyTo({
+        center: coords,
+        zoom: 13.5,
+        speed: 1.3,
+      });
+      updateUserMarker(coords);
+    } else {
+      setGeoNotice(geoError || 'Location unavailable. Map remains at current view.');
+      setTimeout(() => setGeoNotice(null), 4500);
+    }
+  }, [requestLocation, geoError, updateUserMarker]);
+
   useEffect(() => {
     layersRef.current = layers;
   }, [layers]);
@@ -240,6 +339,18 @@ export function DisasterMap({ dataset, className, center, zoom, initialLayers, e
       addCitizenReportLayers(map, citizenReportsToGeoJSON(dataset.citizenReports));
     }
   }, [dataset.citizenReports]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !map.isStyleLoaded()) return;
+    addRiskZoneLayers(map, riskZonesToGeoJSON(dataset.riskZones ?? []));
+    addFloodAreaLayers(map, floodAreasToGeoJSON(dataset.floodAreas ?? []));
+    addShelterLayers(map, sheltersToGeoJSON(dataset.shelters ?? []));
+    addAlertLayers(map, alertsToGeoJSON(dataset.alerts ?? []));
+    addBlockedRoadLayers(map, roadSegmentsToGeoJSON(dataset.roads ?? []));
+    addCitizenReportLayers(map, citizenReportsToGeoJSON(dataset.citizenReports ?? []));
+    addCycloneZoneLayers(map, cycloneZonesToGeoJSON(dataset.cycloneZones ?? []));
+  }, [dataset]);
 
   // ── Map ready ────────────────────────────────────────────────────────────
   const handleMapReady = useCallback(async (map: MLMap) => {
@@ -286,6 +397,21 @@ export function DisasterMap({ dataset, className, center, zoom, initialLayers, e
       mapLayerIds.cycloneZoneFill,
       ...NON_RISK_CLICKABLE.map((c) => c.layerId),
     ];
+
+    // Detect manual user pans or zooms to avoid auto-centering disrupting user navigation
+    map.on('dragstart', () => {
+      userHasPannedRef.current = true;
+    });
+    map.on('zoomstart', () => {
+      userHasPannedRef.current = true;
+    });
+
+    if (userCoords) {
+      updateUserMarker(userCoords);
+      if (!userHasPannedRef.current) {
+        map.flyTo({ center: userCoords, zoom: 13.5, speed: 1.2 });
+      }
+    }
 
     if (clickHandlerRef.current) {
       map.off('click', clickHandlerRef.current);
@@ -406,7 +532,9 @@ export function DisasterMap({ dataset, className, center, zoom, initialLayers, e
       const entry = NON_RISK_CLICKABLE.find((c) => c.layerId === layerId);
       if (!entry) return;
 
-      const html   = entry.builder(props);
+      const safeProps = Object.fromEntries(Object.entries(props).map(([key, value]) =>
+        [key, typeof value === 'string' ? value.replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]!)) : value]));
+      const html = entry.builder({ ...safeProps, dataProvenance: isDemo ? 'Simulated' : 'Live API / cached observations' });
       const coords: [number, number] =
         feature.geometry.type === 'Point'
           ? (feature.geometry.coordinates as [number, number])
@@ -589,7 +717,7 @@ export function DisasterMap({ dataset, className, center, zoom, initialLayers, e
         ) : (
           <div className="mt-1.5 sm:mt-2 inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[10px] sm:text-[11px] font-medium backdrop-blur-sm whitespace-nowrap map-panel">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-slow flex-shrink-0" />
-            <span className="hidden sm:inline">OPERATIONAL ENVIRONMENT — </span>Live Feed Active · India Geographic Monitoring
+            <span className="hidden sm:inline">Live API — </span>{getFeedLabel('REAL', feedStatus, dataset.alerts.filter(alert => alert.isActive).length)}
           </div>
         )}
       </div>
@@ -602,7 +730,42 @@ export function DisasterMap({ dataset, className, center, zoom, initialLayers, e
 
           {/* Basemap Switcher (Dark / Light / Streets / Satellite) */}
           <BasemapSelector currentBasemap={basemap} onChangeBasemap={setBasemap} />
+
+          {/* Manual "Locate Me" Control */}
+          <button
+            type="button"
+            onClick={handleManualLocate}
+            disabled={geoStatus === 'requesting'}
+            className={cn(
+              'pointer-events-auto inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold shadow-md backdrop-blur-md transition-all active:scale-98 border',
+              userCoords
+                ? 'bg-blue-600/20 text-blue-300 border-blue-500/40 hover:bg-blue-600/30'
+                : 'bg-white/95 dark:bg-surface-elevated/90 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-surface-overlay border-slate-200 dark:border-white/10'
+            )}
+            title="Detect & zoom to my current location"
+            aria-label="Locate me on map"
+          >
+            {geoStatus === 'requesting' ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-400" />
+            ) : (
+              <Crosshair className="w-3.5 h-3.5 text-blue-400" />
+            )}
+            <span className="hidden xs:inline">
+              {geoStatus === 'requesting' ? 'Locating...' : 'Locate Me'}
+            </span>
+          </button>
         </div>
+
+        {/* Geolocation status message banner (if denied or unavailable) */}
+        {geoNotice && (
+          <div
+            role="status"
+            className="pointer-events-auto text-[11px] px-2.5 py-1 rounded-lg bg-slate-900/90 text-amber-300 border border-amber-500/30 backdrop-blur-sm shadow-md animate-fade-in flex items-center gap-1.5"
+          >
+            <span>⚠️</span>
+            <span>{geoNotice}</span>
+          </div>
+        )}
 
         {/* Report Incident button */}
         <div className="flex items-center gap-1.5 flex-wrap">
@@ -664,7 +827,8 @@ export function DisasterMap({ dataset, className, center, zoom, initialLayers, e
           >
             <span className="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0" />
             <span className="text-xs font-medium text-emerald-400 whitespace-nowrap">
-              0 Active Alerts · All Sectors Normal
+              {getFeedLabel('REAL', feedStatus, 0)}
+              <span className="block text-[9px]">Last updated: {lastSuccessfulSync ? new Date(lastSuccessfulSync).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour12: false }) + ' IST' : 'Awaiting feed'}</span>
             </span>
           </Link>
         ) : null}
@@ -678,6 +842,7 @@ export function DisasterMap({ dataset, className, center, zoom, initialLayers, e
           'md:bottom-auto md:top-12 md:left-auto md:right-3 md:mt-1',
           'overflow-y-auto max-h-[65dvh] md:max-h-[calc(100%-5rem)]',
         )}>
+          <DataProvenance model detail="Risk, impact and planning estimates" />
           {activePanel.type === 'multiHazard' ? (
             <div className="flex flex-col rounded-xl overflow-hidden shadow-2xl border border-slate-200/80 dark:border-white/10 map-panel">
               {/* Tab bar */}

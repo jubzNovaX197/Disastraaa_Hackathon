@@ -21,40 +21,33 @@
  *   75–100 → VERY_HIGH
  */
 
-import type { Severity } from '@/types';
 import type { LngLat } from '@/data/types';
-import { NODE_BY_ID, DEMO_NODES } from '@/lib/routing/graph';
-import { calculateRoutes } from '@/lib/routing/engine';
-import type { RouteComparison, RouteResult } from '@/lib/routing/types';
 import { calculateDestinationSafety } from '@/lib/destination/engine';
-import { DEMO_SCENARIOS, demoScenarioProvider } from '@/lib/destination/scenarios';
+import { DEMO_SCENARIOS } from '@/lib/destination/scenarios';
 import type {
   DestinationSafetyResult,
   ScenarioSlotKey,
 } from '@/lib/destination/types';
+import { calculateRoutes } from '@/lib/routing/engine';
+import { NODE_BY_ID } from '@/lib/routing/graph';
+import type { RouteComparison, RouteResult } from '@/lib/routing/types';
+import {
+  analyzeCorridorAlerts,
+  analyzeEmergencyContext,
+  analyzeGroundIntelligence,
+  analyzeHazardCorridor,
+  analyzeRoadConditions
+} from './corridor';
 import type {
-  HazardCorridorItem,
-  JourneyAlertItem,
-  JourneyEmergencyContext,
-  JourneyGroundIntelligence,
   JourneyLocation,
   JourneyRiskContributions,
   JourneyRiskFactor,
   JourneyRiskRequest,
   JourneyRiskResult,
   JourneyRiskStatus,
-  RoadConditionBreakdown,
   RouteJourneyComparisonItem,
-  TimeJourneyComparisonItem,
+  TimeJourneyComparisonItem
 } from './types';
-import {
-  analyzeCorridorAlerts,
-  analyzeEmergencyContext,
-  analyzeGroundIntelligence,
-  analyzeHazardCorridor,
-  analyzeRoadConditions,
-  haversineDistanceKm,
-} from './corridor';
 
 // ── Threshold Helpers ───────────────────────────────────────────────────────
 

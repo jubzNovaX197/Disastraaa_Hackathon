@@ -1,23 +1,23 @@
-import { NextResponse } from 'next/server';
+import { resolveServerEnvironment } from '@/lib/env';
+import {
+  createIncident,
+  mapReportSeverityToIncidentSeverity,
+  mapReportTypeToIncidentType,
+  saveIncident,
+} from '@/lib/incidents';
+import { getDatasetProvider } from '@/lib/providers';
 import {
   createCitizenReport,
-  saveReport,
   getAllReports,
   getPersistedReports,
   REPORT_TYPES,
+  saveReport,
   type CreateReportInput,
   type ReportType,
 } from '@/lib/reports';
-import {
-  createIncident,
-  saveIncident,
-  mapReportTypeToIncidentType,
-  mapReportSeverityToIncidentSeverity,
-} from '@/lib/incidents';
-import { ROLES } from '@/types/roles';
 import type { Severity } from '@/types';
-import { resolveServerEnvironment } from '@/lib/env';
-import { getDatasetProvider } from '@/lib/providers';
+import { ROLES } from '@/types/roles';
+import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
   try {

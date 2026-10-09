@@ -1,7 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { resolveServerEnvironment } from '@/lib/env';
 import { getWeatherProvider } from '@/lib/providers';
-import { parseLocationFromText } from '@/lib/geo/regions';
+import { NextRequest, NextResponse } from 'next/server';
 
 // Well-known coordinates for key operational hubs across India / Odisha
 const KNOWN_COORDINATES: Record<string, { lat: number; lon: number; name: string }> = {

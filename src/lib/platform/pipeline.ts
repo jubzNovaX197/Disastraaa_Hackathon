@@ -14,9 +14,9 @@
  * - Lineage logging to Neon `ingestion_job_runs`
  */
 
-import { DATA_SOURCE_REGISTRY, getRegisteredDataSource } from './registry';
-import { storeRawPayload } from './storage';
 import { recordJobRun, upsertDailyAggregates } from './db';
+import { getRegisteredDataSource } from './registry';
+import { storeRawPayload } from './storage';
 import type { IngestionJobRun, TelemetryDailyAggregate } from './types';
 
 export interface PipelineFetchResult<TRaw> {

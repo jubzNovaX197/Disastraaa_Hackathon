@@ -18,16 +18,30 @@
  * 8. Authority Verification Actions (Verify, Escalate, Reject with confirmation)
  */
 
-import { useState, useEffect } from 'react';
+import { DataProvenance } from '@/components/demo/DataProvenance';
 import {
-  AlertCircle,
+  applyAuthorityVerification,
+  BLOCKAGE_CONFIG,
+  CONFIDENCE_CONFIG,
+  REPORT_STATUS_CONFIG,
+  REPORT_TYPE_CONFIG,
+  updateCommunityFeedback,
+  type CitizenReportItem,
+} from '@/lib/reports';
+import {
+  assessPreliminaryEvidence,
+  CONSISTENCY_CONFIG,
+  EVIDENCE_CONFIDENCE_CONFIG,
+  EVIDENCE_FLAG_CONFIG,
+  QUALITY_CONFIG,
+} from '@/lib/reports/evidence';
+import { cn, severityConfig, timeAgo } from '@/lib/utils';
+import {
   AlertTriangle,
   Camera,
   CheckCircle2,
   Clock,
   Cpu,
-  Eye,
-  FileText,
   Info,
   MapPin,
   Shield,
@@ -36,26 +50,10 @@ import {
   ThumbsDown,
   ThumbsUp,
   X,
-  XCircle,
+  XCircle
 } from 'lucide-react';
-import { cn, severityConfig, timeAgo } from '@/lib/utils';
-import {
-  BLOCKAGE_CONFIG,
-  CONFIDENCE_CONFIG,
-  REPORT_STATUS_CONFIG,
-  REPORT_TYPE_CONFIG,
-  updateCommunityFeedback,
-  applyAuthorityVerification,
-  type CitizenReportItem,
-} from '@/lib/reports';
+import { useEffect, useState } from 'react';
 import { EvidencePreview } from './EvidencePreview';
-import {
-  assessPreliminaryEvidence,
-  EVIDENCE_FLAG_CONFIG,
-  QUALITY_CONFIG,
-  CONSISTENCY_CONFIG,
-  EVIDENCE_CONFIDENCE_CONFIG,
-} from '@/lib/reports/evidence';
 
 interface ReportDetailPanelProps {
   report: CitizenReportItem;
@@ -154,6 +152,7 @@ export function ReportDetailPanel({
       role="region"
       aria-label={`Disaster Report: ${report.title}`}
     >
+      <DataProvenance />
       {/* ── Header ── */}
       <div className={cn('p-4 border-b border-slate-200 dark:border-white/10 transition-colors', statusCfg.bg)}>
         <div className="flex items-start justify-between gap-2">

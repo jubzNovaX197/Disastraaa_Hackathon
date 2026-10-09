@@ -6,15 +6,15 @@
  * Handles the full 10-section Emergency Situation Report (SitRep).
  */
 
-import type { AIProvider, GenerateInput } from './provider.interface';
+import { formatNumber } from '@/lib/utils';
+import { ROLES } from '@/types/roles';
 import type {
   AssistantResponsePayload,
   DataQualityBadge,
   EmergencySitRepPayload,
   StructuredSections,
 } from '../types';
-import { formatNumber } from '@/lib/utils';
-import { ROLES } from '@/types/roles';
+import type { AIProvider, GenerateInput } from './provider.interface';
 
 export class DeterministicProvider implements AIProvider {
   readonly name = 'Structured Intelligence Engine (Offline / Local)';

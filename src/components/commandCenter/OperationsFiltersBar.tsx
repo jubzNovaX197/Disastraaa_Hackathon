@@ -1,8 +1,7 @@
 'use client';
 
-import { Filter, RotateCcw, Search } from 'lucide-react';
 import type { OperationsFilters } from '@/lib/commandCenter/types';
-import { cn } from '@/lib/utils';
+import { Filter, RotateCcw } from 'lucide-react';
 
 interface OperationsFiltersBarProps {
   filters: OperationsFilters;

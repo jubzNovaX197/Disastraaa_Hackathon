@@ -4,6 +4,6 @@
  * ⚠️  PROTOTYPE / DEMO MODULE
  */
 
-export * from './types';
-export * from './rules';
 export * from './engine';
+export * from './rules';
+export * from './types';

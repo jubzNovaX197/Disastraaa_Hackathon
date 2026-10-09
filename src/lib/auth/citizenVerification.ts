@@ -22,7 +22,7 @@
  * silently "succeeding" with a visible code.
  */
 
-import { randomBytes, randomInt, createHash } from 'crypto';
+import { createHash, randomBytes, randomInt } from 'crypto';
 
 export interface PendingCitizenAccount {
   id: string;

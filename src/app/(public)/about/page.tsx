@@ -1,7 +1,6 @@
-import type { Metadata } from 'next';
-import { ChevronRight } from 'lucide-react';
 import { Footer } from '@/components/layout/Footer';
 import { brand } from '@/config/brand';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = { title: 'About' };
 

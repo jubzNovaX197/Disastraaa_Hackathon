@@ -1,13 +1,9 @@
 export type {
   HistoricalDisasterEvent,
   HistoricalSummary,
-  LocationHistoricalContext,
+  LocationHistoricalContext
 } from './types';
 
 export {
-  summariseEvents,
-  getLocationHistory,
-  sortByRecent,
-  sortByImpact,
-  filterByType,
+  filterByType, getLocationHistory, sortByImpact, sortByRecent, summariseEvents
 } from './engine';

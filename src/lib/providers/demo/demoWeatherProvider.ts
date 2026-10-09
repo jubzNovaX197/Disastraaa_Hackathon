@@ -5,8 +5,8 @@
  * and monsoonal storm surge telemetry. Strictly isolated to DEMO mode.
  */
 
-import type { WeatherProvider } from '../types';
 import type { NormalizedWeather } from '@/lib/weather/types';
+import type { WeatherProvider } from '../types';
 
 export class DemoWeatherProvider implements WeatherProvider {
   async getWeather(

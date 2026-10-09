@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { resolveServerEnvironment } from '@/lib/env';
+import type { BoundingBox } from '@/lib/geo/osm/types';
 import { getShelterProvider } from '@/lib/providers';
 import { osmShelterStore } from '@/lib/shelters/osmStore';
-import type { BoundingBox } from '@/lib/geo/osm/types';
+import { NextRequest, NextResponse } from 'next/server';
 
 /**
  * GET /api/shelters

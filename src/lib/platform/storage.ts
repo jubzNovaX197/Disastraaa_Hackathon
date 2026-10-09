@@ -8,9 +8,9 @@
  * - Safe fallback to local .storage/ directory when S3/R2 is unconfigured
  */
 
+import { objectStorage } from '@/lib/storage';
 import crypto from 'crypto';
 import zlib from 'zlib';
-import { objectStorage } from '@/lib/storage';
 
 export interface StorePayloadResult {
   storageKey: string;

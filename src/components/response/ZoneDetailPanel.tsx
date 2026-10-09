@@ -1,35 +1,28 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
-import {
-  X,
-  MapPin,
-  ShieldAlert,
-  Users,
-  Building2,
-  Navigation,
-  HeartPulse,
-  GraduationCap,
-  Bell,
-  Home,
-  Package,
-  FileCheck2,
-  Clock,
-  ArrowRight,
-  Sliders,
-  CheckCircle2,
-} from 'lucide-react';
+import { DataProvenance } from '@/components/demo/DataProvenance';
 import { Badge } from '@/components/ui';
-import { formatNumber, cn } from '@/lib/utils';
+import type { DemoAlert } from '@/data/types';
+import type { CitizenReportItem } from '@/lib/reports/types';
 import {
   OPERATIONAL_STATUSES,
-  type ResponseZoneItem,
   type OperationalStatus,
+  type ResponseZoneItem,
 } from '@/lib/response/types';
 import type { RoadSegment } from '@/lib/roads/types';
-import type { CitizenReportItem } from '@/lib/reports/types';
-import type { DemoAlert } from '@/data/types';
+import { cn, formatNumber } from '@/lib/utils';
+import {
+  Bell,
+  Clock,
+  FileCheck2,
+  Home,
+  MapPin,
+  Navigation,
+  Package,
+  ShieldAlert,
+  X
+} from 'lucide-react';
+import { useState } from 'react';
 
 interface ZoneDetailPanelProps {
   zone: ResponseZoneItem | null;
@@ -89,6 +82,7 @@ export function ZoneDetailPanel({
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden bg-black/60 backdrop-blur-sm flex justify-end animate-in fade-in duration-200">
+      <DataProvenance />
       <div
         className="w-full max-w-2xl bg-surface-card border-l border-white/10 shadow-2xl flex flex-col h-full overflow-hidden animate-in slide-in-from-right duration-300"
         role="dialog"

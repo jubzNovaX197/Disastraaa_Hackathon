@@ -1,8 +1,9 @@
 'use client';
 
-import type { RiskDistributionData, SeverityDistributionBucket } from '@/lib/analytics/types';
-import type { Severity } from '@/types';
+import { DataProvenance } from '@/components/demo/DataProvenance';
+import type { RiskDistributionData } from '@/lib/analytics/types';
 import { cn } from '@/lib/utils';
+import type { Severity } from '@/types';
 
 interface RiskDistributionChartProps {
   distribution: RiskDistributionData;
@@ -47,6 +48,7 @@ export function RiskDistributionChart({
 }: RiskDistributionChartProps) {
   return (
     <div className="p-4 rounded-xl bg-white dark:bg-surface-card border border-slate-200 dark:border-white/[0.07] shadow-sm space-y-4">
+      <DataProvenance model />
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">

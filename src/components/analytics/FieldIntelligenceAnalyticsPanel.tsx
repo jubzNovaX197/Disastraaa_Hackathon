@@ -1,17 +1,18 @@
 'use client';
 
-import {
-  FileText,
-  CheckCircle2,
-  Clock,
-  Search,
-  XCircle,
-  AlertOctagon,
-  Camera,
-  ShieldAlert,
-} from 'lucide-react';
+import { DataProvenance } from '@/components/demo/DataProvenance';
 import type { FieldIntelligenceAnalyticsData } from '@/lib/analytics/types';
 import { cn } from '@/lib/utils';
+import {
+  AlertOctagon,
+  Camera,
+  CheckCircle2,
+  Clock,
+  FileText,
+  Search,
+  ShieldAlert,
+  XCircle,
+} from 'lucide-react';
 
 interface FieldIntelligenceAnalyticsPanelProps {
   fieldData: FieldIntelligenceAnalyticsData;
@@ -67,6 +68,7 @@ export function FieldIntelligenceAnalyticsPanel({
 
   return (
     <div className="p-4 rounded-xl bg-white dark:bg-surface-card border border-slate-200 dark:border-white/[0.07] shadow-sm space-y-4">
+      <DataProvenance model />
       {/* Header */}
       <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-white/[0.06]">
         <div className="flex items-center gap-2">

@@ -6,15 +6,11 @@
  * Citizen Report → Preliminary Automated Analysis → Community Confirmation → Authority Verification
  */
 
-import type { HazardType, Severity, ReportStatus } from '@/types';
 import type { LngLat } from '@/data/types';
+import type { HazardType, ReportStatus, Severity } from '@/types';
 import type {
-  EvidenceType,
-  EvidenceStatus,
-  EvidenceSource,
-  EvidenceMetadata,
   PreliminaryEvidenceAssessment,
-  StructuredReportEvidence,
+  StructuredReportEvidence
 } from './evidence/types';
 
 export * from './evidence/types';

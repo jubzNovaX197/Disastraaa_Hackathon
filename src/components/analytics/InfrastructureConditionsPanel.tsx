@@ -1,19 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { DataProvenance } from '@/components/demo/DataProvenance';
+import type { InfrastructureAnalyticsData } from '@/lib/analytics/types';
+import { cn, formatNumber } from '@/lib/utils';
 import {
+  AlertTriangle,
   Car,
   Home,
   Package,
-  CheckCircle,
-  AlertTriangle,
-  XCircle,
-  Clock,
-  Layers,
+  XCircle
 } from 'lucide-react';
-import type { InfrastructureAnalyticsData } from '@/lib/analytics/types';
-import { formatNumber } from '@/lib/utils';
-import { cn } from '@/lib/utils';
+import { useState } from 'react';
 
 interface InfrastructureConditionsPanelProps {
   infrastructure: InfrastructureAnalyticsData;
@@ -28,6 +25,7 @@ export function InfrastructureConditionsPanel({
 
   return (
     <div className="p-4 rounded-xl bg-white dark:bg-surface-card border border-slate-200 dark:border-white/[0.07] shadow-sm space-y-3.5">
+      <DataProvenance model />
       {/* Header with Subtabs */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-2 border-b border-slate-100 dark:border-white/[0.06]">
         <div>

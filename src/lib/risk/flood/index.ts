@@ -3,12 +3,8 @@
  */
 
 export { calculateFloodRisk } from './calculateFloodRisk';
-export { explainFloodRisk, FACTOR_LABELS } from './explainRisk';
-export { FLOOD_WEIGHTS } from './weights';
+export { FACTOR_LABELS, explainFloodRisk } from './explainRisk';
 export type {
-  FloodRiskInputs,
-  FloodFactorScores,
-  FloodRiskResult,
-  FloodRiskExplanation,
-  FloodSeverity,
+  FloodFactorScores, FloodRiskExplanation, FloodRiskInputs, FloodRiskResult, FloodSeverity
 } from './types';
+export { FLOOD_WEIGHTS } from './weights';

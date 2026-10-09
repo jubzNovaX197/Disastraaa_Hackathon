@@ -13,42 +13,36 @@
  * and emergency shelter context.
  */
 
-import { useState } from 'react';
+import { DataProvenance } from '@/components/demo/DataProvenance';
+import type {
+  HazardType,
+  JourneyRiskResult,
+  JourneyRiskStatus
+} from '@/lib/risk/journey/types';
+import type { RouteMode } from '@/lib/routing/types';
+import { cn } from '@/lib/utils';
 import {
   AlertCircle,
   AlertTriangle,
   ArrowRight,
-  CheckCircle2,
   ChevronDown,
   ChevronUp,
   Clock,
-  Compass,
-  FileText,
   HelpCircle,
   Home,
-  Info,
   Layers,
   MapPin,
   Navigation,
   Radio,
   Route as RouteIcon,
   Shield,
-  ShieldAlert,
   Sparkles,
   Users,
   Waves,
   Wind,
-  XCircle,
+  XCircle
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import type { RouteMode } from '@/lib/routing/types';
-import type {
-  HazardType,
-  JourneyRiskFactor,
-  JourneyRiskResult,
-  JourneyRiskStatus,
-} from '@/lib/risk/journey/types';
-import { JOURNEY_STATUS_THRESHOLDS } from '@/lib/risk/journey/types';
+import { useState } from 'react';
 
 interface JourneyRiskPanelProps {
   journeyRisk: JourneyRiskResult;
@@ -145,6 +139,7 @@ export function JourneyRiskPanel({
 
   return (
     <div className={cn('space-y-4 font-sans text-slate-900 dark:text-slate-100', className)}>
+      <DataProvenance model />
       {/* ── 1. Operational Advisory Banner ─────────────────────────────────── */}
       <div className="px-3.5 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-xs text-amber-900 dark:text-amber-200 flex items-start gap-2.5 backdrop-blur-md">
         <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />

@@ -1,9 +1,9 @@
-import { NextResponse } from 'next/server';
-import { verifyPendingCitizenAccount, type VerifyCitizenFailureReason } from '@/lib/auth/citizenVerification';
-import { createVerifiedCitizenUser, findUserByEmail, toSafeUser } from '@/lib/auth/users';
-import { createSessionToken, SESSION_COOKIE_NAME, AUTH_MARKER_COOKIE_NAME, SESSION_MAX_AGE_SECONDS } from '@/lib/auth/session';
-import { ROLE_COOKIE_NAME } from '@/lib/auth/roles';
 import { recordAuditEvent } from '@/lib/audit/log';
+import { verifyPendingCitizenAccount, type VerifyCitizenFailureReason } from '@/lib/auth/citizenVerification';
+import { ROLE_COOKIE_NAME } from '@/lib/auth/roles';
+import { AUTH_MARKER_COOKIE_NAME, createSessionToken, SESSION_COOKIE_NAME, SESSION_MAX_AGE_SECONDS } from '@/lib/auth/session';
+import { createVerifiedCitizenUser, findUserByEmail, toSafeUser } from '@/lib/auth/users';
+import { NextResponse } from 'next/server';
 
 const FAILURE_MESSAGES: Record<VerifyCitizenFailureReason, string> = {
   NOT_FOUND: 'This verification session has expired or was already used. Please register again.',

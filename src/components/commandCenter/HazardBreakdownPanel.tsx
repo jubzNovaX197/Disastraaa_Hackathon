@@ -1,9 +1,10 @@
 'use client';
 
-import { Waves, Wind, Layers, AlertCircle, Users, Bell } from 'lucide-react';
-import { Card, CardHeader, CardTitle, Badge } from '@/components/ui';
-import { formatNumber } from '@/lib/utils';
+import { DataProvenance } from '@/components/demo/DataProvenance';
+import { Badge, Card, CardTitle } from '@/components/ui';
 import type { HazardBreakdownItem } from '@/lib/commandCenter/types';
+import { formatNumber } from '@/lib/utils';
+import { Bell, Layers, Users, Waves, Wind } from 'lucide-react';
 
 interface HazardBreakdownPanelProps {
   breakdown: HazardBreakdownItem[];
@@ -12,6 +13,7 @@ interface HazardBreakdownPanelProps {
 export function HazardBreakdownPanel({ breakdown }: HazardBreakdownPanelProps) {
   return (
     <Card className="bg-surface-card/95 border-white/[0.08] shadow-lg">
+      <DataProvenance />
       <div className="p-4 border-b border-white/[0.06] flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="p-1.5 rounded-lg bg-accent/15 text-accent">

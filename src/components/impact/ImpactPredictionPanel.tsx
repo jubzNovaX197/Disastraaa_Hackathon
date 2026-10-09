@@ -17,10 +17,11 @@
  * Dark + light mode via Tailwind dark: utilities.
  */
 
-import { useCallback } from 'react';
-import type { ImpactResult, ImpactMetric } from '@/lib/impact';
+import { DataProvenance } from '@/components/demo/DataProvenance';
+import type { ImpactMetric, ImpactResult } from '@/lib/impact';
 import { cn, formatNumber } from '@/lib/utils';
-import type { Severity, HazardType } from '@/types';
+import type { HazardType, Severity } from '@/types';
+import { useCallback } from 'react';
 
 // ── Severity styling ──────────────────────────────────────────────────────────
 
@@ -142,6 +143,7 @@ export function ImpactPredictionPanel({
       role="dialog"
       aria-label={`Impact prediction for ${impact.zoneName}`}
     >
+      <DataProvenance model />
       {/* ── Header ── */}
       <div className={cn('px-4 pt-4 pb-3', s.bg)}>
         <div className="flex items-start justify-between gap-2">

@@ -7,9 +7,9 @@
  * combined with time-aware scenario projections and route travel risk.
  */
 
-import type { Severity } from '@/types';
 import type { LngLat } from '@/data/types';
 import type { RouteResult } from '@/lib/routing/types';
+import type { Severity } from '@/types';
 
 // ── Destination Safety Status ───────────────────────────────────────────────
 

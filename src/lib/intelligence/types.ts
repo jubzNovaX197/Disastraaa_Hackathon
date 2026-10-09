@@ -6,12 +6,12 @@
  * 2. DisasterIntelligenceSummary — AI or rule-based executive summary & decision support.
  */
 
-import type { FloodRiskResult } from '@/lib/risk/flood/types';
-import type { CycloneRiskResult } from '@/lib/risk/cyclone/types';
-import type { MultiHazardRiskResult } from '@/lib/risk/multiHazard/types';
-import type { InputQualityStatus } from '@/lib/risk/inputQuality';
-import type { WeatherForecastPoint } from '@/lib/weather/types';
 import type { AppEnvironment } from '@/lib/env';
+import type { CycloneRiskResult } from '@/lib/risk/cyclone/types';
+import type { FloodRiskResult } from '@/lib/risk/flood/types';
+import type { InputQualityStatus } from '@/lib/risk/inputQuality';
+import type { MultiHazardRiskResult } from '@/lib/risk/multiHazard/types';
+import type { WeatherForecastPoint } from '@/lib/weather/types';
 
 export type RecommendationPriority = 'CRITICAL' | 'HIGH' | 'MODERATE' | 'LOW';
 

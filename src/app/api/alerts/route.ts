@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { resolveServerEnvironment } from '@/lib/env';
-import { getAlertProvider, demoAlertProvider } from '@/lib/providers';
 import { alertStore } from '@/lib/alerts/alertStore';
+import { resolveServerEnvironment } from '@/lib/env';
+import { demoAlertProvider } from '@/lib/providers';
+import { NextRequest, NextResponse } from 'next/server';
 
 /**
  * GET /api/alerts

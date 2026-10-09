@@ -30,9 +30,9 @@
  * documented in `SEED_ACCOUNTS.md` at the project root — never in the UI.
  */
 
+import { ROLES, type Role } from '@/types/roles';
 import { randomUUID } from 'crypto';
 import { hashPassword } from './password';
-import { ROLES, type Role } from '@/types/roles';
 
 export interface StoredUser {
   id: string;

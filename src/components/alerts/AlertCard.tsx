@@ -1,23 +1,21 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
+import { Badge } from '@/components/ui';
+import type { DemoAlert } from '@/data/types';
+import type { RealAlert } from '@/lib/alerts/types';
+import { cn } from '@/lib/utils';
 import {
-  AlertTriangle,
-  Clock,
-  MapPin,
-  ShieldAlert,
-  ChevronDown,
-  ChevronUp,
-  ExternalLink,
-  Compass,
   Building2,
   Calendar,
+  ChevronDown,
+  ChevronUp,
+  Clock,
+  Compass,
+  MapPin,
+  ShieldAlert
 } from 'lucide-react';
-import type { RealAlert } from '@/lib/alerts/types';
-import type { DemoAlert } from '@/data/types';
-import { Badge } from '@/components/ui';
-import { cn } from '@/lib/utils';
+import Link from 'next/link';
+import { useState } from 'react';
 
 const HAZARD_ICON: Record<string, string> = {
   FLOOD: '🌊',

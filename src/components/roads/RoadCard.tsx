@@ -7,20 +7,19 @@
  */
 
 import {
-  AlertTriangle,
+  ROAD_BLOCKAGE_CONFIG,
+  ROAD_STATUS_CONFIG,
+  ROAD_TYPE_CONFIG,
+  type RoadSegment,
+} from '@/lib/roads';
+import { cn, timeAgo } from '@/lib/utils';
+import {
   ArrowRight,
   Clock,
   MapPin,
   Navigation,
-  Shield,
+  Shield
 } from 'lucide-react';
-import { cn, timeAgo } from '@/lib/utils';
-import {
-  ROAD_STATUS_CONFIG,
-  ROAD_BLOCKAGE_CONFIG,
-  ROAD_TYPE_CONFIG,
-  type RoadSegment,
-} from '@/lib/roads';
 
 interface RoadCardProps {
   road: RoadSegment;

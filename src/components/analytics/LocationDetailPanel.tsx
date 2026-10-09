@@ -1,26 +1,18 @@
 'use client';
 
-import { useState } from 'react';
-import {
-  X,
-  MapPin,
-  AlertTriangle,
-  Building2,
-  Users,
-  Car,
-  Home,
-  Package,
-  Bell,
-  FileText,
-  Activity,
-  HeartPulse,
-  GraduationCap,
-  ExternalLink,
-} from 'lucide-react';
+import { DataProvenance } from '@/components/demo/DataProvenance';
 import type { RegionalAnalyticsRow } from '@/lib/analytics/types';
-import type { Severity } from '@/types';
-import { formatNumber } from '@/lib/utils';
-import { cn } from '@/lib/utils';
+import { cn, formatNumber } from '@/lib/utils';
+import {
+  Bell,
+  Building2,
+  Car,
+  GraduationCap,
+  HeartPulse,
+  MapPin,
+  X
+} from 'lucide-react';
+import { useState } from 'react';
 
 interface LocationDetailPanelProps {
   location: RegionalAnalyticsRow | null;
@@ -36,6 +28,7 @@ export function LocationDetailPanel({ location, onClose }: LocationDetailPanelPr
 
   return (
     <div className="fixed inset-y-0 right-0 z-50 w-full sm:w-[480px] bg-white dark:bg-surface-card border-l border-slate-200 dark:border-white/[0.1] shadow-2xl flex flex-col transition-all duration-300 ease-in-out">
+      <DataProvenance model />
       {/* Header */}
       <div className="p-4 border-b border-slate-200 dark:border-white/[0.08] flex items-start justify-between gap-3 bg-slate-50 dark:bg-white/[0.02]">
         <div>

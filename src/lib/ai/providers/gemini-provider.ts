@@ -6,10 +6,10 @@
  * Falls back transparently to DeterministicProvider if API key is missing or fails.
  */
 
-import type { AIProvider, GenerateInput } from './provider.interface';
+import { sanitizeUntrustedText, wrapInertDataPayload } from '../sanitize';
 import type { AssistantResponsePayload, DataQualityBadge, StructuredSections } from '../types';
 import { DeterministicProvider } from './deterministic-provider';
-import { sanitizeUntrustedText, wrapInertDataPayload } from '../sanitize';
+import type { AIProvider, GenerateInput } from './provider.interface';
 
 export class GeminiProvider implements AIProvider {
   readonly name = 'Google Gemini 2.0 Flash (Grounded LLM)';

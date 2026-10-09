@@ -7,9 +7,9 @@
  * Seeded with realistic demo incidents using existing alert / report / road data.
  */
 
-import type { Incident, IncidentAction } from './types';
-import { createIncident, assignTeam, addAction } from './engine';
 import { ROLES } from '@/types/roles';
+import { addAction, assignTeam, createIncident } from './engine';
+import type { Incident } from './types';
 
 // ── Demo seed ─────────────────────────────────────────────────────────────────
 
@@ -230,8 +230,8 @@ function seedIncidents(): Incident[] {
 }
 
 // ── Singleton stores — strictly separated ───────────────────────────────────────
-import type { AppEnvironment } from '@/lib/env';
 import { executeQuery } from '@/lib/db';
+import type { AppEnvironment } from '@/lib/env';
 import { parseLocationFromText, registerRealOperationalLocation } from '@/lib/geo/regions';
 
 let _realIncidentsStore: Incident[] = [];

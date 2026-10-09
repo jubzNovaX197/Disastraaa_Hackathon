@@ -8,17 +8,7 @@
  * All formulas are fully explainable, transparent, and reproducible.
  */
 
-import type { HazardType, Severity } from '@/types';
-import type {
-  ResourceCategory,
-  ResourcePlanningInputs,
-  ResourcePlanningResult,
-  ResourcePrioritySummary,
-  ResourceRecommendation,
-  ResourceRequirementItem,
-  ResourceStatus,
-  ZoneResourceInventory,
-} from './types';
+import { getZoneResourceInventory } from '@/data/demo/resources';
 import {
   ASSISTANCE_FRACTION,
   BASE_RATES,
@@ -26,7 +16,15 @@ import {
   deriveResourceStatus,
   HAZARD_MULTIPLIERS,
 } from './rules';
-import { getZoneResourceInventory } from '@/data/demo/resources';
+import type {
+  ResourcePlanningInputs,
+  ResourcePlanningResult,
+  ResourcePrioritySummary,
+  ResourceRecommendation,
+  ResourceRequirementItem,
+  ResourceStatus,
+  ZoneResourceInventory
+} from './types';
 
 // ── Historical adjustment helper ──────────────────────────────────────────────
 

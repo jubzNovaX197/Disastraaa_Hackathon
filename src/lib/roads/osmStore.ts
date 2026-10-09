@@ -10,12 +10,12 @@
  */
 
 import { executeQuery } from '@/lib/db';
-import type { RoadSegment } from './types';
-import { overpassClient } from '@/lib/geo/osm/overpassClient';
-import { validateRoadWay } from '@/lib/geo/osm/validation';
 import { normalizeRoadSegment } from '@/lib/geo/osm/normalization';
-import type { IngestionResult, RoadIngestionOptions, OverpassElement } from '@/lib/geo/osm/types';
+import { overpassClient } from '@/lib/geo/osm/overpassClient';
 import { getRealOsmSeedWays } from '@/lib/geo/osm/seedData';
+import type { IngestionResult, OverpassElement, RoadIngestionOptions } from '@/lib/geo/osm/types';
+import { validateRoadWay } from '@/lib/geo/osm/validation';
+import type { RoadSegment } from './types';
 
 export class OsmRoadStore {
   private cache: Map<string, RoadSegment> = new Map();
@@ -115,9 +115,11 @@ export class OsmRoadStore {
         }
       }
 
-      // Persist newly added seed roads to PostGIS if DATABASE_URL is available
+      // Persist newly added seed roads to PostGIS in parallel without blocking HTTP response
       if (process.env.DATABASE_URL && newSegments.length > 0) {
-        await this.persistBatchToDatabase(newSegments);
+        this.persistBatchToDatabase(newSegments).catch((err) => {
+          console.warn('[ROADS] Background DB persistence:', err?.message);
+        });
       }
     }
 
@@ -125,13 +127,13 @@ export class OsmRoadStore {
   }
 
   /**
-   * Persists a batch of road segments into Neon PostgreSQL + PostGIS.
+   * Persists a batch of road segments into Neon PostgreSQL + PostGIS concurrently.
    */
   private async persistBatchToDatabase(segments: RoadSegment[]): Promise<void> {
     if (!process.env.DATABASE_URL || segments.length === 0) return;
 
-    for (const seg of segments) {
-      if (seg.coordinates.length < 2) continue;
+    const queries = segments.map(async (seg) => {
+      if (seg.coordinates.length < 2) return;
 
       const wkt = this.toWktLineString(seg.coordinates);
       const [startLon, startLat] = seg.coordinates[0];
@@ -189,7 +191,9 @@ export class OsmRoadStore {
       } catch (insertErr) {
         // Continue with remaining segments
       }
-    }
+    });
+
+    await Promise.allSettled(queries);
   }
 
   /**

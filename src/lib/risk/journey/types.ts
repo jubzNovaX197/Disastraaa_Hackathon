@@ -11,14 +11,13 @@
  * and emergency shelter context.
  */
 
-import type { Severity } from '@/types';
 import type { LngLat } from '@/data/types';
-import type { RouteMode, RouteResult, RouteSegment } from '@/lib/routing/types';
 import type {
   DestinationSafetyResult,
-  DestinationSafetyStatus,
-  ScenarioSlotKey,
+  ScenarioSlotKey
 } from '@/lib/destination/types';
+import type { RouteMode, RouteResult } from '@/lib/routing/types';
+import type { Severity } from '@/types';
 
 // ── Journey Risk Status ─────────────────────────────────────────────────────
 

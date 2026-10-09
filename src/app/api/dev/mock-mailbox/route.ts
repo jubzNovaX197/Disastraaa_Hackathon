@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
 import { getLatestMockEmailFor } from '@/lib/email/sendVerificationEmail';
+import { NextResponse } from 'next/server';
 
 export async function GET(req: Request) {
   if (process.env.NODE_ENV === 'production') {

@@ -1,10 +1,10 @@
-export * from './types';
 export * from './engine';
 export * from './store';
+export * from './types';
 
 // UI-facing display configs
 
-import type { IncidentStatus, IncidentSeverity, IncidentType, ResponseTeam, DataLabel } from './types';
+import type { DataLabel, IncidentSeverity, IncidentStatus, IncidentType, ResponseTeam } from './types';
 
 export const INCIDENT_STATUS_CONFIG: Record<IncidentStatus, {
   label: string; color: string; bg: string; border: string; dot: string;
@@ -54,6 +54,7 @@ export const TEAM_LABEL: Record<ResponseTeam, string> = {
 };
 
 export const DATA_LABEL_CONFIG: Record<DataLabel, { label: string; color: string; bg: string }> = {
+  SIMULATION:       { label: 'Simulated', color: 'text-amber-700 dark:text-amber-400', bg: 'bg-amber-100 dark:bg-amber-500/15' },
   VERIFIED:         { label: 'Verified',         color: 'text-emerald-700 dark:text-emerald-400', bg: 'bg-emerald-100 dark:bg-emerald-500/15' },
   PREDICTED:        { label: 'Predicted',        color: 'text-sky-700 dark:text-sky-400',         bg: 'bg-sky-100 dark:bg-sky-500/15' },
   CITIZEN_REPORT:   { label: 'Citizen Report',   color: 'text-violet-700 dark:text-violet-400',   bg: 'bg-violet-100 dark:bg-violet-500/15' },

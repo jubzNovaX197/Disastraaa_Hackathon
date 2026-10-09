@@ -6,8 +6,8 @@
  * and key logistics corridors across coastal Odisha and Andhra Pradesh.
  */
 
-import type { RoadSegment } from '@/lib/roads/types';
 import { calculateRoadTravelRisk } from '@/lib/roads/engine';
+import type { RoadSegment } from '@/lib/roads/types';
 
 export const demoRoadSegments: RoadSegment[] = [
   // 1. NH-16 Cuttack North Bypass — Partially Blocked (Floodwater overflow)

@@ -1,9 +1,9 @@
 'use client';
 
-import { Sliders, RotateCcw, Play, Shield, Sparkles } from 'lucide-react';
-import type { Role } from '@/types/roles';
 import { SCENARIO_PRESETS } from '@/lib/simulation/presets';
 import type { ScenarioPreset } from '@/lib/simulation/types';
+import type { Role } from '@/types/roles';
+import { Play, RotateCcw, Sliders, Sparkles } from 'lucide-react';
 
 interface SimulatorHeaderProps {
   role: Role;

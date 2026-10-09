@@ -11,14 +11,14 @@
  * - Enforces strict role-based authorization, sanitization, and bounded inputs.
  */
 
-import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { assistantEngine } from '@/lib/ai/engine';
 import type { AssistantQueryRequest } from '@/lib/ai/types';
-import { resolveServerEnvironment } from '@/lib/env';
-import { SESSION_COOKIE_NAME, verifySessionToken } from '@/lib/auth/session';
 import { parseRoleFromCookie, ROLE_COOKIE_NAME } from '@/lib/auth/roles';
+import { SESSION_COOKIE_NAME, verifySessionToken } from '@/lib/auth/session';
+import { resolveServerEnvironment } from '@/lib/env';
 import { ROLES, type Role } from '@/types/roles';
+import { cookies } from 'next/headers';
+import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
   try {

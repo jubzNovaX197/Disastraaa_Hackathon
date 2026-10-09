@@ -15,22 +15,16 @@
  * - Optional remove button for form input
  */
 
-import { useState } from 'react';
+import type { ReportEvidence } from '@/lib/reports/types';
+import { cn } from '@/lib/utils';
 import {
   Camera,
-  CheckCircle2,
-  Clock,
-  Eye,
-  FileText,
   Film,
-  HardDrive,
   Maximize2,
-  ShieldAlert,
   Video,
-  X,
+  X
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import type { ReportEvidence } from '@/lib/reports/types';
+import { useState } from 'react';
 
 interface EvidencePreviewProps {
   evidence: ReportEvidence;

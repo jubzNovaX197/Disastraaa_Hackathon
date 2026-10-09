@@ -16,43 +16,37 @@
  * 7. Professional Success Confirmation with "View on Live Map"
  */
 
-import { useState, useRef, useCallback } from 'react';
-import {
-  AlertTriangle,
-  Camera,
-  CheckCircle2,
-  FileText,
-  MapPin,
-  Send,
-  ShieldAlert,
-  User,
-  X,
-  Upload,
-  Image as ImageIcon,
-  Loader2,
-  ExternalLink,
-  Compass,
-  ArrowRight,
-  Maximize2,
-} from 'lucide-react';
-import type { Severity } from '@/types';
+import { LocationPickerMap, type IncidentLocationSource } from '@/components/map/LocationPickerMap';
+import { useLiveIntelligence } from '@/context/LiveIntelligenceContext';
 import type { LngLat } from '@/data/types';
-import { cn } from '@/lib/utils';
-import { EvidencePreview } from './EvidencePreview';
-import { LocationPickerMap } from '@/components/map/LocationPickerMap';
 import {
   BLOCKAGE_CONFIG,
+  EVIDENCE_LIMITS,
   REPORT_TYPE_CONFIG,
   REPORT_TYPES,
-  EVIDENCE_LIMITS,
   validateEvidenceFile,
   type BlockageType,
+  type CitizenReportItem,
   type CreateReportInput,
   type ReportEvidence,
   type ReportType,
-  type CitizenReportItem,
 } from '@/lib/reports';
-import { useLiveIntelligence } from '@/context/LiveIntelligenceContext';
+import { cn } from '@/lib/utils';
+import type { Severity } from '@/types';
+import {
+  AlertTriangle,
+  ArrowRight,
+  Camera,
+  CheckCircle2,
+  Loader2,
+  Send,
+  ShieldAlert,
+  Upload,
+  User,
+  X
+} from 'lucide-react';
+import { useCallback, useRef, useState } from 'react';
+import { EvidencePreview } from './EvidencePreview';
 
 interface CitizenReportFormProps {
   onSubmitReport?: (input: CreateReportInput) => void | Promise<{ report: CitizenReportItem; incident: any }>;
@@ -81,6 +75,7 @@ export function CitizenReportForm({
   const [address, setAddress] = useState(initialAddress ?? 'Puri Coastal Zone, Odisha');
   const [adminArea, setAdminArea] = useState('Puri District, Odisha');
   const [coords, setCoords] = useState<LngLat>(initialCoords);
+  const [locationSource, setLocationSource] = useState<IncidentLocationSource>('DEFAULT');
 
   // Blocked Road details (conditional)
   const [roadName, setRoadName] = useState('');
@@ -107,11 +102,19 @@ export function CitizenReportForm({
   const isRoadReport = reportType === 'BLOCKED_ROAD' || reportType === 'DAMAGED_ROAD';
 
   // Coordinate change callback from interactive location picker
-  const handleCoordinatesChange = useCallback((newCoords: LngLat, suggestedLabel?: string, suggestedAdmin?: string) => {
+  const handleCoordinatesChange = useCallback((
+    newCoords: LngLat,
+    suggestedLabel?: string,
+    suggestedAdmin?: string,
+    source?: IncidentLocationSource,
+  ) => {
     setCoords(newCoords);
     if (suggestedLabel) setAddress(suggestedLabel);
     if (suggestedAdmin) setAdminArea(suggestedAdmin);
+    if (source) setLocationSource(source);
+    setErrorMessage(null);
   }, []);
+
 
   // Process chosen image file (from Camera or Gallery)
   const processImageFile = useCallback((file: File, source: 'DEVICE_CAMERA' | 'FILE_UPLOAD') => {
@@ -203,8 +206,16 @@ export function CitizenReportForm({
       return;
     }
 
-    if (!coords || isNaN(coords[0]) || isNaN(coords[1])) {
-      setErrorMessage('Please confirm a valid map pin location.');
+    if (
+      !coords ||
+      isNaN(coords[0]) ||
+      isNaN(coords[1]) ||
+      coords[0] < -180 ||
+      coords[0] > 180 ||
+      coords[1] < -90 ||
+      coords[1] > 90
+    ) {
+      setErrorMessage('Please confirm a valid map pin location for the incident.');
       return;
     }
 
@@ -577,6 +588,17 @@ export function CitizenReportForm({
             coordinates={coords}
             onCoordinatesChange={handleCoordinatesChange}
           />
+
+          {/* Location distinction prompt */}
+          {locationSource === 'AUTO_DEVICE' && (
+            <div className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/25 text-[11px] text-blue-900 dark:text-blue-200 flex items-start gap-2">
+              <span className="text-base flex-shrink-0">📍</span>
+              <div className="flex-1 leading-relaxed">
+                <span className="font-semibold">Current Device Location Suggested: </span>
+                <span>The map pin has been set to your device GPS coordinates. If the disaster or road obstruction occurred at a different spot, simply drag the pin or click on the map to set the actual incident location.</span>
+              </div>
+            </div>
+          )}
 
           {/* Landmark & Administrative area fields */}
           <div className="grid sm:grid-cols-2 gap-2 pt-1">

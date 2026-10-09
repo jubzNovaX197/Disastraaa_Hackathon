@@ -1,9 +1,10 @@
 'use client';
 
-import { Bell, AlertTriangle, ShieldCheck, MapPin } from 'lucide-react';
+import { DataProvenance } from '@/components/demo/DataProvenance';
 import type { AlertAnalyticsData } from '@/lib/analytics/types';
-import type { Severity } from '@/types';
 import { cn } from '@/lib/utils';
+import type { Severity } from '@/types';
+import { Bell, MapPin } from 'lucide-react';
 
 interface AlertAnalyticsPanelProps {
   alertData: AlertAnalyticsData;
@@ -31,6 +32,7 @@ const SEVERITY_COLORS: Record<Severity, { badge: string; text: string }> = {
 export function AlertAnalyticsPanel({ alertData }: AlertAnalyticsPanelProps) {
   return (
     <div className="p-4 rounded-xl bg-white dark:bg-surface-card border border-slate-200 dark:border-white/[0.07] shadow-sm space-y-3.5">
+      <DataProvenance model />
       <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-white/[0.06]">
         <div className="flex items-center gap-2">
           <Bell className="w-4 h-4 text-purple-500" />

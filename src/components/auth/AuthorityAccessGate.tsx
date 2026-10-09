@@ -1,9 +1,9 @@
 'use client';
 
+import { Badge, Card, CardTitle } from '@/components/ui';
+import { type Role } from '@/types/roles';
+import { ArrowLeft, CheckCircle2, KeyRound, ShieldAlert } from 'lucide-react';
 import Link from 'next/link';
-import { ShieldAlert, ArrowLeft, KeyRound, CheckCircle2 } from 'lucide-react';
-import { Card, CardHeader, CardTitle, Badge } from '@/components/ui';
-import { ROLES, type Role } from '@/types/roles';
 import { AuthorityRoleSwitcher } from './AuthorityRoleSwitcher';
 
 interface AuthorityAccessGateProps {

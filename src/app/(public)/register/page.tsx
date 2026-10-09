@@ -1,8 +1,8 @@
-import type { Metadata } from 'next';
-import { Suspense } from 'react';
-import Link from 'next/link';
-import { UserPlus, Eye } from 'lucide-react';
 import { RegisterAccountTabs } from '@/components/auth/RegisterAccountTabs';
+import { Eye, UserPlus } from 'lucide-react';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { Suspense } from 'react';
 
 export const metadata: Metadata = {
   title: 'Create Account',

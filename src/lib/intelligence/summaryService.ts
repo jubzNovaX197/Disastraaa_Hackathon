@@ -13,12 +13,12 @@
  * 5. ADVISORY ONLY: Never issues binding evacuation mandates or authoritative decrees.
  */
 
+import { sanitizeUntrustedText, wrapInertDataPayload } from '@/lib/ai/sanitize';
 import type {
+  DecisionSupportRecommendation,
   DisasterIntelligenceSnapshot,
   DisasterIntelligenceSummary,
-  DecisionSupportRecommendation,
 } from './types';
-import { sanitizeUntrustedText, wrapInertDataPayload } from '@/lib/ai/sanitize';
 
 interface CachedSummaryEntry {
   summary: DisasterIntelligenceSummary;

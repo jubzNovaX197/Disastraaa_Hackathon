@@ -6,13 +6,13 @@
  * operational records to Neon PostgreSQL + PostGIS.
  */
 
-import type { WeatherProvider } from '../types';
-import type { NormalizedWeather } from '@/lib/weather/types';
-import { openMeteoClient } from '@/lib/weather/openMeteoClient';
-import { normalizeOpenMeteoResponse } from '@/lib/weather/normalizer';
-import { getCachedWeather, saveWeatherTelemetry } from '@/lib/weather/store';
 import { executeQuery } from '@/lib/db';
 import { parseLocationFromText } from '@/lib/geo/regions';
+import { normalizeOpenMeteoResponse } from '@/lib/weather/normalizer';
+import { openMeteoClient } from '@/lib/weather/openMeteoClient';
+import { getCachedWeather, saveWeatherTelemetry } from '@/lib/weather/store';
+import type { NormalizedWeather } from '@/lib/weather/types';
+import type { WeatherProvider } from '../types';
 
 export class RealWeatherProvider implements WeatherProvider {
   async getWeather(

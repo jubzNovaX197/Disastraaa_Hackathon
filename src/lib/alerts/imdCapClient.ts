@@ -9,10 +9,10 @@
  * OID Prefix: urn:oid:2.49.0.1.356.0... (Republic of India)
  */
 
-import type { RealAlert } from './types';
-import type { Severity, HazardType } from '@/types';
 import type { LngLat } from '@/data/types';
 import type { FreshnessStatus } from '@/lib/ingestion/types';
+import type { HazardType, Severity } from '@/types';
+import type { RealAlert } from './types';
 
 export const IMD_RSS_ENDPOINT = 'https://cap-sources.s3.amazonaws.com/in-imd-en/rss.xml';
 

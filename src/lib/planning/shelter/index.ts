@@ -6,8 +6,8 @@
  */
 
 import type { Shelter } from '@/data/types';
-import type { HistoricalDisasterEvent } from '@/lib/historical/types';
 import { getLocationHistory } from '@/lib/historical/engine';
+import type { HistoricalDisasterEvent } from '@/lib/historical/types';
 import type { Severity } from '@/types';
 import { calculateShelterRequirement } from './engine';
 import type {
@@ -21,10 +21,10 @@ export type {
   ShelterPlanningInputs,
   ShelterPlanningResult,
   ShelterPlanningStatus,
-  ShelterSummaryItem,
+  ShelterSummaryItem
 };
 
-export { calculateShelterRequirement };
+  export { calculateShelterRequirement };
 
 // ── Zone to shelter mapping (demo prototype) ──────────────────────────────────
 export const ZONE_SHELTER_IDS: Record<string, string[]> = {

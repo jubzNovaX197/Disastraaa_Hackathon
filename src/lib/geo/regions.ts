@@ -14,8 +14,8 @@
  */
 
 import type { AppEnvironment } from '@/lib/env';
-import { getAllReports } from '@/lib/reports/store';
 import { getIncidents } from '@/lib/incidents/store';
+import { getAllReports } from '@/lib/reports/store';
 
 // ── Canonical Location Data Model ──────────────────────────────────────────
 

@@ -1,6 +1,6 @@
-import type { Metadata } from 'next';
-import { Package } from 'lucide-react';
 import { PlannedFeaturePage } from '@/components/dashboard/PlannedFeaturePage';
+import { Package } from 'lucide-react';
+import type { Metadata } from 'next';
 
 import { resolveServerEnvironment } from '@/lib/env';
 

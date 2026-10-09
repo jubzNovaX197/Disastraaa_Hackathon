@@ -7,8 +7,8 @@
  * Decision-support only · No autonomous emergency control
  */
 
-import type { HazardType, Severity } from '@/types';
 import type { ResourceCategory } from '@/lib/planning/resources/types';
+import type { HazardType, Severity } from '@/types';
 
 // ── Operational Workflow Status ──────────────────────────────────────────────
 

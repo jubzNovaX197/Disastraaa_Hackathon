@@ -5,9 +5,9 @@
  * Adapts to navbar or map overlay placement.
  */
 
-import { Sun, Moon } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 import { cn } from '@/lib/utils';
+import { Moon, Sun } from 'lucide-react';
 
 interface ThemeToggleProps {
   className?: string;

@@ -1,16 +1,17 @@
 'use client';
 
+import { DataProvenance } from '@/components/demo/DataProvenance';
+import { Badge, Card, CardTitle } from '@/components/ui';
+import type { OperationalSummaryNarrative } from '@/lib/commandCenter/types';
 import {
-  FileText,
   AlertCircle,
-  Users,
+  CheckCircle2,
   Compass,
+  FileText,
   Home,
   Package,
-  CheckCircle2,
+  Users,
 } from 'lucide-react';
-import { Card, CardHeader, CardTitle, Badge } from '@/components/ui';
-import type { OperationalSummaryNarrative } from '@/lib/commandCenter/types';
 
 interface SituationSummaryPanelProps {
   narrative: OperationalSummaryNarrative;
@@ -19,6 +20,7 @@ interface SituationSummaryPanelProps {
 export function SituationSummaryPanel({ narrative }: SituationSummaryPanelProps) {
   return (
     <Card className="bg-surface-card/95 border-white/[0.08] shadow-lg">
+      <DataProvenance />
       <div className="p-4 space-y-4">
         <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
           <div className="flex items-center gap-2">

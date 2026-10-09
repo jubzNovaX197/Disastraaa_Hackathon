@@ -5,12 +5,12 @@
  * Replace the input dataset with real records; outputs remain identical.
  */
 
+import type { HazardType, Severity } from '@/types';
 import type {
   HistoricalDisasterEvent,
   HistoricalSummary,
   LocationHistoricalContext,
 } from './types';
-import type { HazardType, Severity } from '@/types';
 
 // ── Severity rank (higher = worse) ───────────────────────────────────────────
 

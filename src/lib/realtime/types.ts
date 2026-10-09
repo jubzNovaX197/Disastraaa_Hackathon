@@ -5,13 +5,13 @@
  * for continuous operational situational awareness without full page reloads.
  */
 
-import type { Severity, HazardType } from '@/types';
 import type { DemoAlert as Alert, Shelter } from '@/data/types';
-import type { CitizenReportItem } from '@/lib/reports/types';
-import type { RoadSegment, RoadStatus } from '@/lib/roads/types';
-import type { CommandCenterData } from '@/lib/commandCenter/types';
-import type { ResponseCoordinationData } from '@/lib/response/types';
 import type { SituationAnalyticsData } from '@/lib/analytics/types';
+import type { CommandCenterData } from '@/lib/commandCenter/types';
+import type { CitizenReportItem } from '@/lib/reports/types';
+import type { ResponseCoordinationData } from '@/lib/response/types';
+import type { RoadSegment } from '@/lib/roads/types';
+import type { Severity } from '@/types';
 
 export type LiveEventType =
   | 'ALERT_CREATED'
@@ -47,6 +47,7 @@ export interface LiveEvent {
 }
 
 export interface LiveDataOverrides {
+  riskZones?: import('@/data/types').RiskZone[];
   alerts: Alert[];
   reports: CitizenReportItem[];
   roads: RoadSegment[];
@@ -62,6 +63,9 @@ export interface LiveDataOverrides {
 }
 
 export interface LiveIntelligenceState {
+  demoStep: number;
+  demoRunning: boolean;
+  lastSuccessfulSync: string | null;
   status: LiveConnectionStatus;
   sourceName: string;
   lastSyncTime: Date;
@@ -79,6 +83,8 @@ export interface LiveIntelligenceState {
 }
 
 export interface LiveIntelligenceContextType extends LiveIntelligenceState {
+  runDemoScenario: () => void;
+  stopDemoScenario: () => void;
   pauseFeed: () => void;
   resumeFeed: () => void;
   refreshNow: () => void;

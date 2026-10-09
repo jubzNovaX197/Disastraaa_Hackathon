@@ -1,5 +1,5 @@
-import type { Metadata } from 'next';
 import { PersonnelManagementPanel } from '@/components/auth/PersonnelManagementPanel';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Personnel & Authority Management',

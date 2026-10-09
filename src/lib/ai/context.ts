@@ -10,13 +10,13 @@
  */
 
 import { aggregateCommandCenterData } from '@/lib/commandCenter/aggregator';
-import type { LiveDataOverrides } from '@/lib/realtime/types';
-import type { AssistantIntent, StructuredContextPayload } from './types';
-import { DETERMINISTIC_LIVE_EVENTS } from '@/lib/realtime/events';
 import { getDbClient } from '@/lib/db';
-import { sanitizeUntrustedText } from './sanitize';
+import { DETERMINISTIC_LIVE_EVENTS } from '@/lib/realtime/events';
+import type { LiveDataOverrides } from '@/lib/realtime/types';
 import { getAllCachedWeather } from '@/lib/weather/store';
 import type { Role } from '@/types/roles';
+import { sanitizeUntrustedText } from './sanitize';
+import type { AssistantIntent, StructuredContextPayload } from './types';
 
 export interface BuildContextOptions {
   intent: AssistantIntent;

@@ -15,7 +15,15 @@
  * - Interactive report detail panel viewer
  */
 
-import { useState, useMemo } from 'react';
+import { useLiveIntelligence } from '@/context/LiveIntelligenceContext';
+import {
+  filterAndSortReports,
+  REPORT_STATUS_CONFIG,
+  REPORT_TYPE_CONFIG,
+  type CitizenReportItem,
+  type CreateReportInput
+} from '@/lib/reports';
+import { cn, severityConfig, timeAgo } from '@/lib/utils';
 import {
   AlertTriangle,
   Camera,
@@ -25,22 +33,11 @@ import {
   MapPin,
   Plus,
   Search,
-  Shield,
   ShieldAlert,
-  ThumbsUp,
+  ThumbsUp
 } from 'lucide-react';
-import type { Severity } from '@/types';
-import { cn, severityConfig, timeAgo } from '@/lib/utils';
-import {
-  filterAndSortReports,
-  REPORT_STATUS_CONFIG,
-  REPORT_TYPE_CONFIG,
-  type CitizenReportItem,
-  type CreateReportInput,
-  createCitizenReport,
-} from '@/lib/reports';
 import { useRouter } from 'next/navigation';
-import { useLiveIntelligence } from '@/context/LiveIntelligenceContext';
+import { useMemo, useState } from 'react';
 import { CitizenReportForm } from './CitizenReportForm';
 import { ReportDetailPanel } from './ReportDetailPanel';
 

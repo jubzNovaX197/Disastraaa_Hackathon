@@ -9,39 +9,29 @@
  * Operational Decision Support System
  */
 
-import { useState, useMemo, useEffect } from 'react';
-import Link from 'next/link';
-import {
-  AlertTriangle,
-  ArrowRight,
-  CheckCircle2,
-  Compass,
-  ExternalLink,
-  Info,
-  Map as MapIcon,
-  Navigation,
-  Shield,
-  ShieldAlert,
-  Sparkles,
-  TrendingDown,
-  XCircle,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { demoRoadSegments } from '@/data/demo';
-import { demoCitizenReports } from '@/data/demo/citizenReports';
+import { Footer } from '@/components/layout/Footer';
 import {
   RoadCard,
   RoadDetailPanel,
   RoadFilters,
 } from '@/components/roads';
+import { RoutePlanner } from '@/components/routing/RoutePlanner';
+import { demoCitizenReports } from '@/data/demo/citizenReports';
+import type { CitizenReportItem } from '@/lib/reports/types';
 import {
   filterRoads,
   type RoadSegment,
 } from '@/lib/roads';
-import type { CitizenReportItem } from '@/lib/reports/types';
-import { Footer } from '@/components/layout/Footer';
-import { RoutePlanner } from '@/components/routing/RoutePlanner';
+import {
+  Info,
+  Map as MapIcon,
+  Navigation,
+  Sparkles
+} from 'lucide-react';
+import Link from 'next/link';
+import { useEffect, useMemo, useState } from 'react';
 
+import { DemoScenarioControls } from '@/components/demo/DemoScenarioControls';
 import { useLiveIntelligence } from '@/context/LiveIntelligenceContext';
 
 export default function TravelPage() {
@@ -156,7 +146,8 @@ export default function TravelPage() {
               </div>
             </div>
             <div className="p-5 sm:p-7 min-h-[580px]">
-              <RoutePlanner />
+              <DemoScenarioControls />
+              <RoutePlanner initialOriginId="node-puri-shelter-1" initialDestinationId="node-puri-dhh" autoCalculate />
             </div>
           </div>
 
@@ -171,7 +162,7 @@ export default function TravelPage() {
                 </span>
               </div>
               <p className="text-slate-700 dark:text-slate-300 leading-relaxed text-[11px]">
-                Road conditions and inundation levels change rapidly during cyclone and monsoon events. Real-time road status is compiled from regional control centers, sensor stations, and verified ground reports. Do not attempt to cross flooded roadways, ford submerged causeways, or bypass official civil barricades.
+                Demo road closures, shelter occupancy and officers are fictional. Live mode uses OSM geography and available external observations; it does not verify road passability. Obey local emergency directives and never cross flooded roads.
               </p>
             </div>
           </div>

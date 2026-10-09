@@ -1,15 +1,17 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Logo } from '@/components/brand/Logo';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
+import { publicNavLinks } from '@/config/nav';
+import { useLiveIntelligence } from '@/context/LiveIntelligenceContext';
+import { parseRoleFromCookie, ROLE_COOKIE_NAME } from '@/lib/auth/roles';
+import { getFeedLabel } from '@/lib/realtime/feedStatus';
+import { cn } from '@/lib/utils';
+import { ROLES, type Role } from '@/types/roles';
+import { LogOut, Menu, Shield, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X, Shield, LogOut } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Logo } from '@/components/brand/Logo';
-import { publicNavLinks } from '@/config/nav';
-import { ThemeToggle } from '@/components/theme/ThemeToggle';
-import { ROLES, type Role } from '@/types/roles';
-import { parseRoleFromCookie, ROLE_COOKIE_NAME } from '@/lib/auth/roles';
+import { useEffect, useState } from 'react';
 
 interface SafeUser {
   uid: string;
@@ -22,6 +24,7 @@ interface SafeUser {
 }
 
 export function PublicNav() {
+  const { environment, status, overrides } = useLiveIntelligence();
   const [open, setOpen] = useState(false);
   const [currentRole, setCurrentRole] = useState<Role>(ROLES.CITIZEN);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -138,7 +141,7 @@ export function PublicNav() {
       >
         <div className="flex items-center gap-3">
           <Logo size="sm" />
-          {isDemo ? (
+          {environment === 'DEMO' ? (
             <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
               SIMULATION MODE
@@ -146,7 +149,7 @@ export function PublicNav() {
           ) : (
             <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-              LIVE OPERATIONAL
+              {getFeedLabel(environment, status, overrides.alerts.filter(alert => alert.isActive).length)}
             </span>
           )}
         </div>

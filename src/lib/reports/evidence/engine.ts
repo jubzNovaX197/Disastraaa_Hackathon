@@ -12,13 +12,13 @@
 
 import type { Severity } from '@/types';
 import type {
-  EvidenceFlag,
-  EvidenceQualityIndicator,
   ContextConsistency,
   EvidenceConfidence,
+  EvidenceFlag,
+  EvidenceQualityIndicator,
+  FutureCvCompatibility,
   PreliminaryEvidenceAssessment,
   StructuredReportEvidence,
-  FutureCvCompatibility,
 } from './types';
 
 export interface EvidenceAssessmentContext {

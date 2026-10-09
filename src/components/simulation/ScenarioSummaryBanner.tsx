@@ -1,9 +1,8 @@
 'use client';
 
-import { Activity, Users, Home, Package, ArrowRight, AlertTriangle } from 'lucide-react';
 import type { SimulationResult } from '@/lib/simulation/types';
 import { formatNumber } from '@/lib/utils';
-import { cn } from '@/lib/utils';
+import { Activity, ArrowRight, Home, Package, Users } from 'lucide-react';
 
 interface ScenarioSummaryBannerProps {
   result: SimulationResult;

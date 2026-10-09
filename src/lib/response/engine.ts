@@ -7,26 +7,25 @@
  * Professional emergency operations decision support.
  */
 
-import { aggregateCommandCenterData } from '@/lib/commandCenter/aggregator';
+import { demoDataset, demoRoadSegments } from '@/data/demo';
 import { demoCitizenReports } from '@/data/demo/citizenReports';
-import { demoRoadSegments } from '@/data/demo';
-import { demoDataset } from '@/data/demo';
-import { formatNumber } from '@/lib/utils';
-import type { HazardType, Severity } from '@/types';
+import { aggregateCommandCenterData } from '@/lib/commandCenter/aggregator';
 import type { ResourceCategory } from '@/lib/planning/resources/types';
+import { formatNumber } from '@/lib/utils';
+import type { Severity } from '@/types';
 import type {
-  ResponseCoordinationData,
   OperationalOverviewMetrics,
+  OperationalStatus,
+  PriorityFactorContribution,
+  ResourceAvailabilityStatus,
   ResourceReadinessItem,
   ResourceZoneAllocation,
-  ResponseZoneItem,
+  ResponseCoordinationData,
   ResponsePriorityIndex,
-  PriorityFactorContribution,
   ResponseTimelineStep,
-  ShelterOperationsData,
+  ResponseZoneItem,
   ShelterOperationalItem,
-  OperationalStatus,
-  ResourceAvailabilityStatus,
+  ShelterOperationsData,
 } from './types';
 
 // ── Default Operational Workflow Statuses per Zone ───────────────────────────
@@ -201,8 +200,8 @@ function buildZoneTimeline(zoneName: string, priorityScore: number): ResponseTim
   ];
 }
 
-import type { CommandCenterData } from '@/lib/commandCenter/types';
 import type { DemoAlert as Alert, Shelter } from '@/data/types';
+import type { CommandCenterData } from '@/lib/commandCenter/types';
 import type { CitizenReportItem } from '@/lib/reports/types';
 import type { RoadSegment } from '@/lib/roads/types';
 

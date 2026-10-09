@@ -1,6 +1,6 @@
-import Link from 'next/link';
-import { cn } from '@/lib/utils';
 import { brand } from '@/config/brand';
+import { cn } from '@/lib/utils';
+import Link from 'next/link';
 
 interface LogoProps {
   size?:      'sm' | 'md' | 'lg';

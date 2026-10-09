@@ -9,12 +9,12 @@
  * - Deterministic Risk Engine baseline comparison
  */
 
+import { calculateFloodRisk } from '@/lib/risk/flood/calculateFloodRisk';
 import type {
   ConfusionMatrix,
-  ModelEvaluationMetrics,
   FloodFeatureRecord,
+  ModelEvaluationMetrics,
 } from './types';
-import { calculateFloodRisk } from '@/lib/risk/flood/calculateFloodRisk';
 
 /**
  * Calculates a complete suite of classification and probabilistic metrics.

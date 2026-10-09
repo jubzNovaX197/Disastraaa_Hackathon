@@ -8,44 +8,43 @@
  * Deterministic aggregation without duplicating underlying datasets or engines.
  */
 
-import { computedMultiHazardRisks } from '@/data/demo/computedMultiHazardRisks';
-import { computedFloodRisks } from '@/data/demo/computedFloodRisks';
-import { computedCycloneRisks } from '@/data/demo/computedCycloneRisks';
-import { demoDataset } from '@/data/demo';
+import { demoDataset, demoRoadSegments } from '@/data/demo';
 import { demoCitizenReports } from '@/data/demo/citizenReports';
+import { computedCycloneRisks } from '@/data/demo/computedCycloneRisks';
+import { computedFloodRisks } from '@/data/demo/computedFloodRisks';
+import { computedMultiHazardRisks } from '@/data/demo/computedMultiHazardRisks';
 import { demoHistoricalEvents } from '@/data/demo/historicalEvents';
-import { demoRoadSegments } from '@/data/demo';
+import type { DemoAlert as Alert, Shelter } from '@/data/types';
+import { getAvailableRealRegions } from '@/lib/geo';
+import type { RegionSummary } from '@/lib/geo/regions';
 import { calculateImpact, DEMO_ZONE_EXPOSURE, fallbackExposure } from '@/lib/impact';
-import { buildShelterPlanningForZone } from '@/lib/planning/shelter';
 import { buildResourcePlanningForZone } from '@/lib/planning/resources';
 import type { ResourceRequirementItem } from '@/lib/planning/resources/types';
-import { getAvailableRealRegions } from '@/lib/geo';
-import { formatNumber } from '@/lib/utils';
-import { calculateFloodRisk } from '@/lib/risk/flood';
+import { buildShelterPlanningForZone } from '@/lib/planning/shelter';
+import type { CitizenReportItem } from '@/lib/reports/types';
 import { calculateCycloneRisk } from '@/lib/risk/cyclone';
+import { calculateFloodRisk } from '@/lib/risk/flood';
+import type { RoadSegment } from '@/lib/roads/types';
+import { formatNumber } from '@/lib/utils';
 import { getAllCachedWeather } from '@/lib/weather/store';
 import type { NormalizedWeather } from '@/lib/weather/types';
-import type { RegionSummary } from '@/lib/geo/regions';
-import type { HazardType, Severity, ReportStatus } from '@/types';
-import type { RoadStatus, RoadSegment } from '@/lib/roads/types';
-import type { DemoAlert as Alert, Shelter } from '@/data/types';
-import type { CitizenReportItem } from '@/lib/reports/types';
+import type { HazardType, Severity } from '@/types';
 import type {
-  CommandCenterData,
-  PriorityLocation,
-  RiskKpis,
-  ImpactKpis,
-  ResponseKpis,
-  OperationalSummaryNarrative,
-  HazardBreakdownItem,
-  SituationTimelinePoint,
   CitizenReportsIntelligence,
+  CommandCenterData,
+  HazardBreakdownItem,
+  ImpactKpis,
+  OperationalSummaryNarrative,
+  OperationsFilters,
+  PriorityLocation,
+  ResourceOperationsItem,
+  ResourceOperationsSummary,
+  ResponseKpis,
+  RiskKpis,
   RoadOperationsSummary,
   ShelterOperationsSummary,
   ShelterOperationsSummaryItem,
-  ResourceOperationsSummary,
-  ResourceOperationsItem,
-  OperationsFilters,
+  SituationTimelinePoint,
 } from './types';
 
 // ── Canonical Location Metadata ──────────────────────────────────────────────
@@ -158,11 +157,18 @@ export interface CommandCenterDataOverrides {
  */
 export function aggregateCommandCenterData(overrides?: CommandCenterDataOverrides): CommandCenterData {
   const isReal = overrides?.environment === 'REAL';
-  const alerts = overrides?.alerts ?? (isReal ? [] : demoDataset.alerts);
+  const rawAlerts = overrides?.alerts ?? (isReal ? [] : demoDataset.alerts);
+  const alerts = isReal ? rawAlerts.filter((a) => !a.id.startsWith('demo-')) : rawAlerts;
   const activeAlerts = alerts.filter((a) => a.isActive);
-  const reports = overrides?.reports ?? (isReal ? [] : demoCitizenReports);
-  const roads = overrides?.roads ?? (isReal ? [] : demoRoadSegments);
-  const rawShelters = overrides?.shelters ?? (isReal ? [] : demoDataset.shelters);
+
+  const rawReports = overrides?.reports ?? (isReal ? [] : demoCitizenReports);
+  const reports = isReal ? rawReports.filter((r) => !r.id.startsWith('rep-demo-') && !r.id.startsWith('demo-')) : rawReports;
+
+  const rawRoads = overrides?.roads ?? (isReal ? [] : demoRoadSegments);
+  const roads = isReal ? rawRoads.filter((rd) => !rd.id.startsWith('rd-puri-') && !rd.id.startsWith('demo-')) : rawRoads;
+
+  const baseShelters = overrides?.shelters ?? (isReal ? [] : demoDataset.shelters);
+  const rawShelters = isReal ? baseShelters.filter((s) => !s.id.startsWith('sh-puri-') && !s.id.startsWith('demo-')) : baseShelters;
   const shelters = overrides?.shelterOccupancies
     ? rawShelters.map((s) => {
         const occ = overrides.shelterOccupancies![s.id];

@@ -17,14 +17,14 @@ import { hazardRepository } from './repositories/hazardRepository';
 import { weatherRiskService } from './risk/weatherRiskService';
 import type { IngestionFilterOptions, IngestionResult } from './types';
 
-export * from './types';
-export * from './freshness';
 export { eonetClient } from './clients/eonetClient';
 export { firmsClient } from './clients/firmsClient';
-export { normalizeEonetResponse, normalizeEonetEvent } from './normalizers/eonetNormalizer';
-export { normalizeFirmsResponse, normalizeFirmsHotspot } from './normalizers/firmsNormalizer';
+export * from './freshness';
+export { normalizeEonetEvent, normalizeEonetResponse } from './normalizers/eonetNormalizer';
+export { normalizeFirmsHotspot, normalizeFirmsResponse } from './normalizers/firmsNormalizer';
 export { hazardRepository } from './repositories/hazardRepository';
 export { weatherRiskService } from './risk/weatherRiskService';
+export * from './types';
 
 export interface ComprehensiveIngestionReport {
   timestamp: string;

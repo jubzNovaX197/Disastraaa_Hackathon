@@ -8,25 +8,18 @@
  * Mobile: Responsive tabbed layout
  */
 
-import { useState, useRef, useEffect } from 'react';
-import {
-  Send,
-  Sparkles,
-  Bot,
-  RefreshCw,
-  AlertTriangle,
-  RotateCcw,
-  Activity,
-  Layers,
-  Shield,
-  HelpCircle,
-} from 'lucide-react';
 import { useLiveIntelligence } from '@/context/LiveIntelligenceContext';
+import type { AssistantMessage, AssistantResponsePayload } from '@/lib/ai/types';
+import { cn } from '@/lib/utils';
+import {
+  AlertTriangle,
+  RefreshCw,
+  Send
+} from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import { AssistantHeader } from './AssistantHeader';
 import { AssistantMessageItem } from './AssistantMessageItem';
 import { AssistantOperationalPanel } from './AssistantOperationalPanel';
-import type { AssistantMessage, AssistantResponsePayload } from '@/lib/ai/types';
-import { cn } from '@/lib/utils';
 
 const INITIAL_WELCOME_MESSAGE: AssistantMessage = {
   id: 'msg-welcome',

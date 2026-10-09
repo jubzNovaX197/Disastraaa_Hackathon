@@ -1,6 +1,6 @@
-import type { Metadata } from 'next';
-import { resolveActiveRole } from '@/lib/auth/resolveRole';
 import { SituationAnalyticsDashboard } from '@/components/analytics/SituationAnalyticsDashboard';
+import { resolveActiveRole } from '@/lib/auth/resolveRole';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Situation Analytics',

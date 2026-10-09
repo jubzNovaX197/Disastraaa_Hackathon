@@ -1,12 +1,11 @@
 'use client';
 
-import { useState } from 'react';
-import { X, ArrowRight, Layers, Sliders, CheckCircle2 } from 'lucide-react';
-import type { SimulationResult } from '@/lib/simulation/types';
-import { SCENARIO_PRESETS } from '@/lib/simulation/presets';
 import { runSimulation } from '@/lib/simulation/engine';
-import { formatNumber } from '@/lib/utils';
-import { cn } from '@/lib/utils';
+import { SCENARIO_PRESETS } from '@/lib/simulation/presets';
+import type { SimulationResult } from '@/lib/simulation/types';
+import { cn, formatNumber } from '@/lib/utils';
+import { Sliders, X } from 'lucide-react';
+import { useState } from 'react';
 
 interface ScenarioComparisonModalProps {
   currentResult: SimulationResult;

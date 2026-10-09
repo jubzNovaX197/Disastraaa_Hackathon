@@ -8,9 +8,9 @@
  * Supports both dark and light themes.
  */
 
-import { useState } from 'react';
-import { Layers, X, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ChevronDown, Layers, X } from 'lucide-react';
+import { useState } from 'react';
 
 export interface LayerToggle {
   id: string;
