@@ -144,6 +144,9 @@ export async function saveWeatherTelemetry(weather: NormalizedWeather): Promise<
       // Update existing record rather than inserting duplicate row
       await executeQuery(
         `UPDATE weather_telemetry SET
+          location_name = COALESCE($13, location_name),
+          state = COALESCE($14, state),
+          district = COALESCE($15, district),
           temperature_c = $1,
           relative_humidity_pct = $2,
           precipitation_mm = $3,
@@ -169,6 +172,9 @@ export async function saveWeatherTelemetry(weather: NormalizedWeather): Promise<
           weather.freshnessStatus,
           JSON.stringify(weather.hourlyForecast ?? []),
           weather.id,
+          weather.locationName,
+          weather.state || null,
+          weather.district || null,
         ],
       );
 

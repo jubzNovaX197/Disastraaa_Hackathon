@@ -5,6 +5,7 @@ import { demoDataset } from '@/data/demo';
 import { demoCitizenReports } from '@/data/demo/citizenReports';
 import { demoRoadSegments } from '@/data/demo';
 import { getIncidents } from '@/lib/incidents';
+import { parseLocationFromText } from '@/lib/geo/regions';
 
 /**
  * GET /api/stats
@@ -198,19 +199,22 @@ export async function GET(request: NextRequest) {
           persistedInDatabase: registeredRegions,
         },
         latestWeather: latestWeather
-          ? {
-              locationName: latestWeather.location_name,
-              state: latestWeather.state,
-              district: latestWeather.district,
-              temperatureC: Number(latestWeather.temperature_c),
-              windSpeedKmh: Number(latestWeather.wind_speed_kmh),
-              surfacePressureHpa: Number(latestWeather.surface_pressure_hpa),
-              precipitationMm: Number(latestWeather.precipitation_mm),
-              condition: latestWeather.weather_condition,
-              observedAt: new Date(latestWeather.observed_at).toISOString(),
-              freshness: latestWeather.freshness_status,
-              source: latestWeather.source,
-            }
+          ? (() => {
+              const parsedGeo = parseLocationFromText(latestWeather.location_name, latestWeather.state || 'Odisha');
+              return {
+                locationName: latestWeather.location_name,
+                state: latestWeather.state || parsedGeo.state,
+                district: latestWeather.district || parsedGeo.district,
+                temperatureC: Number(latestWeather.temperature_c),
+                windSpeedKmh: Number(latestWeather.wind_speed_kmh),
+                surfacePressureHpa: Number(latestWeather.surface_pressure_hpa),
+                precipitationMm: Number(latestWeather.precipitation_mm),
+                condition: latestWeather.weather_condition,
+                observedAt: new Date(latestWeather.observed_at).toISOString(),
+                freshness: latestWeather.freshness_status,
+                source: latestWeather.source,
+              };
+            })()
           : null,
       },
       provenance: {

@@ -7,6 +7,7 @@
 
 import type { OpenMeteoRawResponse } from './openMeteoClient';
 import type { NormalizedWeather, WeatherFreshnessStatus, WeatherForecastPoint } from './types';
+import { parseLocationFromText } from '@/lib/geo/regions';
 
 export interface WeatherConditionInfo {
   label: string;
@@ -158,12 +159,15 @@ export function normalizeOpenMeteoResponse(
   }
 
   const id = `wx-${Math.round(raw.latitude * 1000)}-${Math.round(raw.longitude * 1000)}`;
+  const parsedGeo = parseLocationFromText(locationName, state);
+  const resolvedState = state || parsedGeo.state;
+  const resolvedDistrict = district || parsedGeo.district;
 
   return {
     id,
     locationName,
-    state,
-    district,
+    state: resolvedState,
+    district: resolvedDistrict,
     coordinates: [raw.longitude, raw.latitude],
     temperatureC: current.temperature_2m,
     apparentTemperatureC: current.apparent_temperature,

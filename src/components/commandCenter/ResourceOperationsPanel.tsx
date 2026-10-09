@@ -33,7 +33,11 @@ export function ResourceOperationsPanel({ resourceOperations }: ResourceOperatio
           dot={totalDeficitCategories > 0}
           className="text-xs"
         >
-          {totalDeficitCategories > 0 ? `${totalDeficitCategories} Deficit Categories` : 'Zero Deficits · Stockpiles Adequate'}
+          {totalDeficitCategories > 0
+            ? `${totalDeficitCategories} Deficit Categories`
+            : categories.length > 0
+            ? 'Stockpiles Adequate'
+            : 'Logistics Telemetry Standby'}
         </Badge>
       </div>
 
@@ -53,7 +57,7 @@ export function ResourceOperationsPanel({ resourceOperations }: ResourceOperatio
             {categories.length === 0 ? (
               <tr>
                 <td colSpan={6} className="py-8 text-center text-slate-500 text-xs">
-                  Standard operational stockpiles verified. Zero active logistics deficits.
+                  Logistics Inventory Feeds: External warehouse ERP telemetry unconfigured / Standby. No active deficits reported.
                 </td>
               </tr>
             ) : (

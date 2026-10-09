@@ -12,6 +12,7 @@ import { openMeteoClient } from '@/lib/weather/openMeteoClient';
 import { normalizeOpenMeteoResponse } from '@/lib/weather/normalizer';
 import { getCachedWeather, saveWeatherTelemetry } from '@/lib/weather/store';
 import { executeQuery } from '@/lib/db';
+import { parseLocationFromText } from '@/lib/geo/regions';
 
 export class RealWeatherProvider implements WeatherProvider {
   async getWeather(
@@ -91,6 +92,30 @@ export class RealWeatherProvider implements WeatherProvider {
     if (!process.env.DATABASE_URL) return [];
 
     try {
+      if (!state && !district) {
+        const canonicalSectors = [
+          { name: 'Kalahandi District, Odisha', lat: 19.9075, lon: 83.1659 },
+          { name: 'Bhubaneswar State Command Operations, Khordha District, Odisha', lat: 20.2961, lon: 85.8245 },
+          { name: 'Puri Coastal Belt, Puri District, Odisha', lat: 19.8135, lon: 85.8312 },
+          { name: 'Cuttack Operational Sector, Cuttack District, Odisha', lat: 20.4625, lon: 85.8830 },
+        ];
+
+        try {
+          const countCheck = await executeQuery<{ cnt: string }>(
+            `SELECT COUNT(*)::text as cnt FROM weather_telemetry WHERE environment = 'REAL' AND observed_at >= NOW() - INTERVAL '3 hours';`,
+          );
+          const hasRecent = countCheck.length > 0 && parseInt(countCheck[0].cnt, 10) >= 4;
+
+          if (!hasRecent) {
+            await Promise.allSettled(
+              canonicalSectors.map((s) => this.getWeather(s.lat, s.lon, s.name)),
+            );
+          }
+        } catch {
+          // Continue to query existing records if live refresh encounters network timeout
+        }
+      }
+
       let query = 'SELECT *, ST_X(coordinates::geometry) as lng, ST_Y(coordinates::geometry) as lat FROM weather_telemetry WHERE environment = $1';
       const params: any[] = ['REAL'];
 
@@ -105,12 +130,14 @@ export class RealWeatherProvider implements WeatherProvider {
       query += ' ORDER BY observed_at DESC LIMIT 20;';
 
       const rows = await executeQuery<any>(query, params);
-      return rows.map((r) => ({
-        id: r.id,
-        locationName: r.location_name,
-        state: r.state,
-        district: r.district,
-        coordinates: [Number(r.lng) || 0, Number(r.lat) || 0] as [number, number],
+      return rows.map((r) => {
+        const parsed = parseLocationFromText(r.location_name, r.state || 'Odisha');
+        return {
+          id: r.id,
+          locationName: r.location_name,
+          state: r.state || parsed.state,
+          district: r.district || parsed.district,
+          coordinates: [Number(r.lng) || 0, Number(r.lat) || 0] as [number, number],
         temperatureC: Number(r.temperature_c),
         relativeHumidityPct: r.relative_humidity_pct,
         precipitationMm: Number(r.precipitation_mm),
@@ -128,8 +155,9 @@ export class RealWeatherProvider implements WeatherProvider {
         validUntil: new Date(new Date(r.observed_at).getTime() + 3600000).toISOString(),
         freshnessStatus: r.freshness_status,
         environment: 'REAL',
-      }));
-    } catch (err: any) {
+      };
+    });
+  } catch (err: any) {
       console.warn('[REAL-WEATHER-PROVIDER] Failed to fetch regional weather:', err.message);
       return [];
     }

@@ -43,6 +43,7 @@ import type {
 } from '@/lib/commandCenter/types';
 import { ROLES, type Role } from '@/types/roles';
 import { cn } from '@/lib/utils';
+import { createCircularPolygon } from '@/lib/ingestion/risk/weatherRiskService';
 
 // Operational default map layers (Citizen reports & road disruptions visible for command response)
 const COMMAND_CENTER_MAP_LAYERS = [
@@ -100,9 +101,35 @@ export function CommandCenterDashboard({
           since: r.lastUpdated,
         }));
 
+      const riskZones = baseData.priorityLocations.map((loc) => ({
+        id: `rz-${loc.id}`,
+        name: loc.name,
+        severity: loc.severity,
+        coordinates: createCircularPolygon(loc.coordinates, 15),
+        primaryHazard: (loc.dominantHazard === 'MULTI_HAZARD'
+          ? (loc.cycloneRiskScore && loc.cycloneRiskScore > (loc.floodRiskScore ?? 0) ? 'CYCLONE' : 'FLOOD')
+          : loc.dominantHazard) as 'FLOOD' | 'CYCLONE',
+        riskScore: loc.riskScore,
+        affectedPopulation: loc.populationExposed,
+        description: `Operational Priority Sector: ${loc.severity} (${loc.riskScore}/100)`,
+      }));
+
+      const floodAreas = baseData.priorityLocations
+        .filter((loc) => (loc.floodRiskScore ?? 0) >= 25)
+        .map((loc) => ({
+          id: `fa-${loc.id}`,
+          name: `${loc.name} Hydrological Basin`,
+          severity: loc.severity,
+          type: 'FLOOD' as const,
+          coordinates: createCircularPolygon(loc.coordinates, 10),
+          areaKm2: 30,
+          lastUpdated: new Date().toISOString(),
+          description: `River gauge & rainfall risk: ${loc.floodRiskScore}/100`,
+        }));
+
       return {
-        riskZones: [],
-        floodAreas: [],
+        riskZones,
+        floodAreas,
         shelters: overrides.shelters,
         alerts: overrides.alerts,
         infrastructure: [],
@@ -125,7 +152,7 @@ export function CommandCenterDashboard({
       sourceType: 'SIMULATION' as const,
       environment: 'DEMO' as const,
     };
-  }, [overrides, environment]);
+  }, [overrides, environment, baseData.priorityLocations]);
 
   // Filtered priority locations
   const filteredLocations = useMemo(

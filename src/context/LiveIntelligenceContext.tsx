@@ -47,6 +47,7 @@ import type { DemoAlert as Alert, Shelter } from '@/data/types';
 import type { RoadSegment } from '@/lib/roads/types';
 import type { NormalizedWeather } from '@/lib/weather/types';
 import type { CitizenReportItem } from '@/lib/reports/types';
+import { getCanonicalOdishaRegions, getAvailableRealRegions, type RegionSummary } from '@/lib/geo/regions';
 
 const REAL_OVERRIDES: LiveDataOverrides = {
   alerts: [],
@@ -57,6 +58,7 @@ const REAL_OVERRIDES: LiveDataOverrides = {
   resourceStocks: {},
   riverGaugeDeltas: {},
   rainfallDeltas: {},
+  regions: getCanonicalOdishaRegions(),
   environment: 'REAL',
 };
 
@@ -226,6 +228,12 @@ export function LiveIntelligenceProvider({
       const totalFeeds = 5;
       const failedCount = Object.keys(feedErrors).length;
 
+      const dynamicRegions = getAvailableRealRegions();
+      const combinedRegionsMap = new Map<string, RegionSummary>();
+      getCanonicalOdishaRegions().forEach((r) => combinedRegionsMap.set(r.id, r));
+      dynamicRegions.forEach((r) => combinedRegionsMap.set(r.id, r));
+      const monitoredRegions = Array.from(combinedRegionsMap.values());
+
       setOverrides({
         alerts,
         reports,
@@ -236,6 +244,7 @@ export function LiveIntelligenceProvider({
         riverGaugeDeltas: {},
         rainfallDeltas: {},
         weather: weatherList,
+        regions: monitoredRegions,
         feedErrors: failedCount > 0 ? feedErrors : undefined,
         environment: 'REAL',
       });
