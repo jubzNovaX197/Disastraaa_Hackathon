@@ -116,7 +116,7 @@ export function LiveStatusIndicator({ className, compact = false }: LiveStatusIn
 
           {/* Text Labels */}
           {!compact && (
-            <span className="text-[11px] font-bold tracking-wider font-mono">
+            <span className="text-[11px] font-bold tracking-wider font-mono truncate max-w-[120px] sm:max-w-none">
               {getFeedLabel(environment, status, overrides.alerts.filter(alert => alert.isActive).length)}
             </span>
           )}
@@ -137,7 +137,7 @@ export function LiveStatusIndicator({ className, compact = false }: LiveStatusIn
         <button
           type="button"
           onClick={isPaused ? resumeFeed : pauseFeed}
-          className="p-1 rounded-lg border border-slate-200 dark:border-white/10 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] transition-colors"
+          className="hidden sm:inline-flex p-1 rounded-lg border border-slate-200 dark:border-white/10 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] transition-colors"
           title={isPaused ? 'Resume live simulation feed' : 'Pause live simulation feed'}
         >
           {isPaused ? <Play className="w-3 h-3 text-emerald-500 fill-emerald-500" /> : <Pause className="w-3 h-3" />}
@@ -147,7 +147,7 @@ export function LiveStatusIndicator({ className, compact = false }: LiveStatusIn
         <button
           type="button"
           onClick={refreshNow}
-          className="p-1 rounded-lg border border-slate-200 dark:border-white/10 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] transition-colors"
+          className="hidden sm:inline-flex p-1 rounded-lg border border-slate-200 dark:border-white/10 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] transition-colors"
           title="Synchronize streams now"
         >
           <RefreshCw className={cn('w-3 h-3', status === 'updating' && 'animate-spin text-blue-500')} />

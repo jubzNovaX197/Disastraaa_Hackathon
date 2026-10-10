@@ -23,7 +23,12 @@ import { ROLE_COOKIE_NAME, parseRoleFromCookie } from './roles';
 import { SESSION_COOKIE_NAME, verifySessionToken } from './session';
 
 export async function resolveActiveRole(): Promise<Role> {
-  const cookieStore = await cookies();
+  let cookieStore;
+  try {
+    cookieStore = await cookies();
+  } catch {
+    return ROLES.CITIZEN;
+  }
 
   // 1. Real verified authority session takes precedence
   const sessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value;

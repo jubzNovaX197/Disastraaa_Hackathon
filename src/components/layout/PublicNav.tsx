@@ -8,7 +8,7 @@ import { parseRoleFromCookie, ROLE_COOKIE_NAME } from '@/lib/auth/roles';
 import { getFeedLabel } from '@/lib/realtime/feedStatus';
 import { cn } from '@/lib/utils';
 import { ROLES, type Role } from '@/types/roles';
-import { LogOut, Menu, Shield, X } from 'lucide-react';
+import { KeyRound, LogOut, Map, Menu, Shield, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -143,6 +143,9 @@ export function PublicNav() {
         return '/analytics';
       case ROLES.FIELD_OPERATOR:
         return '/operations';
+      case ROLES.CITIZEN:
+      case ROLES.REGISTERED_USER:
+        return '/map';
       default:
         return '/dashboard';
     }
@@ -211,13 +214,23 @@ export function PublicNav() {
           {/* STATE 1: REAL AUTHENTICATED USER */}
           {isAuthenticated ? (
             <>
-              <Link
-                href={getDashboardHref(currentRole)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-accent/15 dark:bg-accent/10 text-cyan-700 dark:text-accent border border-accent/30 hover:bg-accent/20 transition-colors"
-              >
-                <Shield className="w-3.5 h-3.5" />
-                Dashboard
-              </Link>
+              {currentRole === ROLES.CITIZEN || currentRole === ROLES.REGISTERED_USER ? (
+                <Link
+                  href="/map"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-accent/15 dark:bg-accent/10 text-cyan-700 dark:text-accent border border-accent/30 hover:bg-accent/20 transition-colors"
+                >
+                  <Map className="w-3.5 h-3.5" />
+                  Live Map
+                </Link>
+              ) : (
+                <Link
+                  href={getDashboardHref(currentRole)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-accent/15 dark:bg-accent/10 text-cyan-700 dark:text-accent border border-accent/30 hover:bg-accent/20 transition-colors"
+                >
+                  <Shield className="w-3.5 h-3.5" />
+                  Dashboard
+                </Link>
+              )}
               <button
                 type="button"
                 onClick={handleRealSignOut}
@@ -231,13 +244,24 @@ export function PublicNav() {
           ) : isDemo ? (
             /* STATE 2: DEMO ENVIRONMENT */
             <>
-              <Link
-                href="/dashboard"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-500/15 text-amber-400 border border-amber-500/30 hover:bg-amber-500/20 transition-colors"
-              >
-                <Shield className="w-3.5 h-3.5" />
-                Dashboard
-              </Link>
+              {currentRole === ROLES.CITIZEN ? (
+                <Link
+                  href="/demo"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 hover:bg-cyan-500/20 transition-colors"
+                  title="Switch simulated role or explore authority command centers"
+                >
+                  <KeyRound className="w-3.5 h-3.5" />
+                  Demo Roles
+                </Link>
+              ) : (
+                <Link
+                  href={getDashboardHref(currentRole)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-500/15 text-amber-400 border border-amber-500/30 hover:bg-amber-500/20 transition-colors"
+                >
+                  <Shield className="w-3.5 h-3.5" />
+                  Dashboard
+                </Link>
+              )}
               <button
                 type="button"
                 onClick={handleExitDemo}
@@ -350,14 +374,25 @@ export function PublicNav() {
             <div className="pt-2 mt-1 border-t border-slate-200 dark:border-white/[0.06] flex flex-col gap-2">
               {isAuthenticated ? (
                 <>
-                  <Link
-                    href={getDashboardHref(currentRole)}
-                    onClick={() => setOpen(false)}
-                    className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-accent/15 text-cyan-700 dark:text-accent border border-accent/30"
-                  >
-                    <Shield className="w-4 h-4" />
-                    Dashboard
-                  </Link>
+                  {currentRole === ROLES.CITIZEN || currentRole === ROLES.REGISTERED_USER ? (
+                    <Link
+                      href="/map"
+                      onClick={() => setOpen(false)}
+                      className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-accent/15 text-cyan-700 dark:text-accent border border-accent/30"
+                    >
+                      <Map className="w-4 h-4" />
+                      Live Map
+                    </Link>
+                  ) : (
+                    <Link
+                      href={getDashboardHref(currentRole)}
+                      onClick={() => setOpen(false)}
+                      className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-accent/15 text-cyan-700 dark:text-accent border border-accent/30"
+                    >
+                      <Shield className="w-4 h-4" />
+                      Dashboard
+                    </Link>
+                  )}
                   <button
                     type="button"
                     onClick={() => {
@@ -372,14 +407,25 @@ export function PublicNav() {
                 </>
               ) : isDemo ? (
                 <>
-                  <Link
-                    href="/dashboard"
-                    onClick={() => setOpen(false)}
-                    className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-amber-500/15 text-amber-400 border border-amber-500/30"
-                  >
-                    <Shield className="w-4 h-4" />
-                    Open Dashboard
-                  </Link>
+                  {currentRole === ROLES.CITIZEN ? (
+                    <Link
+                      href="/demo"
+                      onClick={() => setOpen(false)}
+                      className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30"
+                    >
+                      <KeyRound className="w-4 h-4" />
+                      Demo Roles
+                    </Link>
+                  ) : (
+                    <Link
+                      href={getDashboardHref(currentRole)}
+                      onClick={() => setOpen(false)}
+                      className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-amber-500/15 text-amber-400 border border-amber-500/30"
+                    >
+                      <Shield className="w-4 h-4" />
+                      Open Dashboard
+                    </Link>
+                  )}
                   <button
                     type="button"
                     onClick={() => {

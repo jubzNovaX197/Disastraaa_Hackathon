@@ -35,7 +35,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 // Icon registry — avoids dynamic require; extend when adding nav items
 const iconMap: Record<string, React.ElementType> = {
@@ -62,11 +62,18 @@ const iconMap: Record<string, React.ElementType> = {
 interface DashboardSidebarProps {
   mobileOpen?: boolean;
   onCloseMobile?: () => void;
+  initialRole?: Role;
 }
 
-export function DashboardSidebar({ mobileOpen = false, onCloseMobile }: DashboardSidebarProps) {
+export function DashboardSidebar({ mobileOpen = false, onCloseMobile, initialRole }: DashboardSidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
-  const [currentRole, setCurrentRole] = useState<Role>(ROLES.STATE_AUTHORITY);
+  const [currentRole, setCurrentRole] = useState<Role>(() => {
+    if (initialRole) return initialRole;
+    if (typeof document !== 'undefined') {
+      return parseRoleFromCookie(document.cookie);
+    }
+    return ROLES.STATE_AUTHORITY;
+  });
   const [realUser, setRealUser] = useState<{
     uid: string;
     name: string;
@@ -78,10 +85,12 @@ export function DashboardSidebar({ mobileOpen = false, onCloseMobile }: Dashboar
   } | null>(null);
   const pathname = usePathname();
 
-  // Close mobile drawer on route change
+  // Close mobile drawer strictly on route change (not on initial mount or re-render)
+  const prevPathnameRef = useRef(pathname);
   useEffect(() => {
-    if (onCloseMobile) {
-      onCloseMobile();
+    if (prevPathnameRef.current !== pathname) {
+      prevPathnameRef.current = pathname;
+      onCloseMobile?.();
     }
   }, [pathname, onCloseMobile]);
 
@@ -122,7 +131,7 @@ export function DashboardSidebar({ mobileOpen = false, onCloseMobile }: Dashboar
           setRealUser(null);
           if (typeof document !== 'undefined') {
             const active = parseRoleFromCookie(document.cookie);
-            setCurrentRole(active === ROLES.CITIZEN ? ROLES.STATE_AUTHORITY : active);
+            setCurrentRole(active);
           }
         }
       })
@@ -130,7 +139,7 @@ export function DashboardSidebar({ mobileOpen = false, onCloseMobile }: Dashboar
         if (!isMounted) return;
         if (typeof document !== 'undefined') {
           const active = parseRoleFromCookie(document.cookie);
-          setCurrentRole(active === ROLES.CITIZEN ? ROLES.STATE_AUTHORITY : active);
+          setCurrentRole(active);
         }
       });
 
@@ -184,7 +193,7 @@ export function DashboardSidebar({ mobileOpen = false, onCloseMobile }: Dashboar
           <button
             type="button"
             onClick={onCloseMobile}
-            className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
+            className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500/40"
             aria-label="Close navigation sidebar"
           >
             <X className="w-5 h-5" />
@@ -388,7 +397,12 @@ export function DashboardSidebar({ mobileOpen = false, onCloseMobile }: Dashboar
 
       {/* ── MOBILE DRAWER: Completely unmounted/hidden by default; overlays screen with backdrop when open ── */}
       {mobileOpen && (
-        <div className="lg:hidden fixed inset-0 z-50 flex">
+        <div
+          className="lg:hidden fixed inset-0 z-[9999] flex"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Mobile dashboard navigation"
+        >
           {/* Backdrop */}
           <div
             className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity animate-fade-in"
@@ -399,7 +413,7 @@ export function DashboardSidebar({ mobileOpen = false, onCloseMobile }: Dashboar
           {/* Drawer Panel */}
           <aside
             className="relative w-72 max-w-[85vw] h-full bg-white dark:bg-surface-card border-r border-slate-200 dark:border-white/[0.08] shadow-2xl flex flex-col z-10 animate-slide-in"
-            aria-label="Mobile dashboard navigation"
+            aria-label="Mobile dashboard navigation panel"
           >
             {renderSidebarBody(true, false)}
           </aside>

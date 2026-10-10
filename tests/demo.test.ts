@@ -6,6 +6,7 @@ import { calculateRoutes } from '../src/lib/routing/engine';
 import { DEMO_EDGES, DEMO_NODES, NODE_BY_ID } from '../src/lib/routing/graph';
 import { getFeedLabel } from '../src/lib/realtime/feedStatus';
 import { canAccessDashboard } from '../src/lib/auth/accessPolicy';
+import { getDashboardNavGroupsForRole } from '../src/config/nav';
 import { parseEnvironmentFromCookie } from '../src/lib/env';
 import { createSessionToken, verifySessionToken } from '../src/lib/auth/session';
 
@@ -54,8 +55,29 @@ test('loading, unavailable and no received alerts are distinct states', () => {
 test('server policy restricts citizen and field operator dashboard access', () => {
   assert.equal(canAccessDashboard('CITIZEN', '/dashboard'), false);
   assert.equal(canAccessDashboard('FIELD_OPERATOR', '/governance'), false);
-  assert.equal(canAccessDashboard('STATE_AUTHORITY', '/analytics'), false);
+  assert.equal(canAccessDashboard('STATE_AUTHORITY', '/analytics'), true);
+  assert.equal(canAccessDashboard('DISTRICT_AUTHORITY', '/analytics'), false);
   assert.equal(canAccessDashboard('SUPER_ADMIN', '/governance'), true);
+});
+
+test('role navigation groups expose citizen services for citizens and full command for state authority', () => {
+  const citizenGroups = getDashboardNavGroupsForRole('CITIZEN');
+  const citizenHrefs = citizenGroups.flatMap(g => g.items.map(i => i.href));
+  assert.ok(citizenHrefs.includes('/map'));
+  assert.ok(citizenHrefs.includes('/alerts'));
+  assert.ok(citizenHrefs.includes('/travel'));
+  assert.ok(citizenHrefs.includes('/shelters'));
+  assert.ok(citizenHrefs.includes('/reports'));
+  // Authority-only routes must not be present in citizen nav
+  assert.equal(citizenHrefs.includes('/dashboard'), false);
+  assert.equal(citizenHrefs.includes('/analytics'), false);
+  assert.equal(citizenHrefs.includes('/operations'), false);
+  assert.equal(citizenHrefs.includes('/governance'), false);
+
+  const stateGroups = getDashboardNavGroupsForRole('STATE_AUTHORITY');
+  const stateHrefs = stateGroups.flatMap(g => g.items.map(i => i.href));
+  assert.ok(stateHrefs.includes('/analytics'));
+  assert.ok(stateHrefs.includes('/dashboard'));
 });
 
 test('signed sessions reject tampering and unknown roles', async () => {
