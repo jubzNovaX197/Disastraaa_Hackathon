@@ -13,7 +13,7 @@ import type {
 } from '@/lib/analytics/types';
 import { isAuthorizedForOperations } from '@/lib/auth/roles';
 import type { Severity } from '@/types';
-import { ROLES, type Role } from '@/types/roles';
+import { ROLES, rolePermissions, type Role } from '@/types/roles';
 import { useCallback, useMemo, useState } from 'react';
 import { AlertAnalyticsPanel } from './AlertAnalyticsPanel';
 import { AnalyticsFilterBar } from './AnalyticsFilterBar';
@@ -100,7 +100,11 @@ export function SituationAnalyticsDashboard({
   }, []);
 
   // Authority gate check
-  if (!isAuthorizedForOperations(role)) {
+  const hasAnalyticsClearance =
+    isAuthorizedForOperations(role) &&
+    Boolean(rolePermissions[role]?.canViewNationalData || rolePermissions[role]?.canViewStateData);
+
+  if (!hasAnalyticsClearance) {
     return (
       <div className="p-4 sm:p-6 space-y-6 animate-fade-in max-w-[1600px] mx-auto">
         <AuthorityAccessGate

@@ -122,7 +122,7 @@ export function DashboardSidebar({ mobileOpen = false, onCloseMobile }: Dashboar
           setRealUser(null);
           if (typeof document !== 'undefined') {
             const active = parseRoleFromCookie(document.cookie);
-            setCurrentRole(active === ROLES.CITIZEN ? ROLES.STATE_AUTHORITY : active);
+            setCurrentRole(active);
           }
         }
       })
@@ -130,7 +130,7 @@ export function DashboardSidebar({ mobileOpen = false, onCloseMobile }: Dashboar
         if (!isMounted) return;
         if (typeof document !== 'undefined') {
           const active = parseRoleFromCookie(document.cookie);
-          setCurrentRole(active === ROLES.CITIZEN ? ROLES.STATE_AUTHORITY : active);
+          setCurrentRole(active);
         }
       });
 

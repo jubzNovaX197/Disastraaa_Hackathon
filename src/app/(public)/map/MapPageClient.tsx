@@ -14,7 +14,6 @@ import { demoDataset } from '@/data/demo';
 import type { AppEnvironment } from '@/lib/env';
 import { cn } from '@/lib/utils';
 import { Activity, Sparkles } from 'lucide-react';
-import { DemoScenarioControls } from '@/components/demo/DemoScenarioControls';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -232,12 +231,6 @@ export function MapPageClient({ initialDataset, environment }: MapPageClientProp
         <p role="alert" className="absolute top-14 left-1/2 -translate-x-1/2 z-40 bg-slate-900/95 text-rose-300 rounded-lg px-3 py-1.5 text-xs border border-rose-500/30 shadow-lg">
           {modeError}
         </p>
-      )}
-
-      {currentEnv === 'DEMO' && (
-        <aside aria-label="Simulation scenario" className="absolute bottom-6 left-3 sm:left-4 z-20 max-w-[calc(100vw-2rem)] sm:max-w-xs md:max-w-sm pointer-events-auto">
-          <DemoScenarioControls />
-        </aside>
       )}
 
       <DisasterMap

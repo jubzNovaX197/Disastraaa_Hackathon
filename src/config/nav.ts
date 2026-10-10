@@ -201,6 +201,21 @@ export function getDashboardNavGroupsForRole(role: Role = ROLES.STATE_AUTHORITY)
         },
       ];
 
+    case ROLES.CITIZEN:
+    case ROLES.REGISTERED_USER:
+      return [
+        {
+          label: 'Citizen Services',
+          items: [
+            { label: 'Live Situation Map', href: '/map',      icon: 'Map' },
+            { label: 'Active Alerts',       href: '/alerts',   icon: 'Bell' },
+            { label: 'Safe Transit',        href: '/travel',   icon: 'Truck' },
+            { label: 'Emergency Shelters',  href: '/shelters', icon: 'Home' },
+            { label: 'Citizen Reports',     href: '/reports',  icon: 'FileText' },
+          ],
+        },
+      ];
+
     case ROLES.STATE_AUTHORITY:
     default:
       return [
