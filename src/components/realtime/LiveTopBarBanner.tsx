@@ -26,21 +26,21 @@ export function LiveTopBarBanner({ className, onOpenFeed, onOpenMenu }: LiveTopB
   return (
     <div
       className={cn(
-        'flex items-center justify-between gap-3 px-3.5 py-2 rounded-xl text-xs',
+        'flex items-center justify-between gap-2 sm:gap-3 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-xs',
         'bg-slate-100/90 dark:bg-surface-card/90 border border-slate-200/80 dark:border-white/[0.08] shadow-xs backdrop-blur-md',
         className,
       )}
     >
       {/* Left: Latest Event Ticker */}
-      <div className="flex items-center gap-2 overflow-hidden flex-1 min-w-0">
+      <div className="flex items-center gap-1.5 sm:gap-2 overflow-hidden flex-1 min-w-0">
         {onOpenMenu && (
           <button
             type="button"
             onClick={onOpenMenu}
             aria-label="Open navigation sidebar"
-            className="lg:hidden p-1 -ml-1 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors flex-shrink-0"
+            className="lg:hidden p-1.5 -ml-1 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-white/10 active:scale-95 transition-all flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-cyan-500/40"
           >
-            <Menu className="w-4 h-4" />
+            <Menu className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
           </button>
         )}
         <span className="flex items-center gap-1 font-bold text-purple-600 dark:text-purple-400 flex-shrink-0 text-[11px] uppercase tracking-wider">
@@ -65,7 +65,7 @@ export function LiveTopBarBanner({ className, onOpenFeed, onOpenMenu }: LiveTopB
       </div>
 
       {/* Right: Live Status Indicator, Controls & Theme Mode */}
-      <div className="flex items-center gap-2 flex-shrink-0">
+      <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
         <LiveStatusIndicator />
         <div className="h-4 w-px bg-slate-200 dark:bg-white/10 hidden sm:block" />
         <ThemeToggle size="sm" />
